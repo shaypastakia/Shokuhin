@@ -16,7 +16,7 @@ public class Recipe implements Serializable{
 	private String title; //Primary Key - will be used as the file name
 	private ArrayList<String> ingredients = new ArrayList<String>(); //List of Ingredients
 	private ArrayList<String> methodSteps = new ArrayList<String>(); //List of steps in the method
-	private ArrayList<Integer> courses = new ArrayList<Integer>(); //List of courses this Recipe suits (use defined constants)
+	private int course = 5; //Course that this Recipe suits (use defined constants)
 	private ArrayList<String> tags = new ArrayList<String>(); //List of tags/keywords that apply to this Recipe
 	private int prepTime; //The amount of preparation time for the dish in mins
 	private int cookTime; //The amount of cooking time for the dish in mins (add to prepTime for Total Time)
@@ -55,12 +55,12 @@ public class Recipe implements Serializable{
 		this.methodSteps = methodSteps;
 	}
 
-	public ArrayList<Integer> getCourses() {
-		return courses;
+	public int getCourse() {
+		return course;
 	}
 
-	public void setCourses(ArrayList<Integer> courses) {
-		this.courses = courses;
+	public void setCourse(int course) {
+		this.course = course;
 	}
 
 	public ArrayList<String> getTags() {

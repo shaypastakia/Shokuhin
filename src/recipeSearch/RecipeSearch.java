@@ -1,6 +1,5 @@
 package recipeSearch;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -10,11 +9,15 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 import main.Module;
 import main.ShokuhinMain;
@@ -30,13 +33,20 @@ public class RecipeSearch extends Module {
 				JPanel searchPanel = new JPanel();
 					JPanel searchSelector = new JPanel();
 				JPanel goPanel = new JPanel();
+		JPanel advancedPanel = new JPanel();
+			JPanel advTextPanel = new JPanel();
+				JPanel ingredientsPanel = new JPanel();
+				JPanel tagsPanel = new JPanel();
+			JPanel othersPanel = new JPanel();
+				JPanel firstRowPanel = new JPanel();
+					JPanel coursesPanel = new JPanel();
+					JPanel totalTimePanel = new JPanel();
+				JPanel secondRowPanel = new JPanel();
+					JPanel servingsPanel = new JPanel();
+					JPanel ratingsPanel = new JPanel();
 				
-				
-	JPanel advancedPanel = new JPanel();
-		JPanel advTextPanel = new JPanel();
-		
 	//firstPanel fields
-	JTextField titleText = new JTextField(100);
+	JTextField titleText = new JTextField(80);
 	JButton searchButton = new JButton("Search");
 	JRadioButton simpleRadio = new JRadioButton("Title Search");
 	JRadioButton advancedRadio = new JRadioButton("Advanced Search");
@@ -44,6 +54,22 @@ public class RecipeSearch extends Module {
 	//advancedPanel fields
 	JTextField ingredientsText = new JTextField(100);
 	JTextField tagsText = new JTextField(100);
+	
+	JCheckBox breakfastCheckBox = new JCheckBox("Breakfast");
+	JCheckBox lunchCheckBox = new JCheckBox("Lunch");
+	JCheckBox dinnerCheckBox = new JCheckBox("Dinner");
+	JCheckBox dessertCheckBox = new JCheckBox("Dessert");
+	JCheckBox snackCheckBox = new JCheckBox("Snack");
+	JCheckBox generalCheckBox = new JCheckBox("General");
+	
+	JSpinner totalTime = new JSpinner();
+	JSpinner servings = new JSpinner();
+	
+	JCheckBox oneCheckBox = new JCheckBox("1");
+	JCheckBox twoCheckBox = new JCheckBox("2");
+	JCheckBox threeCheckBox = new JCheckBox("3");
+	JCheckBox fourCheckBox = new JCheckBox("4");
+	JCheckBox fiveCheckBox = new JCheckBox("5");
 	
 	public RecipeSearch(ShokuhinMain m) {
 		super(m, "Recipe Search");
@@ -56,6 +82,7 @@ public class RecipeSearch extends Module {
 		firstPanel.add(advancedPanel);
 		firstPanel.setLayout(new BoxLayout(firstPanel, BoxLayout.PAGE_AXIS));
 		add(firstPanel);
+		isAdvanced(false);
 	}
 	
 	public void createTopGui(){
@@ -100,6 +127,7 @@ public class RecipeSearch extends Module {
 		
 		//Add all panels together
 		goPanel.add(searchButton);
+		textPanel.add(new JLabel("Enter Title here: "));
 		textPanel.add(titleText);
 		titlePanel.add(textPanel);
 		titlePanel.add(controlPanel);
@@ -111,21 +139,74 @@ public class RecipeSearch extends Module {
 	}
 	
 	public void createBottomGui(){
+		//Set up the Layout and Border of the Advanced Search section
 		advancedPanel.setBorder(BorderFactory.createTitledBorder("Advanced Search"));
 		advancedPanel.setLayout(new BoxLayout(advancedPanel, BoxLayout.PAGE_AXIS));
 		
+		//Prepare the first part of the section
+		advTextPanel.setLayout(new BoxLayout(advTextPanel, BoxLayout.PAGE_AXIS));
+		ingredientsPanel.setLayout(new BoxLayout(ingredientsPanel, BoxLayout.LINE_AXIS));
+		tagsPanel.setLayout(new BoxLayout(tagsPanel, BoxLayout.LINE_AXIS));
+		tagsText.setMaximumSize(new Dimension(9999, 40));
+		ingredientsText.setMaximumSize(new Dimension(9999, 40));
 		
+		ingredientsPanel.add(new JLabel("Enter Ingredients here (Separated with Commas): "));
+		ingredientsPanel.add(ingredientsText);
+		tagsPanel.add(new JLabel("Enter Tags here (Separated with Commas):            "));
+		tagsPanel.add(tagsText);
+		
+		advTextPanel.add(tagsPanel);
+		advTextPanel.add(ingredientsPanel);
+		
+		//Prepare the second part of this section
+		firstRowPanel.setLayout(new BoxLayout(firstRowPanel, BoxLayout.LINE_AXIS));
+		secondRowPanel.setLayout(new BoxLayout(secondRowPanel, BoxLayout.LINE_AXIS));
+		
+		coursesPanel.setMaximumSize(new Dimension(9999, 80));
+		coursesPanel.add(breakfastCheckBox);
+		coursesPanel.add(lunchCheckBox);
+		coursesPanel.add(dinnerCheckBox);
+		coursesPanel.add(dessertCheckBox);
+		coursesPanel.add(snackCheckBox);
+		coursesPanel.add(generalCheckBox);
+		
+		SpinnerNumberModel timeModel = new SpinnerNumberModel(0, 0, 999, 1);
+		totalTime.setModel(timeModel);
+		totalTimePanel.setMaximumSize(new Dimension(9999, 80));
+		totalTimePanel.add(totalTime);
+		
+		coursesPanel.setBorder(BorderFactory.createTitledBorder("Course"));
+		totalTimePanel.setBorder(BorderFactory.createTitledBorder("Total Time"));
+		firstRowPanel.add(coursesPanel);
+		firstRowPanel.add(totalTimePanel);
+		
+		SpinnerNumberModel servingsModel = new SpinnerNumberModel(0, 0, 16, 1);
+		servings.setModel(servingsModel);
+		servingsPanel.setMaximumSize(new Dimension(9999, 80));
+		servingsPanel.add(servings);
+		
+		ratingsPanel.setMaximumSize(new Dimension(9999, 80));
+		ratingsPanel.add(oneCheckBox);
+		ratingsPanel.add(twoCheckBox);
+		ratingsPanel.add(threeCheckBox);
+		ratingsPanel.add(fourCheckBox);
+		ratingsPanel.add(fiveCheckBox);
+		
+		servingsPanel.setBorder(BorderFactory.createTitledBorder("Servings"));
+		ratingsPanel.setBorder(BorderFactory.createTitledBorder("Rating"));
+		secondRowPanel.add(servingsPanel);
+		secondRowPanel.add(ratingsPanel);
 		
 		advancedPanel.add(advTextPanel);
+		advancedPanel.add(firstRowPanel);
+		advancedPanel.add(secondRowPanel);
 	}
 	
 	public void isAdvanced(boolean adv){
 		if (adv)
-			for (Component c : advancedPanel.getComponents())
-				c.setEnabled(false);
+				advancedPanel.setVisible(true);
 		else
-			for (Component c : advancedPanel.getComponents())
-				c.setEnabled(true);
+				advancedPanel.setVisible(false);
 	}
 
 	@Override
