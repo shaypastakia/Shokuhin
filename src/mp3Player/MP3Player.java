@@ -12,13 +12,11 @@ public class MP3Player extends Module {
 
 	public MP3Player(ShokuhinMain m) {
 		super(m, "MP3 Player");
-		// TODO Auto-generated constructor stub
-		add(new JLabel("Tom Hiddleston"));
+		add(new JLabel("Tom Hiddleston is an absolute babe. He's the sexiest Loki you'll ever see."));
 	}
 
 	@Override
 	public boolean close() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
