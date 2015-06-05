@@ -4,25 +4,31 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import main.Module;
 import main.ShokuhinMain;
+import recipe.RecipeMethods;
 
-public class RecipeSearch extends Module {
+public class RecipeSearch extends Module implements ActionListener{
 	private static final long serialVersionUID = -8627032843621798303L;
 
 	//Do not adjust Indents! Represents Nesting of Panels
@@ -44,6 +50,11 @@ public class RecipeSearch extends Module {
 				JPanel secondRowPanel = new JPanel();
 					JPanel servingsPanel = new JPanel();
 					JPanel ratingsPanel = new JPanel();
+	JPanel secondPanel = new JPanel();
+		JScrollPane searchResultPanel = new JScrollPane();
+		JPanel searchControlPanel = new JPanel();
+			JPanel searchButtonPanel = new JPanel();
+//			JPanel searchImagePanel = new JPanel();
 				
 	//firstPanel fields
 	JTextField titleText = new JTextField(80);
@@ -71,6 +82,14 @@ public class RecipeSearch extends Module {
 	JCheckBox fourCheckBox = new JCheckBox("4");
 	JCheckBox fiveCheckBox = new JCheckBox("5");
 	
+	//Second Panel fields
+	DefaultListModel<String> listModel = new DefaultListModel<String>();
+	JList<String> searchResultList = new JList<String>(listModel);
+	JButton searchBackButton = new JButton("Return to Search");
+	JButton searchOpenButton = new JButton("Open Selected Recipes in Recipe Viewer");
+	JButton searchEditButton = new JButton("Edit Selected Recipes in Recipe Editor");
+	
+	
 	public RecipeSearch(ShokuhinMain m) {
 		super(m, "Recipe Search");
 		
@@ -82,10 +101,12 @@ public class RecipeSearch extends Module {
 		firstPanel.add(advancedPanel);
 		firstPanel.setLayout(new BoxLayout(firstPanel, BoxLayout.PAGE_AXIS));
 		add(firstPanel);
-		isAdvanced(false);
+		showAdvanced(false);
 	}
 	
 	public void createTopGui(){
+		
+		//Format JPanels
 		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.LINE_AXIS));
 		
 		titlePanel.setBorder(BorderFactory.createTitledBorder("Recipe Search"));
@@ -99,12 +120,12 @@ public class RecipeSearch extends Module {
 		searchSelector.setBorder(BorderFactory.createTitledBorder("Search Type"));
 		searchSelector.setLayout(new BoxLayout(searchSelector, BoxLayout.PAGE_AXIS));
 		
-		//Add listeners to Radio Buttons
+		//Add listeners to Controls
 		simpleRadio.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				isAdvanced(false);
+				showAdvanced(false);
 			}
 		});
 		
@@ -112,7 +133,20 @@ public class RecipeSearch extends Module {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				isAdvanced(true);
+				showAdvanced(true);
+			}
+		});
+		
+		titleText.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent arg0) {}
+			@Override
+			public void keyPressed(KeyEvent arg0) {}
+			
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER)
+					actionPerformed(null);
 			}
 		});
 		
@@ -123,7 +157,8 @@ public class RecipeSearch extends Module {
 		simpleRadio.setSelected(true);
 		
 		//Format the Search Button
-		searchButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		searchButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+		searchButton.addActionListener(this);
 		
 		//Add all panels together
 		goPanel.add(searchButton);
@@ -206,19 +241,62 @@ public class RecipeSearch extends Module {
 		advancedPanel.add(secondRowPanel);
 	}
 	
-	public void isAdvanced(boolean adv){
+	/**
+	 * Generate the Interface for the Search Results
+	 */
+	private void createSecondGui(){
+		searchResultPanel.setViewportView(searchResultList);
+		
+		searchControlPanel.setLayout(new BoxLayout(searchControlPanel, BoxLayout.PAGE_AXIS));
+		searchControlPanel.add(searchBackButton);
+		searchControlPanel.add(searchOpenButton);
+		searchControlPanel.add(searchEditButton);
+		
+		secondPanel.setLayout(new BoxLayout(secondPanel, BoxLayout.LINE_AXIS));
+		
+		searchResultPanel.setBorder(BorderFactory.createTitledBorder("Results"));
+		searchControlPanel.setBorder(BorderFactory.createTitledBorder("Options"));
+		
+		searchBackButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		searchEditButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		searchOpenButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		
+		searchBackButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				remove(secondPanel);
+				add(firstPanel);
+				repaint();
+			}
+		});
+		
+		secondPanel.add(searchResultPanel);
+		secondPanel.add(searchControlPanel);
+	}
+	
+	/**
+	 * Sets the visibility of the Advanced Criteria
+	 * @param adv True to show Advanced criteria, False to hide
+	 */
+	public void showAdvanced(boolean adv){
 		if (adv)
 				advancedPanel.setVisible(true);
 		else
 				advancedPanel.setVisible(false);
 	}
 
+	/**
+	 * No cleanup to perform. Always permit closing
+	 */
 	@Override
 	public boolean close() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * No functions. Return empty Menu
+	 */
 	@Override
 	public JMenu getFunctionMenu() {
 		JMenu menu = new JMenu("Recipe Search");
@@ -230,4 +308,50 @@ public class RecipeSearch extends Module {
 		return menu;
 	}
 
+	/**
+	 * Action Listener for Search Button
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		remove(firstPanel);
+		createSecondGui();
+		add(secondPanel);
+		
+		if (simpleRadio.isSelected())
+			simpleSearch();
+		else
+			advancedSearch();
+		
+		paintAll(getGraphics());
+	}
+
+	/**
+	 * Search by Title only
+	 */
+	public void simpleSearch(){
+		String title = titleText.getText().toLowerCase();
+		boolean succeeded = false;
+		
+		for (String s : RecipeMethods.getRecipeFileNames()){
+			if (s.toLowerCase().contains(title)){
+				listModel.addElement(s);
+				if (!succeeded)
+					succeeded = true;
+			}
+		}
+		
+		if (!succeeded){
+			listModel.addElement("(No Results Found)");
+			searchEditButton.setEnabled(false);
+			searchOpenButton.setEnabled(false);
+		}
+		
+	}
+	
+	/**
+	 * Search using any combination of Advanced Criteria
+	 */
+	public void advancedSearch(){
+		
+	}
 }

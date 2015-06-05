@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.function.Predicate;
 
 import javax.swing.JOptionPane;
 
@@ -70,6 +72,21 @@ public class RecipeMethods {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	/**
+	 * Get all Filenames from the Recipes folder
+	 * @return An ArrayList of Strings, containing the Recipe names
+	 */
+	public static ArrayList<String> getRecipeFileNames(){
+		File parent = new File("./Shokuhin/Recipes/");
+		ArrayList<String> files = new ArrayList<String>();
+		for (File file: parent.listFiles()){
+			if (file.isFile() && file.getAbsolutePath().endsWith(".rec"))
+				files.add(file.getName().replaceAll(".rec", ""));
+		}
+		
+		return files;
 	}
 
 }
