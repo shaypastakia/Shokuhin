@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -26,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 
 import main.Module;
 import main.ShokuhinMain;
+import recipe.Recipe;
 import recipe.RecipeMethods;
 
 public class RecipeSearch extends Module implements ActionListener{
@@ -209,7 +212,7 @@ public class RecipeSearch extends Module implements ActionListener{
 		SpinnerNumberModel timeModel = new SpinnerNumberModel(0, 0, 999, 1);
 		totalTime.setModel(timeModel);
 		totalTimePanel.setMaximumSize(new Dimension(9999, 80));
-		totalTimePanel.add(new JLabel("Enter a maximum cooking. Select 0 for any time: "));
+		totalTimePanel.add(new JLabel("Enter a maximum cooking Time. Select 0 for any time: "));
 		totalTimePanel.add(totalTime);
 		
 		coursesPanel.setBorder(BorderFactory.createTitledBorder("Course"));
@@ -265,6 +268,7 @@ public class RecipeSearch extends Module implements ActionListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				listModel.clear();
 				remove(secondPanel);
 				add(firstPanel);
 				repaint();
@@ -341,9 +345,7 @@ public class RecipeSearch extends Module implements ActionListener{
 		}
 		
 		if (!succeeded){
-			listModel.addElement("(No Results Found)");
-			searchEditButton.setEnabled(false);
-			searchOpenButton.setEnabled(false);
+			failed();
 		}
 		
 	}
@@ -351,7 +353,34 @@ public class RecipeSearch extends Module implements ActionListener{
 	/**
 	 * Search using any combination of Advanced Criteria
 	 */
-	public void advancedSearch(){
+	private void advancedSearch(){
+		String title = titleText.getText().toLowerCase();
+		ArrayList<String> matches = new ArrayList<String>();
+		ArrayList<Recipe> recipeMatches = new ArrayList<Recipe>();
 		
+		//Get the name of all Recipes matching the Title Search
+		for (String s : RecipeMethods.getRecipeFileNames()){
+			if (s.toLowerCase().contains(title)){
+				matches.add(s);
+			}
+		}
+		
+		if (matches.isEmpty()){
+			failed();
+			return;
+		}
+		
+		//Load in all matched Recipes as Objects
+		for (String s : matches){
+			recipeMatches.add(RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec")));
+		}
+		
+		//At this stage, recipeMatches is filled with Recipes that match the 
+	}
+	
+	private void failed(){
+		listModel.addElement("(No Results Found)");
+		searchEditButton.setEnabled(false);
+		searchOpenButton.setEnabled(false);
 	}
 }
