@@ -135,13 +135,18 @@ public class TimerBar extends JPanel {
 	
 	/**
 	 * Decrement the secs Spinner. If it has reached Zero, call decrementMins()
+	 * <br />
+	 * If all fields have reached Zero, call alert()
 	 */
 	private void decrementSecs(){
 		int val = (int) secs.getValue();
-		if (val > 0)
+		if (val > 0) {
 			secs.setValue(val-1);
-		else
+			if ((int) secs.getValue() == 0 && (int) mins.getValue() == 0 && (int) hour.getValue() == 0)
+				alert();	
+		} else {
 			decrementMins();
+		}
 	}
 	
 	/**
@@ -157,7 +162,7 @@ public class TimerBar extends JPanel {
 	}
 	
 	/**
-	 * Decrement the hour Spinner. If it has reached Zero, produce an audiovisual alarm and stop the Timer
+	 * Decrement the hour Spinner. If is has reached Zero, call alert()
 	 */
 	private void decrementHour(){
 		int val = (int) hour.getValue();
@@ -166,10 +171,17 @@ public class TimerBar extends JPanel {
 			secs.setValue(59);
 			hour.setValue(val-1);
 		} else {
-			MidiPlayer.play(MidiSongs.SPIRITED_AWAY_ALWAYS_WITH_ME); //audio
-			setBackground(ShokuhinMain.REDRUM_RED); //visual
-			timer.cancel();
+			alert();
 		}
+	}
+	
+	/**
+	 *  Produce an audiovisual alarm and stop the Timer
+	 */
+	private void alert(){
+		MidiPlayer.play(MidiSongs.SPIRITED_AWAY_ALWAYS_WITH_ME); //audio
+		setBackground(ShokuhinMain.REDRUM_RED); //visual
+		timer.cancel();
 	}
 
 }

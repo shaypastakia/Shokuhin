@@ -163,6 +163,7 @@ public class RecipeSearch extends Module {
 		secondRowPanel.setLayout(new BoxLayout(secondRowPanel, BoxLayout.LINE_AXIS));
 		
 		coursesPanel.setMaximumSize(new Dimension(9999, 80));
+		coursesPanel.add(new JLabel("Select allowed Courses. Leave blank for any course: "));
 		coursesPanel.add(breakfastCheckBox);
 		coursesPanel.add(lunchCheckBox);
 		coursesPanel.add(dinnerCheckBox);
@@ -173,6 +174,7 @@ public class RecipeSearch extends Module {
 		SpinnerNumberModel timeModel = new SpinnerNumberModel(0, 0, 999, 1);
 		totalTime.setModel(timeModel);
 		totalTimePanel.setMaximumSize(new Dimension(9999, 80));
+		totalTimePanel.add(new JLabel("Enter a maximum cooking. Select 0 for any time: "));
 		totalTimePanel.add(totalTime);
 		
 		coursesPanel.setBorder(BorderFactory.createTitledBorder("Course"));
@@ -183,9 +185,11 @@ public class RecipeSearch extends Module {
 		SpinnerNumberModel servingsModel = new SpinnerNumberModel(0, 0, 16, 1);
 		servings.setModel(servingsModel);
 		servingsPanel.setMaximumSize(new Dimension(9999, 80));
+		servingsPanel.add(new JLabel("Select a number of Servings. Select 0 for any serving: "));
 		servingsPanel.add(servings);
 		
 		ratingsPanel.setMaximumSize(new Dimension(9999, 80));
+		ratingsPanel.add(new JLabel("Select allowed Ratings. Leave blank for any rating: "));
 		ratingsPanel.add(oneCheckBox);
 		ratingsPanel.add(twoCheckBox);
 		ratingsPanel.add(threeCheckBox);
