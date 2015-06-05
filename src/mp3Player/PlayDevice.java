@@ -8,99 +8,96 @@ public class PlayDevice {
 
 	/**
 	 * Player to play the songs, as well as an array list of songs for a
-	 * playlist
+	 * playlist.
 	 */
 	private Player p;
 	private ArrayList<String> songs;
 
 	/**
-	 * Struct used to depict the state of the player
-	 *
+	 * Store the current song number and the position when paused
 	 */
-	private enum PLAYER_STATE {
-		PLAYING, STOPPED, PAUSED;
-	};
+	private int songNumber;
+	private long pos;
 
 	/**
-	 * Stores the last state of the player before pausing
+	 * Signifies if the player has been paused or stopped
 	 */
-	private PlayerStorage ps;
-
-	/**
-	 * Stores the current state of the player
-	 */
-	private PLAYER_STATE state;
+	private boolean PAUSED = false;
+	private boolean STOPPED = false;
 
 	public PlayDevice() {
 		p = new Player();
 		songs = new ArrayList<String>();
-		state = PLAYER_STATE.STOPPED;
-		ps = null;
+		songNumber = 0;
+		pos = 0;
 	}
 
 	/**
-	 * Plays the current playlist
-	 */
-	public synchronized void play() {
-		// if we're starting a fresh playlist, and have nothing saved from a
-		// previous pause
-		if (ps == null) {
-			for (String song : songs) {
-				p.setSourceLocation(song);
-				p.play();
-				state = PLAYER_STATE.PLAYING;
-				while (!p.isEndOfMediaReached())
-					;
-			}
-		}
-	}
-
-	/**
-	 * Pauses the state of the player and stores it
+	 * Functions which cause the pausing, stopping and playing, executed in
+	 * separate threads when buttons are pressed
 	 */
 	public synchronized void pause() {
-		if (state == PLAYER_STATE.PLAYING) {
-			p.pause();
+		PAUSED = true;
+	}
 
-			ps = new PlayerStorage(p.getSourceLocation(),
-					p.getCurrentPosition());
+	public synchronized void stop() {
+		STOPPED = true;
+	}
 
-			state = PLAYER_STATE.PAUSED;
-		}
+	public synchronized void play() {
+		PAUSED = false;
+		STOPPED = false;
 	}
 
 	/**
-	 * Resumes the state of the player and calls play once more
+	 * Stops the player
 	 */
-	public synchronized void resume() {
-		if (state == PLAYER_STATE.PAUSED) {
-			// Find the place where we left off in the array
-			int i = 0;
-			while (i < songs.size()) {
-				if (songs.get(i).compareTo(ps.getCurrentSong()) != 0) {
-					i++;
-				} else {
-					break;
-				}
+	private void stopPlayer() {
+		p.pause();
+		songNumber = 0;
+		pos = 0;
+	}
 
+	/**
+	 * Pauses the player
+	 */
+	private void pausePlayer() {
+		p.pause();
+		pos = p.getCurrentPosition();
+	}
+
+	/**
+	 * Plays a single song
+	 * 
+	 * @return returns true if the player has been interrupted
+	 */
+	public synchronized boolean playSong() {
+		p.setSourceLocation(songs.get(songNumber));
+		p.seek(pos);
+		p.play();
+		while (!p.isEndOfMediaReached()) {
+			if (PAUSED) {
+				pausePlayer();
+				return true;
 			}
-			// Resume playing the song
-			p.setSourceLocation(ps.getCurrentSong());
-			p.seek(ps.getPosition());
-			p.play();
-			state = PLAYER_STATE.PLAYING;
-			while (!p.isEndOfMediaReached());
 
-			i++;
-
-			// Then loop through the rest of the list
-			while (i < songs.size()) {
-				p.setSourceLocation(songs.get(i));
-				p.play();
-				state = PLAYER_STATE.PLAYING;
-				while (!p.isEndOfMediaReached());
+			if (STOPPED) {
+				stopPlayer();
+				return true;
 			}
+		}
+		songNumber++;
+		return false;
+	}
 
+	/**
+	 * Plays a playlist, run this in a thread
+	 */
+	public synchronized void playPlaylist() {
+		while (songNumber < songs.size()) {
+			if (playSong())
+				return;
 		}
 	}
+
 }
