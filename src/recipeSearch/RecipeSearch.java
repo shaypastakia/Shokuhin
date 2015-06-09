@@ -8,6 +8,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -30,6 +33,8 @@ import main.Module;
 import main.ShokuhinMain;
 import recipe.Recipe;
 import recipe.RecipeMethods;
+import recipeEditor.RecipeEditor;
+import recipeViewer.RecipeViewer;
 
 public class RecipeSearch extends Module implements ActionListener{
 	private static final long serialVersionUID = -8627032843621798303L;
@@ -223,7 +228,7 @@ public class RecipeSearch extends Module implements ActionListener{
 		SpinnerNumberModel servingsModel = new SpinnerNumberModel(0, 0, 16, 1);
 		servings.setModel(servingsModel);
 		servingsPanel.setMaximumSize(new Dimension(9999, 80));
-		servingsPanel.add(new JLabel("Select a number of Servings. Select 0 for any serving: "));
+		servingsPanel.add(new JLabel("Select a minimum number of Servings. Select 0 for any serving: "));
 		servingsPanel.add(servings);
 		
 		ratingsPanel.setMaximumSize(new Dimension(9999, 80));
@@ -264,6 +269,7 @@ public class RecipeSearch extends Module implements ActionListener{
 		searchEditButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		searchOpenButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		
+		//Add Action Listeners to buttons on second GUI
 		searchBackButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -272,6 +278,38 @@ public class RecipeSearch extends Module implements ActionListener{
 				remove(secondPanel);
 				add(firstPanel);
 				repaint();
+			}
+		});
+		
+		searchOpenButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (searchResultList.isSelectionEmpty()){
+					java.awt.Toolkit.getDefaultToolkit().beep();
+					return;
+				} else {
+					List<String> selection = searchResultList.getSelectedValuesList();
+					for (String s : selection){
+						getPar().openTab(new RecipeViewer(getPar(), RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec"))));
+					}
+				}
+			}
+		});
+		
+		searchEditButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (searchResultList.isSelectionEmpty()){
+					java.awt.Toolkit.getDefaultToolkit().beep();
+					return;
+				} else {
+					List<String> selection = searchResultList.getSelectedValuesList();
+					for (String s : selection){
+						getPar().openTab(new RecipeEditor(getPar(), RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec"))));
+					}
+				}
 			}
 		});
 		
@@ -345,15 +383,87 @@ public class RecipeSearch extends Module implements ActionListener{
 		}
 		
 		if (!succeeded){
-			failed();
+			failed("Simple Search");
 		}
 		
 	}
 	
 	/**
 	 * Search using any combination of Advanced Criteria
+	 * <br />
+	 * Calls a series of methods to traverse through search criteria
 	 */
 	private void advancedSearch(){
+		//Perform a simple title search
+		ArrayList<Recipe> resultSet = advancedTitleSearch();
+		//If there are no results, perform fail procedure and do not continue
+		if (resultSet.size() == 0){
+			failed("Title Search");
+			return;
+		}
+		
+		//If the user specified tags, perform a tag search, otherwise skip it
+		if (!tagsText.getText().equals("")){
+			resultSet = advancedTagSearch(resultSet);
+		}
+		//If there are no results, perform fail procedure and do not continue
+		if (resultSet.size() == 0){
+			failed("Tag Search");
+			return;
+		}
+		
+		//If the user specified ingredients, perform an ingredient search, otherwise skip it
+		if (!ingredientsText.getText().equals("")){
+			resultSet = advancedIngredientSearch(resultSet);
+		}
+		//If there are no results, perform fail procedure and do not continue
+		if (resultSet.size() == 0){
+			failed("Ingredient Search");
+			return;
+		}
+		
+		//Filter down results based on Courses
+		resultSet = advancedCourseSearch(resultSet);
+		//If there are no results, perform fail procedure and do not continue
+		if (resultSet.size() == 0){
+			failed("Course Search");
+			return;
+		}
+		
+		//Filter down results based on Total Time
+		resultSet = advancedTotalTimeSearch(resultSet);
+		//If there are no results, perform fail procedure and do not continue
+		if (resultSet.size() == 0){
+			failed("Total Time Search");
+			return;
+		}
+		
+		//Filter down results based on Servings
+		resultSet = advancedServingsSearch(resultSet);
+		//If there are no results, perform fail procedure and do not continue
+		if (resultSet.size() == 0){
+			failed("Servings Search");
+			return;
+		}
+		
+		//Filter down results based on Ratings
+		resultSet = advancedRatingsSearch(resultSet);
+		//If there are no results, perform fail procedure and do not continue
+		if (resultSet.size() == 0){
+			failed("Ratings Search");
+			return;
+		}
+		
+		for (Recipe r : resultSet){
+			listModel.addElement(r.getTitle());
+		}
+	}
+	
+	/**
+	 * Initial step for the Advanced Search. Search filenames, then produce Recipes from the results
+	 * @return An ArrayList of Recipes that pass a simple title search
+	 */
+	private ArrayList<Recipe> advancedTitleSearch(){
 		String title = titleText.getText().toLowerCase();
 		ArrayList<String> matches = new ArrayList<String>();
 		ArrayList<Recipe> recipeMatches = new ArrayList<Recipe>();
@@ -365,22 +475,218 @@ public class RecipeSearch extends Module implements ActionListener{
 			}
 		}
 		
-		if (matches.isEmpty()){
-			failed();
-			return;
-		}
-		
 		//Load in all matched Recipes as Objects
 		for (String s : matches){
 			recipeMatches.add(RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec")));
 		}
-		
-		//At this stage, recipeMatches is filled with Recipes that match the 
+		return recipeMatches;
 	}
 	
-	private void failed(){
+	/**
+	 * Second step for Advanced Search. Check user-specified tags to find matches.
+	 * @param recipes A list of Recipes to filter.
+	 * @return A list of Recipes filtered by tags
+	 */
+	private ArrayList<Recipe> advancedTagSearch(ArrayList<Recipe> recipes){
+		ArrayList<Recipe> filtered = new ArrayList<Recipe>();
+		
+		//Filter out any Recipes that don't match the tags
+		String[] userTags = tagsText.getText().split(",");
+		for (int i = 0; i < userTags.length; i++){
+			userTags[i] = userTags[i].toLowerCase();
+		} //Have the user's search tags in lower case
+		
+		//Format all Recipe's tags as above with user search tags
+		for (Recipe r : recipes){
+			String[] recipeTags = (String[]) r.getTags().toArray(new String[r.getTags().size()]);
+			for (int i = 0; i < recipeTags.length; i++){
+				recipeTags[i] = recipeTags[i].toLowerCase();
+			}
+			r.setTags(new ArrayList<String>(Arrays.asList(recipeTags)));
+		} //Have the User Tags and Recipe tags formatted
+		
+		//Add a recipe if it contains any of the tags
+		for (Recipe r : recipes){
+			breakloop:
+			for (String s : userTags){
+				for (String s2 : r.getTags()){
+					if (s2.contains(s)){
+						filtered.add(r);
+						break breakloop;
+					}
+				}
+			}
+		} //Have the Recipes that pass the given Tags
+		
+		return filtered;
+	}
+	
+	/**
+	 * Third step for Advanced Search. Check user-specified ingredients to find matches.
+	 * @param recipes A list of Recipes to filter.
+	 * @return A list of Recipes filtered by ingredients
+	 */
+	private ArrayList<Recipe> advancedIngredientSearch(ArrayList<Recipe> recipes){
+		ArrayList<Recipe> filtered = new ArrayList<Recipe>();
+		
+		String[] userIngredients = ingredientsText.getText().split(",");
+		for (int i = 0; i < userIngredients.length; i++){
+			userIngredients[i] = userIngredients[i].toLowerCase();
+		} //Have the user's search Ingredients in lower case
+		
+		//Format all Recipe's Ingredients as above with user search Ingredients
+		for (Recipe r : recipes){
+			String[] recipeIngredients= (String[]) r.getIngredients().toArray(new String[r.getIngredients().size()]);
+			for (int i = 0; i < recipeIngredients.length; i++){
+				recipeIngredients[i] = recipeIngredients[i].toLowerCase();
+			}
+			r.setIngredients(new ArrayList<String>(Arrays.asList(recipeIngredients)));
+		} //Have the User Ingredients and Recipe Ingredients formatted
+		
+		//Add a recipe if it contains any of the Ingredients
+		for (Recipe r : recipes){
+			breakloop:
+			for (String s : userIngredients){
+				for (String s2 : r.getIngredients()){
+					if (s2.contains(s)){
+						filtered.add(r);
+						break breakloop;
+					}
+				}
+			}
+		} //Have the Recipes that pass the given Ingredients
+		return filtered;
+	}
+	
+	/**
+	 * Fourth step for Advanced Search. Filter down Recipes to selected Courses
+	 * @param recipes A list of Recipes to filter.
+	 * @return A list of Recipes filtered by course
+	 */
+	private ArrayList<Recipe> advancedCourseSearch(ArrayList<Recipe> recipes){
+		ArrayList<Integer> courses = new ArrayList<Integer>();
+		if (breakfastCheckBox.isSelected())
+			courses.add(Recipe.BREAKFAST);
+		if (lunchCheckBox.isSelected())
+			courses.add(Recipe.LUNCH);
+		if (dinnerCheckBox.isSelected())
+			courses.add(Recipe.DINNER);
+		if (dessertCheckBox.isSelected())
+			courses.add(Recipe.DESSERT);
+		if (snackCheckBox.isSelected())
+			courses.add(Recipe.SNACK);
+		if (generalCheckBox.isSelected())
+			courses.add(Recipe.GENERAL);
+		
+		if (courses.isEmpty())
+			return recipes;
+		
+		recipes.removeIf(new Predicate<Recipe>() {
+
+			@Override
+			public boolean test(Recipe t) {
+				if (courses.contains(t.getCourse()))
+					return false;
+				
+				return true;
+			}
+			
+		});
+		
+		return recipes;
+	}
+	
+	/**
+	 * Fifth step for Advanced Search. Filter down Recipes based on Total Time
+	 * @param recipes A list of Recipes to filter.
+	 * @return A list of Recipes filtered by total time
+	 */
+	private ArrayList<Recipe> advancedTotalTimeSearch(ArrayList<Recipe> recipes){
+		if ((Integer) totalTime.getValue() == 0)
+			return recipes;
+		
+		recipes.removeIf(new Predicate<Recipe>() {
+
+			@Override
+			public boolean test(Recipe t) {
+				if ((t.getPrepTime() + t.getCookTime()) <= (Integer) totalTime.getValue())
+					return false;
+				
+				return true;
+			}
+			
+		});
+		
+		return recipes;
+	}
+	
+	/**
+	 * Sixth step for Advanced Search. Filter down Recipes based on Servings
+	 * @param recipes A list of Recipes to filter.
+	 * @return A list of Recipes filtered by servings
+	 */
+	private ArrayList<Recipe> advancedServingsSearch(ArrayList<Recipe> recipes){
+		if ((Integer) servings.getValue() == 0)
+			return recipes;
+		
+		recipes.removeIf(new Predicate<Recipe>() {
+
+			@Override
+			public boolean test(Recipe t) {
+				if ((t.getServings() < (Integer) servings.getValue()))
+					return true;
+				
+				return false;
+			}
+			
+		});
+		
+		return recipes;
+	}
+	
+	/**
+	 * Seventh step for Advanced Search. Filter down Recipes based on selected Ratings
+	 * @param recipes A list of Recipes to filter.
+	 * @return A list of Recipes filtered by ratings
+	 */
+	private ArrayList<Recipe> advancedRatingsSearch(ArrayList<Recipe> recipes){
+		ArrayList<Integer> ratings = new ArrayList<Integer>();
+		if (oneCheckBox.isSelected())
+			ratings.add(1);
+		if (twoCheckBox.isSelected())
+			ratings.add(2);
+		if (threeCheckBox.isSelected())
+			ratings.add(3);
+		if (fourCheckBox.isSelected())
+			ratings.add(4);
+		if (fiveCheckBox.isSelected())
+			ratings.add(5);
+		
+		if (ratings.isEmpty())
+			return recipes;
+		
+		recipes.removeIf(new Predicate<Recipe>() {
+
+			@Override
+			public boolean test(Recipe t) {
+				if (ratings.contains(t.getRating()))
+					return false;
+				
+				return true;
+			}
+			
+		});
+		
+		return recipes;
+	}
+	
+	/**
+	 * The action for when there are no Search Results
+	 */
+	private void failed(String s){
 		listModel.addElement("(No Results Found)");
 		searchEditButton.setEnabled(false);
 		searchOpenButton.setEnabled(false);
+		System.out.println("Failed on: " + s);
 	}
 }
