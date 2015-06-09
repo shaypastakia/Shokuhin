@@ -6,12 +6,13 @@ import javax.swing.JMenuItem;
 
 import main.Module;
 import main.ShokuhinMain;
+import recipe.Recipe;
 
 public class RecipeEditor extends Module {
 	private static final long serialVersionUID = 306718353578602520L;
 
-	public RecipeEditor(ShokuhinMain m) {
-		super(m, "Recipe Editor");
+	public RecipeEditor(ShokuhinMain m, Recipe recipe) {
+		super(m, recipe.getTitle());
 		// TODO Auto-generated constructor stub
 		add(new JLabel("Jessica Chastain"));
 	}

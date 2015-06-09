@@ -2,6 +2,10 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -82,7 +86,7 @@ public class ShokuhinMain {
 		//Create a Tabbed Pane to display tabs for all Modules
 		tabPane = new JTabbedPane();
 
-		//Add a listener to set the Module Menu on the Frame to change according to the current tab
+		//Add a listener to set the Dynamic Menu on the Frame to change according to the current tab
 		tabPane.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -132,21 +136,6 @@ public class ShokuhinMain {
 		if (((Module) current).close()){
 			tabPane.remove((Component) current);
 		}
-	}
-
-	/**
-	 * 
-	 * @param m (A class to check if its Module Type already exists)
-	 * @return true, if the Module is already open. Additionally gives that tab focus.
-	 */
-	private boolean tabExists(Class<?> m) {
-		for (Component c : tabPane.getComponents()){
-			if (c.getClass() == m){
-				tabPane.setSelectedComponent(c);
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	/**

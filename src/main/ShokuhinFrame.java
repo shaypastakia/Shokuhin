@@ -14,6 +14,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import recipe.Recipe;
 import recipeEditor.RecipeEditor;
 import recipeSearch.RecipeSearch;
 import recipeViewer.RecipeViewer;
@@ -139,11 +140,11 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 			switch(e.getActionCommand()) {
 			case "Test": main.openTab(new Test(main));
 				break;
-			case "Recipe Editor": main.openTab(new RecipeEditor(main));
+			case "Recipe Editor": main.openTab(new RecipeEditor(main, new Recipe("test")));
 				break;
 			case "Recipe Search": main.openTab(new RecipeSearch(main));
 				break;
-			case "Recipe Viewer": main.openTab(new RecipeViewer(main));
+			case "Recipe Viewer": main.openTab(new RecipeViewer(main, new Recipe("test")));
 				break;
 			case "MP3 Player": main.openTab(new MP3Player(main));
 			}

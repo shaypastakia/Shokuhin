@@ -3,6 +3,7 @@ package recipe;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -70,6 +71,17 @@ public class RecipeMethods {
 			ShokuhinMain.displayMessage("Failed to write Recipe", "Returned the error: " + e.getMessage(), JOptionPane.WARNING_MESSAGE);
 			e.printStackTrace();
 			return null;
+		}
+	}
+	
+	public static boolean deleteRecipe(Recipe recipe){
+		File file = new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec");
+		try {
+			return Files.deleteIfExists(file.toPath());
+		} catch (IOException e) {
+			ShokuhinMain.displayMessage("Failed to delete Recipe", "Returned the error: " + e.getMessage(), JOptionPane.WARNING_MESSAGE);
+			e.printStackTrace();
+			return false;
 		}
 	}
 	
