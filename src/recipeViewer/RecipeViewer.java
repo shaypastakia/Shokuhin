@@ -23,9 +23,9 @@ public class RecipeViewer extends Module {
 		text.append("\nIngredients: ");
 		for (String s : recipe.getIngredients())
 			text.append(s + ", ");
-		text.append("\nIngredients: ");
+		text.append("\nMethod: ");
 		for (String s : recipe.getMethodSteps())
-			text.append(s + ", ");
+			text.append(s + "\n ");
 		text.append("\nCourse: " + recipe.getCourse() + "\nTotal Time: " + recipe.getPrepTime() + " + " + recipe.getCookTime() + "\n");
 		text.append("Servings: " + recipe.getServings() + "\nRating: " + recipe.getRating());
 	}

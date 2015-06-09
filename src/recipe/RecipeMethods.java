@@ -2,12 +2,16 @@ package recipe;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +19,11 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import main.ShokuhinMain;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class RecipeMethods {
 	
@@ -98,6 +107,66 @@ public class RecipeMethods {
 		}
 		
 		return files;
+	}
+	
+	/**
+	 * Attempt to parse a Recipe from BBC Good Food
+	 * @param url The full URL of the Recipe to parse
+	 * @return the Recipe parsed from the URl
+	 */
+	public static Recipe parseBBCGoodFood(String url){
+		Recipe parsedRecipe = new Recipe("");
+		if (!url.contains("bbcgoodfood") || !url.contains("recipes")){
+			System.out.println("Invalid URL. Cannot parse from " + url + "\n" + "Please use a recipe from www.bbcgoodfood.com");
+			return null;
+		}
+		
+		try {
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		connection.setRequestProperty("User-Agent", "Chrome");
+		//Get the resulting page 
+		InputStreamReader in = new InputStreamReader(connection.getInputStream());
+		BufferedReader bufIn = new BufferedReader(in);
+		String temp;
+		String response = "";
+		//Write the page into a String
+		while ((temp = bufIn.readLine()) != null){
+			response = response.concat(temp);
+		}
+		bufIn.close();
+		//Produce a HTML Document from the response
+		Document doc = Jsoup.parse(response);
+		
+		//Get the title of the Recipe
+		Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
+		String titleElementText = titleElement.get(0).text();
+		parsedRecipe.setTitle(titleElementText);
+		
+		//Get the rating of the Recipe
+		String ratingValue = doc.getElementsByAttributeValue("itemprop", "ratingValue").get(0).attr("content");
+		parsedRecipe.setRating((int) Math.round(Double.parseDouble(ratingValue)));
+		
+		//Get the ingredients of the Recipe
+		Elements ingredientsElement = doc.getElementsByAttributeValue("itemprop", "ingredients");
+		ArrayList<String> ingredients = new ArrayList<String>();
+		for (Element e : ingredientsElement){
+			ingredients.add(e.text());
+		}
+		parsedRecipe.setIngredients(ingredients);
+		
+		//Get the method steps of the Recipe
+				Elements methodElement = doc.getElementsByAttributeValue("itemprop", "recipeInstructions");
+				ArrayList<String> methodSteps = new ArrayList<String>();
+				for (Element e : methodElement){
+					methodSteps.add(e.text());
+				}
+				parsedRecipe.setMethodSteps(methodSteps);
+				
+		return parsedRecipe;
+		} catch (Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

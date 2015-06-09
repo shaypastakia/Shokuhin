@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import recipe.Recipe;
+import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
 import recipeSearch.RecipeSearch;
 import recipeViewer.RecipeViewer;
@@ -116,7 +117,6 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		JMenuItem recipeSearch = new JMenuItem("Recipe Search");
 		JMenuItem recipeViewer = new JMenuItem("Recipe Viewer");
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
-		
 		fileMenu.add(openTab);
 		openTab.add(openTest);
 		openTab.add(recipeEditor);
@@ -127,7 +127,25 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		for (Component m : openTab.getMenuComponents())
 		((JMenuItem)m).addActionListener(this);
 		
+		//Add parsing menu item
+		JMenuItem parse = new JMenuItem("Parse Recipe");
+		parse.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String url = JOptionPane.showInputDialog(null,"Enter a URL for a recipe on BBC Good Food to parse:");
+				Recipe recipe = RecipeMethods.parseBBCGoodFood(url);
+				//TODO Change to open in Recipe Editor
+				if (recipe != null)
+					main.openTab(new RecipeViewer(main, recipe));
+				else
+					ShokuhinMain.displayMessage("Error", "Unable to parse Recipe from " + url, JOptionPane.ERROR_MESSAGE);
+			}
+		});
+		
 		fileMenu.add(closeTab);
+		fileMenu.addSeparator();
+		fileMenu.add(parse);
+		fileMenu.addSeparator();
 		fileMenu.add(closeShokuhin);
 		
 		return fileMenu;

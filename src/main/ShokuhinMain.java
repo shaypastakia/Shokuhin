@@ -2,12 +2,6 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -17,9 +11,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
-
-import recipe.Recipe;
-import recipe.RecipeMethods;
 
 /**
  * ShokuhinMain
