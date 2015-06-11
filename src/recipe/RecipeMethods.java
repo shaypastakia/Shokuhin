@@ -116,19 +116,30 @@ public class RecipeMethods {
 	 */
 	public static Recipe parseBBCGoodFood(String url){
 		Recipe parsedRecipe = new Recipe("");
+		if (url == null){
+			return null;
+		}
+		//Don't proceed if the link isn't a valid BBC Good Food Recipe
 		if (!url.contains("bbcgoodfood") || !url.contains("recipes")){
-			System.out.println("Invalid URL. Cannot parse from " + url + "\n" + "Please use a recipe from www.bbcgoodfood.com");
+			System.out.println("Invalid URL. Cannot parse from " + url + "\n" + "Please use a recipe from http://www.bbcgoodfood.com");
 			return null;
 		}
 		
+		//Add protocol if it isn't already there
+		if(!url.startsWith("http://"))
+			url = "http://".concat(url);
+		
 		try {
+		//Connect to the Recipe URL
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "Chrome");
+		
 		//Get the resulting page 
 		InputStreamReader in = new InputStreamReader(connection.getInputStream());
 		BufferedReader bufIn = new BufferedReader(in);
 		String temp;
 		String response = "";
+		
 		//Write the page into a String
 		while ((temp = bufIn.readLine()) != null){
 			response = response.concat(temp);
@@ -150,7 +161,7 @@ public class RecipeMethods {
 		Elements ingredientsElement = doc.getElementsByAttributeValue("itemprop", "ingredients");
 		ArrayList<String> ingredients = new ArrayList<String>();
 		for (Element e : ingredientsElement){
-			ingredients.add(e.text());
+			ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
 		}
 		parsedRecipe.setIngredients(ingredients);
 		
@@ -158,7 +169,7 @@ public class RecipeMethods {
 				Elements methodElement = doc.getElementsByAttributeValue("itemprop", "recipeInstructions");
 				ArrayList<String> methodSteps = new ArrayList<String>();
 				for (Element e : methodElement){
-					methodSteps.add(e.text());
+					methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
 				}
 				parsedRecipe.setMethodSteps(methodSteps);
 				
