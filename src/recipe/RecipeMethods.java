@@ -154,21 +154,21 @@ public class RecipeMethods {
 		bufIn.close();
 		//Produce a HTML Document from the response
 		Document doc = Jsoup.parse(response);
-		
-		if(url.contains("bbc"))
+		if(url.contains("bbcgoodfood"))
+			return parseBBCGoodFood(doc);
+		else if(url.contains("bbc"))
 			return parseBBC(doc);
-		if(url.contains("allrecipes"))
+		else if(url.contains("allrecipes"))
 			return parseAllRecipes(doc);
 		else
 			return null;
-		
 		} catch (Exception e){
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	private static Recipe parseBBC(Document doc){
+	private static Recipe parseBBCGoodFood(Document doc){
 		Recipe parsedRecipe = new Recipe("");
 		
 		try {
@@ -238,6 +238,40 @@ public class RecipeMethods {
 			for (Element e : methodElement){
 				methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
 			}
+			parsedRecipe.setMethodSteps(methodSteps);
+
+			return parsedRecipe;
+		} catch (Exception e){
+			return null;
+		}
+	}
+	
+	private static Recipe parseBBC(Document doc){
+		Recipe parsedRecipe = new Recipe("");
+		
+		try {
+			//Get the title of the Recipe
+			Elements titleElement = doc.getElementsByClass("article-title");
+			String titleElementText = titleElement.get(0).text();
+			parsedRecipe.setTitle(titleElementText);
+			
+			//Get the ingredients of the Recipe
+			Elements ingredientsElement = doc.getElementsByAttributeValue("id", "ingredients");
+			ingredientsElement = Jsoup.parse(ingredientsElement.html()).select("li");
+			ArrayList<String> ingredients = new ArrayList<String>();
+			for (Element e : ingredientsElement){
+				ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+			}
+			parsedRecipe.setIngredients(ingredients);
+			
+			//Get the method steps of the Recipe
+			Elements methodElement = doc.getElementsByClass("instructions");
+			methodElement = Jsoup.parse(methodElement.html()).select("li");
+			ArrayList<String> methodSteps = new ArrayList<String>();
+			for (Element e : methodElement){
+					Elements el = e.select("p");
+					methodSteps.add(new String(el.get(0).ownText().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+				}
 			parsedRecipe.setMethodSteps(methodSteps);
 
 			return parsedRecipe;
