@@ -2,8 +2,6 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -13,8 +11,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
-
-import recipeViewer.RecipeViewer;
 
 /**
  * ShokuhinMain
@@ -116,26 +112,6 @@ public class ShokuhinMain {
 	public void openTab(Module m){
 		tabPane.add((Component) m);
 		tabPane.setSelectedComponent((Component) m);
-		if (m instanceof RecipeViewer){
-			m.addKeyListener(new KeyListener() {
-				
-				@Override
-				public void keyTyped(KeyEvent e) {
-					System.out.println("Bonjour");
-				}
-				
-				@Override
-				public void keyReleased(KeyEvent e) {
-					System.out.println("Au Revoir");
-				}
-				
-				@Override
-				public void keyPressed(KeyEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
-			});
-		}
 	}
 	
 	/**
