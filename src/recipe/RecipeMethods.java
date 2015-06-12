@@ -15,15 +15,23 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Set;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.swing.JOptionPane;
 
 import main.ShokuhinMain;
+import marytts.LocalMaryInterface;
+import marytts.MaryInterface;
+import marytts.util.data.audio.AudioPlayer;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
 
 public class RecipeMethods {
 	
@@ -110,18 +118,17 @@ public class RecipeMethods {
 	}
 	
 	/**
-	 * Attempt to parse a Recipe from BBC Good Food
+	 * Attempt to parse a Recipe from BBC Good Food or All Recipes
 	 * @param url The full URL of the Recipe to parse
-	 * @return the Recipe parsed from the URl
+	 * @return the Recipe parsed from the URL
 	 */
-	public static Recipe parseBBCGoodFood(String url){
-		Recipe parsedRecipe = new Recipe("");
+	public static Recipe parseRecipeUrl(String url){
 		if (url == null){
 			return null;
 		}
-		//Don't proceed if the link isn't a valid BBC Good Food Recipe
-		if (!url.contains("bbcgoodfood") || !url.contains("recipes")){
-			System.out.println("Invalid URL. Cannot parse from " + url + "\n" + "Please use a recipe from http://www.bbcgoodfood.com");
+		//Don't proceed if the link isn't a valid Recipe URL
+		if (!url.contains("recipe")){
+			System.out.println("Invalid URL. Cannot parse from " + url + "\n" + "Please use a recipe from http://www.bbcgoodfood.com or http://allrecipes.co.uk");
 			return null;
 		}
 		
@@ -148,36 +155,123 @@ public class RecipeMethods {
 		//Produce a HTML Document from the response
 		Document doc = Jsoup.parse(response);
 		
-		//Get the title of the Recipe
-		Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
-		String titleElementText = titleElement.get(0).text();
-		parsedRecipe.setTitle(titleElementText);
+		if(url.contains("bbc"))
+			return parseBBC(doc);
+		if(url.contains("allrecipes"))
+			return parseAllRecipes(doc);
+		else
+			return null;
 		
-		//Get the rating of the Recipe
-		String ratingValue = doc.getElementsByAttributeValue("itemprop", "ratingValue").get(0).attr("content");
-		parsedRecipe.setRating((int) Math.round(Double.parseDouble(ratingValue)));
-		
-		//Get the ingredients of the Recipe
-		Elements ingredientsElement = doc.getElementsByAttributeValue("itemprop", "ingredients");
-		ArrayList<String> ingredients = new ArrayList<String>();
-		for (Element e : ingredientsElement){
-			ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
-		}
-		parsedRecipe.setIngredients(ingredients);
-		
-		//Get the method steps of the Recipe
-				Elements methodElement = doc.getElementsByAttributeValue("itemprop", "recipeInstructions");
-				ArrayList<String> methodSteps = new ArrayList<String>();
-				for (Element e : methodElement){
-					methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
-				}
-				parsedRecipe.setMethodSteps(methodSteps);
-				
-		return parsedRecipe;
 		} catch (Exception e){
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	private static Recipe parseBBC(Document doc){
+		Recipe parsedRecipe = new Recipe("");
+		
+		try {
+			//Get the title of the Recipe
+			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
+			String titleElementText = titleElement.get(0).text();
+			parsedRecipe.setTitle(titleElementText);
+			
+			//Get the rating of the Recipe
+			String ratingValue = doc.getElementsByAttributeValue("itemprop", "ratingValue").get(0).attr("content");
+			parsedRecipe.setRating((int) Math.round(Double.parseDouble(ratingValue)));
+			
+			//Get the ingredients of the Recipe
+			Elements ingredientsElement = doc.getElementsByAttributeValue("itemprop", "ingredients");
+			ArrayList<String> ingredients = new ArrayList<String>();
+			for (Element e : ingredientsElement){
+				ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+			}
+			parsedRecipe.setIngredients(ingredients);
+			
+			//Get the method steps of the Recipe
+			Elements methodElement = doc.getElementsByAttributeValue("itemprop", "recipeInstructions");
+			ArrayList<String> methodSteps = new ArrayList<String>();
+			for (Element e : methodElement){
+				methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+			}
+			parsedRecipe.setMethodSteps(methodSteps);
+					
+			return parsedRecipe;
+		} catch (Exception e){
+			return null;
+		}
+	}
+	
+	private static Recipe parseAllRecipes(Document doc){
+		Recipe parsedRecipe = new Recipe("");
+		
+		try {
+			//Get the title of the Recipe
+			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
+			String titleElementText = titleElement.get(0).text();
+			parsedRecipe.setTitle(titleElementText);
+			
+			//Get the rating of the Recipe
+			Element ratingElement = doc.getElementById("starRating");
+			String[] ratingHTML = ratingElement.getAllElements().get(0).html().split("rating");
+			int ratingRaw = Integer.parseInt(ratingHTML[1].split("\"")[0]);
+			if (ratingRaw <= 5){
+				parsedRecipe.setRating(ratingRaw);
+			} else {
+				parsedRecipe.setRating((ratingRaw+5)/10);
+			}
+			
+			//Get the ingredients of the Recipe
+			Elements ingredientsElement = doc.getElementsByAttributeValue("itemprop", "ingredients");
+			ArrayList<String> ingredients = new ArrayList<String>();
+			for (Element e : ingredientsElement){
+				ingredients.add(new String(e.text().getBytes(), "UTF-8"));
+			}
+			parsedRecipe.setIngredients(ingredients);
+
+			//Get the method steps of the Recipe
+			Elements methodElement = doc.getElementsByAttributeValue("itemprop", "recipeInstructions");
+			doc = Jsoup.parse(methodElement.html());
+			methodElement = doc.select("span");
+			ArrayList<String> methodSteps = new ArrayList<String>();
+			for (Element e : methodElement){
+				methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+			}
+			parsedRecipe.setMethodSteps(methodSteps);
+
+			return parsedRecipe;
+		} catch (Exception e){
+			return null;
+		}
+	}
+	
+	/**
+	 * Speak out the Current Step with Mary, or fall back to Kevin if need be
+	 * @param text The text to be read out
+	 */
+	public static void read(String text){
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					MaryInterface marytts = new LocalMaryInterface();
+					Set<String> voices = marytts.getAvailableVoices();
+					marytts.setVoice(voices.iterator().next());
+					AudioInputStream audio = marytts.generateAudio(text);
+					AudioPlayer player = new AudioPlayer(audio);
+					player.start();
+					player.join();
+				} catch (Exception e) {
+					Voice voice;
+					VoiceManager voiceManager = VoiceManager.getInstance();
+					voice = voiceManager.getVoice("kevin16");
+					voice.allocate();
+					voice.speak(text);
+				}
+			}
+		});
+		thread.start();
 	}
 
 }

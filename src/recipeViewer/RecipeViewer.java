@@ -5,10 +5,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.Stack;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -23,20 +21,16 @@ import javax.swing.JTextArea;
 
 import main.Module;
 import main.ShokuhinMain;
-import marytts.LocalMaryInterface;
-import marytts.MaryInterface;
-import marytts.util.data.audio.AudioPlayer;
 import recipe.Recipe;
+import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
-
-import com.sun.speech.freetts.Voice;
-import com.sun.speech.freetts.VoiceManager;
 
 public class RecipeViewer extends Module {
 	private static final long serialVersionUID = 2180887752409681176L;
 	private Recipe recipe;
 	private ShokuhinMain main;
 	
+	//Panel structure for Recipe Viewer, indicated by indentation
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		private JScrollPane ingredientsPane = new JScrollPane();
 		private JPanel methodPane = new JPanel();
@@ -44,8 +38,13 @@ public class RecipeViewer extends Module {
 			private JScrollPane secondStepPane = new JScrollPane();
 			private JPanel controlPane = new JPanel();
 			private JPanel infoPane = new JPanel();
-			
+		
+	//Data structures used in Recipe Viewer
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
+	private LinkedList<String> steps = new LinkedList<String>();
+	private Stack<String> previousSteps = new Stack<String>();
+	
+	//Swing objects used in Recipe Viewer
 	private JList<String> ingredientsList = new JList<String>(listModel);
 	private JTextArea firstStepText = new JTextArea();
 	private JTextArea secondStepText = new JTextArea();
@@ -54,16 +53,16 @@ public class RecipeViewer extends Module {
 	private JButton readButton = new JButton("Read out Current Step");
 	private JButton nextButton = new JButton("Next Step ->");
 	
-	private LinkedList<String> steps = new LinkedList<String>();
-	private Stack<String> previousSteps = new Stack<String>();
-	
-	private Thread thread;
-	
+	/**
+	 * Constructor
+	 * 
+	 * @param m The ShokuhinMain parent
+	 * @param recipe The Recipe to view
+	 */
 	public RecipeViewer(ShokuhinMain m, Recipe recipe) {
 		super(m, recipe.getTitle());
 		this.recipe = recipe;
 		this.main = m;
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		
 		//Configure the Panel structures and layouts
 		splitPane.setLeftComponent(ingredientsPane);
@@ -71,19 +70,23 @@ public class RecipeViewer extends Module {
 		ingredientsPane.setMinimumSize(new Dimension(200, 0));
 		ingredientsPane.setViewportView(ingredientsList);
 		
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		methodPane.setLayout(new BoxLayout(methodPane, BoxLayout.PAGE_AXIS));
 		controlPane.setLayout(new BoxLayout(controlPane, BoxLayout.LINE_AXIS));
 		infoPane.setLayout(new BoxLayout(infoPane, BoxLayout.PAGE_AXIS));
 		
+		//Set up Panel structure
 		methodPane.add(firstStepPane);
 		methodPane.add(secondStepPane);
 		methodPane.add(controlPane);
 		methodPane.add(infoPane);
 		
+		//Set up Borders for Panels
 		firstStepPane.setBorder(BorderFactory.createTitledBorder("Current Step"));
 		secondStepPane.setBorder(BorderFactory.createTitledBorder("Next Step"));
 		infoPane.setBorder(BorderFactory.createTitledBorder("Information"));
 		
+		//Set up Swing items
 		firstStepPane.setViewportView(firstStepText);
 		secondStepPane.setViewportView(secondStepText);
 		infoPane.add(infoText);
@@ -91,10 +94,12 @@ public class RecipeViewer extends Module {
 		controlPane.add(readButton);
 		controlPane.add(nextButton);
 		
+		//Set fonts for JButtons
 		previousButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
 		readButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
 		nextButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
 		
+		//Set up Listeners for JButtons
 		previousButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -105,7 +110,7 @@ public class RecipeViewer extends Module {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				read(firstStepText.getText());
+				RecipeMethods.read(firstStepText.getText());
 			}
 		});
 		nextButton.addActionListener(new ActionListener() {
@@ -115,7 +120,7 @@ public class RecipeViewer extends Module {
 			}
 		});
 		
-		
+		//Set up Text Areas
 		firstStepText.setFont(new Font("SansSerif", Font.BOLD, 18));
 		secondStepText.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		firstStepText.setEditable(false);
@@ -153,8 +158,12 @@ public class RecipeViewer extends Module {
 		infoText.append("Serves: " + recipe.getServings());
 		
 		displayRecipe();
+		
 	}
 	
+	/**
+	 * Populate fields with details of the Recipe
+	 */
 	private void displayRecipe(){
 		//Add all Ingredients to the JList
 		for (String s : recipe.getIngredients())
@@ -165,6 +174,9 @@ public class RecipeViewer extends Module {
 		nextStep();
 	}
 	
+	/**
+	 * Move back to the previous step in the Method
+	 */
 	private void previousStep(){
 		try {
 			String s = previousSteps.pop();
@@ -181,6 +193,9 @@ public class RecipeViewer extends Module {
 		}
 	}
 	
+	/**
+	 * Move forward to the next step in the Method
+	 */
 	private void nextStep(){
 		try {
 			String s = steps.pop();
@@ -198,30 +213,6 @@ public class RecipeViewer extends Module {
 		return true;
 	}
 	
-	private void read(String text){
-		thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					MaryInterface marytts = new LocalMaryInterface();
-					Set<String> voices = marytts.getAvailableVoices();
-					marytts.setVoice(voices.iterator().next());
-					AudioInputStream audio = marytts.generateAudio(text);
-					AudioPlayer player = new AudioPlayer(audio);
-					player.start();
-					player.join();
-				} catch (Exception e) {
-					Voice voice;
-					VoiceManager voiceManager = VoiceManager.getInstance();
-					voice = voiceManager.getVoice("kevin16");
-					voice.allocate();
-					voice.speak(text);
-				}
-			}
-		});
-		thread.start();
-	}
-
 	@Override
 	public JMenu getFunctionMenu() {
 		JMenu menu = new JMenu("Recipe Viewer");
