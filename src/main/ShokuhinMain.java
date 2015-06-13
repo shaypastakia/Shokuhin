@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.io.File;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -11,6 +12,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
+
+import recipe.Recipe;
+import recipe.RecipeMethods;
 
 /**
  * ShokuhinMain

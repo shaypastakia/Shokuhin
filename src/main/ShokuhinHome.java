@@ -104,7 +104,7 @@ public class ShokuhinHome extends Module implements ActionListener {
 
 	@Override
 	public JMenu getFunctionMenu() {
-		JMenu menu = new JMenu("Recipe Search");
+		JMenu menu = new JMenu("Home");
 		
 		//A menu item that can be used when there are no functions to be displayed
 		JMenuItem noFuncs = new JMenuItem("(No functions)");

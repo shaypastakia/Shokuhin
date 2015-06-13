@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -241,7 +242,7 @@ public class RecipeViewer extends Module {
 				main.openTab(new RecipeEditor(main, recipe));
 			}
 		});
-		JCheckBox autoReadOption = new JCheckBox("Auto-Read Current Step");
+		JCheckBoxMenuItem autoReadOption = new JCheckBoxMenuItem("Auto-Read Current Step");
 		autoReadOption.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

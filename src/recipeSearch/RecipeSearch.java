@@ -6,16 +6,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -28,6 +33,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import main.Module;
 import main.ShokuhinMain;
@@ -62,7 +69,8 @@ public class RecipeSearch extends Module implements ActionListener{
 		JScrollPane searchResultPanel = new JScrollPane();
 		JPanel searchControlPanel = new JPanel();
 			JPanel searchButtonPanel = new JPanel();
-//			JPanel searchImagePanel = new JPanel();
+			JScrollPane searchImageScrollPanel = new JScrollPane();
+				JPanel searchImagePanel = new JPanel();
 				
 	//firstPanel fields
 	JTextField titleText = new JTextField(80);
@@ -254,11 +262,41 @@ public class RecipeSearch extends Module implements ActionListener{
 	 */
 	private void createSecondGui(){
 		searchResultPanel.setViewportView(searchResultList);
-		
+		searchResultPanel.setMinimumSize(new Dimension(200, 0));
+		searchResultList.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				searchImagePanel.removeAll();
+				String recipe = searchResultList.getSelectedValue();
+				File file = new File("");
+				
+				if (Files.exists(new File("./Shokuhin/Images/" + recipe + ".jpg").toPath())){
+					file = new File("./Shokuhin/Images/" + recipe + ".jpg");
+				} else if (Files.exists(new File("./Shokuhin/Images/" + recipe + ".png").toPath())){
+					file = new File("./Shokuhin/Images/" + recipe + ".png");
+				}
+				
+				if (!Files.exists(file.toPath()))
+					searchImagePanel.removeAll();
+				
+				try {
+					BufferedImage image = ImageIO.read(file);
+					searchImagePanel.add(new JLabel(new ImageIcon(image)));
+					searchControlPanel.paintAll(searchControlPanel.getGraphics());
+				} catch (IOException e1) {
+					searchImagePanel.removeAll();
+					searchControlPanel.paintAll(searchControlPanel.getGraphics());
+				}
+			}
+		});
 		searchControlPanel.setLayout(new BoxLayout(searchControlPanel, BoxLayout.PAGE_AXIS));
-		searchControlPanel.add(searchBackButton);
-		searchControlPanel.add(searchOpenButton);
-		searchControlPanel.add(searchEditButton);
+		searchButtonPanel.add(searchBackButton);
+		searchButtonPanel.add(searchOpenButton);
+		searchButtonPanel.add(searchEditButton);
+		searchControlPanel.add(searchButtonPanel);
+		searchImageScrollPanel.setViewportView(searchImagePanel);
+		searchControlPanel.add(searchImageScrollPanel);
 		
 		secondPanel.setLayout(new BoxLayout(secondPanel, BoxLayout.LINE_AXIS));
 		
@@ -382,6 +420,9 @@ public class RecipeSearch extends Module implements ActionListener{
 			}
 		}
 		
+		searchOpenButton.setEnabled(true);
+		searchEditButton.setEnabled(true);
+		
 		if (!succeeded){
 			failed("Simple Search");
 		}
@@ -396,6 +437,9 @@ public class RecipeSearch extends Module implements ActionListener{
 	private void advancedSearch(){
 		//Perform a simple title search
 		ArrayList<Recipe> resultSet = advancedTitleSearch();
+		searchOpenButton.setEnabled(true);
+		searchEditButton.setEnabled(true);
+
 		//If there are no results, perform fail procedure and do not continue
 		if (resultSet.size() == 0){
 			failed("Title Search");
