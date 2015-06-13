@@ -90,6 +90,7 @@ public class ShokuhinMain {
 		//Add the Tabbed Pane to the Window
 		frame.add(tabPane);
 		frame.add(timer);
+		openTab(new ShokuhinHome(this));
 		
 	} //closes constructor
 	

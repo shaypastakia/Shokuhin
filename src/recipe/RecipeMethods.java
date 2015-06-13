@@ -134,9 +134,10 @@ public class RecipeMethods {
 		
 		//Add protocol if it isn't already there
 		if(!url.startsWith("http://"))
-			url = "http://".concat(url);
+			url = "http://www.bbcgoodfood.com".concat(url);
 		
 		try {
+			System.out.println(url);
 		//Connect to the Recipe URL
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "Chrome");

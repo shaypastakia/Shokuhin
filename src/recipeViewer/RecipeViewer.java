@@ -11,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -29,6 +30,7 @@ public class RecipeViewer extends Module {
 	private static final long serialVersionUID = 2180887752409681176L;
 	private Recipe recipe;
 	private ShokuhinMain main;
+	private boolean autoRead = false;
 	
 	//Panel structure for Recipe Viewer, indicated by indentation
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -212,6 +214,8 @@ public class RecipeViewer extends Module {
 			String s = steps.pop();
 			previousSteps.push(s);
 			secondStepText.setText(s);
+			if (autoRead)
+				RecipeMethods.read(s);
 			s = steps.peek();
 			thirdStepText.setText(s);
 			firstStepText.setText(temp);
@@ -237,7 +241,18 @@ public class RecipeViewer extends Module {
 				main.openTab(new RecipeEditor(main, recipe));
 			}
 		});
+		JCheckBox autoReadOption = new JCheckBox("Auto-Read Current Step");
+		autoReadOption.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (autoReadOption.isSelected())
+					autoRead = true;
+				else 
+					autoRead = false;
+			}
+		});
 		menu.add(editRecipe);
+		menu.add(autoReadOption);
 		return menu;
 	}
 
