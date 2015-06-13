@@ -3,6 +3,8 @@ package main;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -43,7 +45,7 @@ public class ShokuhinHome extends Module implements ActionListener {
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
 	private ArrayList<String> listUrls = new ArrayList<String>();
 	
-	private JLabel parentLabel = new JLabel("BBC Good Food Recipe Search");
+	private JLabel parentLabel = new JLabel("BBC Food & BBC Good Food Recipe Search");
 	private JLabel termLabel = new JLabel("Search Term: ");
 	private JTextField termText = new JTextField();
 	private JButton searchButton = new JButton("Search");
@@ -70,6 +72,20 @@ public class ShokuhinHome extends Module implements ActionListener {
 		buttonPane.add(editButton);
 		leftPane.add(buttonPane);
 		
+		termText.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					actionPerformed(null);
+			}
+		});
 		searchButton.addActionListener(this);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		openButton.addActionListener(new ActionListener() {
@@ -119,6 +135,8 @@ public class ShokuhinHome extends Module implements ActionListener {
 		listUrls.clear();
 		String searchTerm = termText.getText().replaceAll(" ", "\\+");
 		String url = "http://www.bbcgoodfood.com/search/recipes?query=" + searchTerm;
+		String url2 = "http://www.bbc.co.uk/food/recipes/search?keywords=" + searchTerm;
+		
 		if (searchTerm == null || searchTerm.equals(""))
 			return;
 		
@@ -127,25 +145,48 @@ public class ShokuhinHome extends Module implements ActionListener {
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "Chrome");
 		
+		HttpURLConnection connection2 = (HttpURLConnection) new URL(url2).openConnection();
+		connection2.setRequestProperty("User-Agent", "Chrome");
+
 		//Get the resulting page 
 		InputStreamReader in = new InputStreamReader(connection.getInputStream());
 		BufferedReader bufIn = new BufferedReader(in);
 		String temp;
 		String response = "";
 		
+		InputStreamReader in2 = new InputStreamReader(connection2.getInputStream());
+		BufferedReader bufIn2 = new BufferedReader(in2);
+		String temp2;
+		String response2 = "";
+		
 		//Write the page into a String
 		while ((temp = bufIn.readLine()) != null){
 			response = response.concat(temp);
 		}
 		bufIn.close();
+		
+		while ((temp2 = bufIn2.readLine()) != null){
+			response2 = response2.concat(temp2);
+		}
+		bufIn2.close();
+		
 		//Produce a HTML Document from the response
 		Document doc = Jsoup.parse(response);
+		Document doc2 = Jsoup.parse(response2);
+		
+		Elements links2 = doc2.select("div.left");
+		System.out.println(links2.size());
+		for (Element el : links2){
+			listModel.addElement(new String(el.child(0).text().getBytes(), "UTF-8").trim());
+			listUrls.add("http://www.bbc.co.uk" + el.child(0).child(0).attr("href"));
+		}
 		
 		Elements links = doc.getElementsByClass("node-title");
 		for (Element el : links){
 			listModel.addElement(new String(el.text().getBytes(), "UTF-8").trim());
 			listUrls.add(el.select("a").get(0).attr("href"));
 		}
+		
 		leftPane.paintAll(leftPane.getGraphics());
 		if (listUrls.isEmpty())
 			ShokuhinMain.displayMessage("No Results", "Unable to find any results", JOptionPane.INFORMATION_MESSAGE);

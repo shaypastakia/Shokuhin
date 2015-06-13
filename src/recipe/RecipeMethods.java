@@ -175,7 +175,7 @@ public class RecipeMethods {
 		try {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
-			String titleElementText = titleElement.get(0).text();
+			String titleElementText = new String(titleElement.get(0).text().getBytes(), "UTF-8");
 			parsedRecipe.setTitle(titleElementText);
 			
 			//Get the rating of the Recipe
@@ -211,7 +211,7 @@ public class RecipeMethods {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
 			String titleElementText = titleElement.get(0).text();
-			parsedRecipe.setTitle(titleElementText);
+			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
 			
 			//Get the rating of the Recipe
 			Element ratingElement = doc.getElementById("starRating");
@@ -253,7 +253,7 @@ public class RecipeMethods {
 		try {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByClass("article-title");
-			String titleElementText = titleElement.get(0).text();
+			String titleElementText = new String(titleElement.get(0).text().getBytes(), "UTF-8");
 			parsedRecipe.setTitle(titleElementText);
 			
 			//Get the ingredients of the Recipe
