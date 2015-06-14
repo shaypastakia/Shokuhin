@@ -10,12 +10,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -30,7 +24,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -134,43 +127,6 @@ public class ShokuhinHome extends Module implements ActionListener {
 		noFuncs.setEnabled(false);
 		menu.add(noFuncs);
 		return menu;
-	}
-	
-	public void concurrentSearch(){
-		ExecutorService executor = Executors.newFixedThreadPool(5);
-		//Store the results in a Set
-		Set<Future<String>> results = new HashSet<Future<String>>();
-		
-		String searchTerm;
-		
-		Callable<String> bbcCall = bbcSearch(searchTerm); 
-		Future<String> bbcFut = executor.submit(bbcCall);
-		Callable<String> wikiCall = wikipediaSearch(text.getText()); 
-		Future<String> wikiFut = executor.submit(wikiCall);
-	}
-	
-	public Callable<String> bbcSearch(final String term){
-		return new Callable<String>() {
-
-			@Override
-			public String call () {
-				
-				return term;
-			}
-		};
-		
-	}
-	
-	public Callable<String> bbcGoodFoodSearch(final String term){
-		return new Callable<String>() {
-
-			@Override
-			public String call () {
-				
-				return term;
-			}
-		};
-		
 	}
 
 	@Override
