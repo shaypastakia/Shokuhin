@@ -2,8 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.io.File;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -14,7 +13,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
-import recipeViewer.RecipeViewer;
+import recipe.Recipe;
+import recipe.RecipeMethods;
 
 /**
  * ShokuhinMain <br>
@@ -100,9 +100,16 @@ public class ShokuhinMain {
 		// Add the Tabbed Pane to the Window
 		frame.add(tabPane);
 		frame.add(timer);
+<<<<<<< HEAD
 
 	} // closes constructor
 
+=======
+		openTab(new ShokuhinHome(this));
+		
+	} //closes constructor
+	
+>>>>>>> origin/master
 	/**
 	 * Can be called by any Class to display a Message Window
 	 * 
@@ -123,6 +130,7 @@ public class ShokuhinMain {
 	public void openTab(Module m) {
 		tabPane.add((Component) m);
 		tabPane.setSelectedComponent((Component) m);
+<<<<<<< HEAD
 		if (m instanceof RecipeViewer) {
 			m.addKeyListener(new KeyListener() {
 
@@ -143,6 +151,8 @@ public class ShokuhinMain {
 				}
 			});
 		}
+=======
+>>>>>>> origin/master
 	}
 
 	/**

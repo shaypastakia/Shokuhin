@@ -134,9 +134,10 @@ public class RecipeMethods {
 		
 		//Add protocol if it isn't already there
 		if(!url.startsWith("http://"))
-			url = "http://".concat(url);
+			url = "http://www.bbcgoodfood.com".concat(url);
 		
 		try {
+			System.out.println(url);
 		//Connect to the Recipe URL
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "Chrome");
@@ -154,27 +155,27 @@ public class RecipeMethods {
 		bufIn.close();
 		//Produce a HTML Document from the response
 		Document doc = Jsoup.parse(response);
-		
-		if(url.contains("bbc"))
+		if(url.contains("bbcgoodfood"))
+			return parseBBCGoodFood(doc);
+		else if(url.contains("bbc"))
 			return parseBBC(doc);
-		if(url.contains("allrecipes"))
+		else if(url.contains("allrecipes"))
 			return parseAllRecipes(doc);
 		else
 			return null;
-		
 		} catch (Exception e){
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	private static Recipe parseBBC(Document doc){
+	private static Recipe parseBBCGoodFood(Document doc){
 		Recipe parsedRecipe = new Recipe("");
 		
 		try {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
-			String titleElementText = titleElement.get(0).text();
+			String titleElementText = new String(titleElement.get(0).text().getBytes(), "UTF-8");
 			parsedRecipe.setTitle(titleElementText);
 			
 			//Get the rating of the Recipe
@@ -210,7 +211,7 @@ public class RecipeMethods {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
 			String titleElementText = titleElement.get(0).text();
-			parsedRecipe.setTitle(titleElementText);
+			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
 			
 			//Get the rating of the Recipe
 			Element ratingElement = doc.getElementById("starRating");
@@ -238,6 +239,40 @@ public class RecipeMethods {
 			for (Element e : methodElement){
 				methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
 			}
+			parsedRecipe.setMethodSteps(methodSteps);
+
+			return parsedRecipe;
+		} catch (Exception e){
+			return null;
+		}
+	}
+	
+	private static Recipe parseBBC(Document doc){
+		Recipe parsedRecipe = new Recipe("");
+		
+		try {
+			//Get the title of the Recipe
+			Elements titleElement = doc.getElementsByClass("article-title");
+			String titleElementText = new String(titleElement.get(0).text().getBytes(), "UTF-8");
+			parsedRecipe.setTitle(titleElementText);
+			
+			//Get the ingredients of the Recipe
+			Elements ingredientsElement = doc.getElementsByAttributeValue("id", "ingredients");
+			ingredientsElement = Jsoup.parse(ingredientsElement.html()).select("li");
+			ArrayList<String> ingredients = new ArrayList<String>();
+			for (Element e : ingredientsElement){
+				ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+			}
+			parsedRecipe.setIngredients(ingredients);
+			
+			//Get the method steps of the Recipe
+			Elements methodElement = doc.getElementsByClass("instructions");
+			methodElement = Jsoup.parse(methodElement.html()).select("li");
+			ArrayList<String> methodSteps = new ArrayList<String>();
+			for (Element e : methodElement){
+					Elements el = e.select("p");
+					methodSteps.add(new String(el.get(0).ownText().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+				}
 			parsedRecipe.setMethodSteps(methodSteps);
 
 			return parsedRecipe;

@@ -132,7 +132,7 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		parse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String url = JOptionPane.showInputDialog(null,"Enter a URL for a recipe on BBC Good Food (bbcgoodfood.com) or All Recipes (allrecipes.co.uk) to parse:");
+				String url = JOptionPane.showInputDialog(null,"Enter a URL for a recipe on:\nBBC Good Food (bbcgoodfood.com)\nAll Recipes (allrecipes.co.uk)\nBBC (bbc.co.uk/food)\nto parse:");
 				Recipe recipe = RecipeMethods.parseRecipeUrl(url);
 				//TODO Change to open in Recipe Editor
 				if (recipe != null)

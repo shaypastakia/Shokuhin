@@ -11,6 +11,8 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -29,6 +31,7 @@ public class RecipeViewer extends Module {
 	private static final long serialVersionUID = 2180887752409681176L;
 	private Recipe recipe;
 	private ShokuhinMain main;
+	private boolean autoRead = false;
 	
 	//Panel structure for Recipe Viewer, indicated by indentation
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -36,6 +39,7 @@ public class RecipeViewer extends Module {
 		private JPanel methodPane = new JPanel();
 			private JScrollPane firstStepPane = new JScrollPane();
 			private JScrollPane secondStepPane = new JScrollPane();
+			private JScrollPane thirdStepPane = new JScrollPane();
 			private JPanel controlPane = new JPanel();
 			private JPanel infoPane = new JPanel();
 		
@@ -48,6 +52,7 @@ public class RecipeViewer extends Module {
 	private JList<String> ingredientsList = new JList<String>(listModel);
 	private JTextArea firstStepText = new JTextArea();
 	private JTextArea secondStepText = new JTextArea();
+	private JTextArea thirdStepText = new JTextArea();
 	private JTextArea infoText = new JTextArea();
 	private JButton previousButton = new JButton("<- Previous Step");
 	private JButton readButton = new JButton("Read out Current Step");
@@ -78,17 +83,20 @@ public class RecipeViewer extends Module {
 		//Set up Panel structure
 		methodPane.add(firstStepPane);
 		methodPane.add(secondStepPane);
+		methodPane.add(thirdStepPane);
 		methodPane.add(controlPane);
 		methodPane.add(infoPane);
 		
 		//Set up Borders for Panels
-		firstStepPane.setBorder(BorderFactory.createTitledBorder("Current Step"));
-		secondStepPane.setBorder(BorderFactory.createTitledBorder("Next Step"));
+		firstStepPane.setBorder(BorderFactory.createTitledBorder("Previous Step"));
+		secondStepPane.setBorder(BorderFactory.createTitledBorder("Current Step"));
+		thirdStepPane.setBorder(BorderFactory.createTitledBorder("Next Step"));
 		infoPane.setBorder(BorderFactory.createTitledBorder("Information"));
 		
 		//Set up Swing items
 		firstStepPane.setViewportView(firstStepText);
 		secondStepPane.setViewportView(secondStepText);
+		thirdStepPane.setViewportView(thirdStepText);
 		infoPane.add(infoText);
 		controlPane.add(previousButton);
 		controlPane.add(readButton);
@@ -110,7 +118,7 @@ public class RecipeViewer extends Module {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				RecipeMethods.read(firstStepText.getText());
+				RecipeMethods.read(secondStepText.getText());
 			}
 		});
 		nextButton.addActionListener(new ActionListener() {
@@ -121,10 +129,12 @@ public class RecipeViewer extends Module {
 		});
 		
 		//Set up Text Areas
-		firstStepText.setFont(new Font("SansSerif", Font.BOLD, 18));
-		secondStepText.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		firstStepText.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		secondStepText.setFont(new Font("SansSerif", Font.BOLD, 20));
+		thirdStepText.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		firstStepText.setEditable(false);
 		secondStepText.setEditable(false);
+		thirdStepText.setEditable(false);
 		infoText.setEditable(false);
 		infoPane.setMaximumSize(new Dimension(9999, 500));
 		
@@ -181,15 +191,18 @@ public class RecipeViewer extends Module {
 		try {
 			String s = previousSteps.pop();
 			steps.addFirst(s);
-			secondStepText.setText(steps.peek());
-			
-			if (previousSteps.isEmpty())
+			thirdStepText.setText(steps.peek());
+			if (previousSteps.isEmpty()){
+				secondStepText.setText("");
 				firstStepText.setText("");
-			else
-				firstStepText.setText(previousSteps.peek());
-			
+			}
+			else {
+				secondStepText.setText(previousSteps.peek());
+				firstStepText.setText(previousSteps.get(previousSteps.indexOf(previousSteps.peek())-1));
+			}
+				
 		} catch (Exception e){
-			
+			firstStepText.setText("");
 		}
 	}
 	
@@ -198,11 +211,15 @@ public class RecipeViewer extends Module {
 	 */
 	private void nextStep(){
 		try {
+			String temp = secondStepText.getText();
 			String s = steps.pop();
 			previousSteps.push(s);
-			firstStepText.setText(s);
-			s = steps.peek();
 			secondStepText.setText(s);
+			if (autoRead)
+				RecipeMethods.read(s);
+			s = steps.peek();
+			thirdStepText.setText(s);
+			firstStepText.setText(temp);
 		} catch (Exception e){
 			
 		}
@@ -225,7 +242,18 @@ public class RecipeViewer extends Module {
 				main.openTab(new RecipeEditor(main, recipe));
 			}
 		});
+		JCheckBoxMenuItem autoReadOption = new JCheckBoxMenuItem("Auto-Read Current Step");
+		autoReadOption.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (autoReadOption.isSelected())
+					autoRead = true;
+				else 
+					autoRead = false;
+			}
+		});
 		menu.add(editRecipe);
+		menu.add(autoReadOption);
 		return menu;
 	}
 
