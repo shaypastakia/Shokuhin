@@ -128,10 +128,6 @@ public class ShokuhinHome extends Module implements ActionListener {
 		menu.add(noFuncs);
 		return menu;
 	}
-	
-	public void search(){
-		
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
