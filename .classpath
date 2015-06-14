@@ -5,11 +5,14 @@
 	<classpathentry kind="lib" path="lib/jfugue-5.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/JavaMediaPlayer.jar"/>
 	<classpathentry kind="lib" path="lib/jsoup-1.8.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Shaylen/workspace/Shokuhin/lib/freetts/freetts.jar"/>
 	<classpathentry kind="lib" path="lib/marytts/marytts-client-5.1.2-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/marytts/marytts-lang-en-5.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/marytts/icu4j-54.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/marytts/marytts-runtime-5.1.2-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/marytts/voice-cmu-slt-hsmm-5.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/freetts/cmu_us_kal.jar"/>
+	<classpathentry kind="lib" path="lib/freetts/cmulex.jar"/>
+	<classpathentry kind="lib" path="lib/freetts/en_us.jar"/>
+	<classpathentry kind="lib" path="lib/freetts/freetts.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
