@@ -12,6 +12,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
+import recipeSearch.RecipeSearch;
+
 /**
  * ShokuhinMain
  * <br>
@@ -91,6 +93,8 @@ public class ShokuhinMain {
 		frame.add(tabPane);
 		frame.add(timer);
 		openTab(new ShokuhinHome(this));
+		openTab(new RecipeSearch(this));
+		tabPane.setSelectedIndex(0);
 		
 	} //closes constructor
 	

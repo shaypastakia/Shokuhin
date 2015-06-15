@@ -14,10 +14,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Set;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import main.ShokuhinMain;
@@ -309,4 +311,25 @@ public class RecipeMethods {
 		thread.start();
 	}
 
+	public static void exportHTML(Recipe recipe){
+		JFileChooser chooser = new JFileChooser();
+		chooser.showSaveDialog(null);
+		File saveFile = chooser.getSelectedFile();
+		
+		if (saveFile == null)
+			return;
+		
+		if (!saveFile.toString().endsWith(".html"))
+			saveFile = new File(saveFile.toString() + ".html");
+		
+		try {
+			Files.createFile(saveFile.toPath());
+			Files.write(saveFile.toPath(), new RecipeHTML(recipe).getHTML().getBytes(), StandardOpenOption.CREATE);
+		} catch (IOException e) {
+			ShokuhinMain.displayMessage("Error", "Failed to export file.\n" + e.getMessage(), JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		ShokuhinMain.displayMessage("Exported File", "Successfully exported " + recipe.getTitle() + " to " + saveFile.getAbsolutePath(), JOptionPane.INFORMATION_MESSAGE);
+	}
 }

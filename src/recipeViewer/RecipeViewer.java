@@ -235,6 +235,8 @@ public class RecipeViewer extends Module {
 		
 		//A menu item that can be used when there are no functions to be displayed
 		JMenuItem editRecipe = new JMenuItem("Edit current Recipe");
+		JMenuItem exportRecipe = new JMenuItem("Export Recipe to HTML");
+		
 		editRecipe.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -251,7 +253,16 @@ public class RecipeViewer extends Module {
 					autoRead = false;
 			}
 		});
+		
+		exportRecipe.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				RecipeMethods.exportHTML(recipe);				
+			}
+		});
 		menu.add(editRecipe);
+		menu.add(exportRecipe);
 		menu.add(autoReadOption);
 		return menu;
 	}
