@@ -6,6 +6,9 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -48,8 +51,9 @@ public class RecipeEditor extends Module {
 
 	// Data structures used in Recipe Viewer
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
-
 	private ArrayList<String> instructions = new ArrayList<String>();
+
+	// Represents the current instruction one is viewing
 	private int currentInstruction = 0;
 
 	// Swing objects used in Recipe Viewer
@@ -57,6 +61,7 @@ public class RecipeEditor extends Module {
 	private JTextArea firstStepText = new JTextArea();
 	private JTextArea secondStepText = new JTextArea();
 
+	// Buttons used
 	private JButton startButton = new JButton("Start Recipe");
 	private JButton previousButton = new JButton("<- Previous Step");
 	private JButton saveButton = new JButton("Save Recipe");
@@ -71,7 +76,10 @@ public class RecipeEditor extends Module {
 	private JRadioButton snack = new JRadioButton("Snack");
 	private JRadioButton general = new JRadioButton("General");
 
+	// Button groups
 	private ButtonGroup group, group2;
+
+	// Rating radio buttons
 	private JRadioButton rating1 = new JRadioButton("1");
 	private JRadioButton rating2 = new JRadioButton("2");
 	private JRadioButton rating3 = new JRadioButton("3");
@@ -79,9 +87,11 @@ public class RecipeEditor extends Module {
 	private JRadioButton rating5 = new JRadioButton("5");
 	private JRadioButton rating0 = new JRadioButton("0");
 
-	private Component[] editableComponents = { previousButton,
-			saveButton, nextButton, ingredientButton };
+	// Components which are editable
+	private Component[] editableComponents = { previousButton, saveButton,
+			nextButton, ingredientButton };
 
+	// Text fields used
 	private JTextField prepTime, cookTime, serveText, tagField;
 
 	/**
@@ -94,6 +104,7 @@ public class RecipeEditor extends Module {
 	 */
 	public RecipeEditor(ShokuhinMain m, Recipe recipe) {
 		super(m, recipe.getTitle());
+
 		this.recipe = recipe;
 		this.main = m;
 
@@ -111,6 +122,7 @@ public class RecipeEditor extends Module {
 		ingredientsPane.setMinimumSize(new Dimension(200, 0));
 		ingredientsPane.setViewportView(ingredientsList);
 
+		// Set the layouts
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		methodPane.setLayout(new BoxLayout(methodPane, BoxLayout.PAGE_AXIS));
 		controlPane.setLayout(new BoxLayout(controlPane, BoxLayout.LINE_AXIS));
@@ -133,10 +145,8 @@ public class RecipeEditor extends Module {
 		secondStepPane.setViewportView(secondStepText);
 
 		// Adding to the infoPane
-
 		controlPane.add(startButton);
 		controlPane.add(saveButton);
-
 		controlPane.add(ingredientButton);
 		controlPane.add(previousButton);
 		controlPane.add(nextButton);
@@ -149,156 +159,7 @@ public class RecipeEditor extends Module {
 		ingredientButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 
 		// Set up Listeners for JButtons
-		startButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane
-						.showInputDialog("Enter a name for the recipe");
-				if (!name.equals(null)) {
-					recipe.setTitle(name);
-					m.renameTab(name);
-				}
-
-				int steps;
-				while (true) {
-					String number = JOptionPane
-							.showInputDialog("How many steps does your recipe involve?");
-					steps = Integer.parseInt(number);
-					if (steps > 0) {
-						break;
-					}
-				}
-
-				for (int i = 0; i < steps; i++) {
-					instructions.add("Instruction " + (i + 1));
-				}
-
-				setEnableDisable(true);
-				startButton.setText("Restart Recipe");
-
-				firstStepText.setText(instructions.get(0));
-				if (currentInstruction == instructions.size()) {
-					secondStepText.setText("");
-				} else {
-					secondStepText.setText(instructions.get(1));
-				}
-			}
-		});
-
-		ingredientButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String ingred = JOptionPane
-						.showInputDialog("Which ingredient would you like to add? And how much?");
-				if (!ingred.equals(null)) {
-					listModel.addElement(ingred);
-				}
-			}
-
-		});
-
-		saveButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				int mealType;
-
-				if (breakfast.isSelected()) {
-					mealType = Recipe.BREAKFAST;
-				} else if (lunch.isSelected()) {
-					mealType = Recipe.LUNCH;
-				} else if (dinner.isSelected()) {
-					mealType = Recipe.DINNER;
-				} else if (dessert.isSelected()) {
-					mealType = Recipe.DESSERT;
-				} else if (snack.isSelected()) {
-					mealType = Recipe.SNACK;
-				} else {
-					mealType = Recipe.GENERAL;
-				}
-
-				int rating;
-
-				if (rating0.isSelected()) {
-					rating = 0;
-				} else if (rating1.isSelected()) {
-					rating = 1;
-				} else if (rating2.isSelected()) {
-					rating = 2;
-				} else if (rating3.isSelected()) {
-					rating = 3;
-				} else if (rating4.isSelected()) {
-					rating = 4;
-				} else {
-					rating = 5;
-				}
-
-				int prep = Integer.parseInt(prepTime.getText());
-				int cook = Integer.parseInt(cookTime.getText());
-				int serves = Integer.parseInt(serveText.getText());
-
-				recipe.setCourse(mealType);
-				recipe.setRating(rating);
-				recipe.setCookTime(cook);
-				recipe.setPrepTime(prep);
-				recipe.setServings(serves);
-				recipe.setMethodSteps(instructions);
-
-				Object[] tagArray = listModel.toArray();
-
-				ArrayList<Object> tagArrList = new ArrayList<Object>(Arrays
-						.asList(tagArray));
-
-				ArrayList<String> finalList = new ArrayList<String>();
-
-				for (Object obj : tagArrList) {
-					finalList.add(obj.toString());
-				}
-
-				recipe.setIngredients(finalList);
-
-				// Now we must parse the tags
-				ArrayList<String> tagList = new ArrayList<String>();
-
-				for (String word : tagField.getText().split(" ")) {
-					tagList.add(word);
-				}
-
-				recipe.setTags(tagList);
-				
-				System.out.println("Tag List:");
-				for (String string : tagList) {
-					System.out.println(string);
-				}
-				
-				System.out.println("Ingredients");
-				for (String string : finalList) {
-					System.out.println(string);
-				}
-				
-				System.out.println("Steps:");
-				for (String string : instructions) {
-					System.out.println(string);
-				}
-
-				RecipeMethods.writeRecipe(recipe, new File(
-						"./Shokuhin/Recipes/" + recipe.getTitle() + ".rec"));
-			}
-		});
-
-		previousButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				previousStep();
-			}
-		});
-
-		nextButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				nextStep();
-			}
-		});
+		setupListeners(m);
 
 		// Set up Text Areas
 		firstStepText.setFont(new Font("SansSerif", Font.BOLD, 18));
@@ -308,17 +169,7 @@ public class RecipeEditor extends Module {
 		secondStepText.setEditable(false);
 		infoPane.setMaximumSize(new Dimension(9999, 500));
 
-		String tags = "";
-		// Append Tags to info String tags = "Tags: ";
-		for (String s : recipe.getTags()) {
-			tags = tags.concat(s);
-			if (recipe.getTags().indexOf(s) < recipe.getTags().size() - 1) {
-				tags = tags.concat(", ");
-			} else {
-				tags = tags.concat(".").trim();
-			}
-		}
-
+		// Implement the course radio button group
 		group = new ButtonGroup();
 		group.add(breakfast);
 		group.add(lunch);
@@ -357,6 +208,7 @@ public class RecipeEditor extends Module {
 		}
 		add(splitPane);
 
+		// And now we do the same for the rating
 		JLabel ratingLabel = new JLabel("Rating:     ");
 		int rating = recipe.getRating();
 
@@ -393,12 +245,12 @@ public class RecipeEditor extends Module {
 			rating5.setSelected(true);
 		}
 
+		// Get the cooking and prep times
 		JPanel timePanel = new JPanel();
 		JLabel prepTimeLabel = new JLabel("Preparation time (mins): ");
 		prepTime = new JTextField(10);
 		JLabel cookTimeLabel = new JLabel("Cooking time (mins): ");
 		cookTime = new JTextField(10);
-
 		prepTime.setText("" + recipe.getPrepTime());
 		cookTime.setText("" + recipe.getCookTime());
 
@@ -423,11 +275,177 @@ public class RecipeEditor extends Module {
 		tagField = new JTextField(10);
 		tagPanel.setLayout(new BoxLayout(tagPanel, BoxLayout.LINE_AXIS));
 		tagPanel.add(new JLabel("Tags:     "));
+
+		String tags = "";
+		// Append Tags to info String tags = "Tags: ";
+		for (String s : recipe.getTags()) {
+			tags = tags.concat(s);
+			if (recipe.getTags().indexOf(s) < recipe.getTags().size() - 1) {
+				tags = tags.concat(", ");
+			} else {
+				tags = tags.concat(".").trim();
+			}
+		}
+
 		tagField.setText(tags);
 		tagPanel.add(tagField);
 		infoPane.add(tagPanel);
 
 		displayRecipe();
+	}
+
+	/**
+	 * Sets up the listeners for each of the buttons
+	 * 
+	 * @param m
+	 *            The ShokuhinMain used
+	 */
+	private void setupListeners(ShokuhinMain m) {
+
+		// Listens on the start button to start a new recipe.
+		startButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String name = JOptionPane
+						.showInputDialog("Enter a name for the recipe");
+				if (!name.equals(null)) {
+					recipe.setTitle(name);
+					m.renameTab(name);
+				}
+
+				int steps;
+				while (true) {
+					String number = JOptionPane
+							.showInputDialog("How many steps does your recipe involve?");
+					steps = Integer.parseInt(number);
+					if (steps > 0) {
+						break;
+					}
+				}
+
+				for (int i = 0; i < steps; i++) {
+					instructions.add("Instruction " + (i + 1));
+				}
+
+				setEnableDisable(true);
+				startButton.setText("Restart Recipe");
+
+				firstStepText.setText(instructions.get(0));
+				if (currentInstruction == instructions.size()) {
+					secondStepText.setText("");
+				} else {
+					secondStepText.setText(instructions.get(1));
+				}
+			}
+		});
+
+		// Adds an ingredient
+		ingredientButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String ingred = JOptionPane
+						.showInputDialog("Which ingredient would you like to"
+								+ " add? And how much?");
+				if (!ingred.equals(null)) {
+					listModel.addElement(ingred);
+				}
+			}
+
+		});
+
+		// Saves the recipe
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				instructions.set(currentInstruction, firstStepText.getText());
+
+				int mealType;
+
+				if (breakfast.isSelected()) {
+					mealType = Recipe.BREAKFAST;
+				} else if (lunch.isSelected()) {
+					mealType = Recipe.LUNCH;
+				} else if (dinner.isSelected()) {
+					mealType = Recipe.DINNER;
+				} else if (dessert.isSelected()) {
+					mealType = Recipe.DESSERT;
+				} else if (snack.isSelected()) {
+					mealType = Recipe.SNACK;
+				} else {
+					mealType = Recipe.GENERAL;
+				}
+
+				int rating;
+
+				if (rating0.isSelected()) {
+					rating = 0;
+				} else if (rating1.isSelected()) {
+					rating = 1;
+				} else if (rating2.isSelected()) {
+					rating = 2;
+				} else if (rating3.isSelected()) {
+					rating = 3;
+				} else if (rating4.isSelected()) {
+					rating = 4;
+				} else {
+					rating = 5;
+				}
+
+				int prep = Integer.parseInt(prepTime.getText());
+				int cook = Integer.parseInt(cookTime.getText());
+				int serves = Integer.parseInt(serveText.getText());
+
+				ArrayList<Object> tagArrList = new ArrayList<Object>(Arrays
+						.asList(listModel.toArray()));
+
+				ArrayList<String> finalList = new ArrayList<String>();
+
+				for (Object obj : tagArrList) {
+					finalList.add(obj.toString());
+				}
+
+				// Now we must parse the tags
+				ArrayList<String> tagList = new ArrayList<String>();
+
+				for (String word : tagField.getText().split(" ")) {
+					tagList.add(word);
+				}
+
+				recipe.setTags(tagList);
+				recipe.setCourse(mealType);
+				recipe.setRating(rating);
+				recipe.setCookTime(cook);
+				recipe.setPrepTime(prep);
+				recipe.setServings(serves);
+				recipe.setMethodSteps(instructions);
+				recipe.setIngredients(finalList);
+
+				if (Files.exists(new File("./Shokuhin/Recipes/"
+						+ recipe.getTitle() + ".rec").toPath())) {
+					RecipeMethods.deleteRecipe(recipe);
+				}
+
+				RecipeMethods.writeRecipe(recipe, new File(
+						"./Shokuhin/Recipes/" + recipe.getTitle() + ".rec"));
+
+				JOptionPane.showMessageDialog(null, "Recipe saved!");
+			}
+		});
+
+		previousButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				previousStep();
+			}
+		});
+
+		nextButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				nextStep();
+			}
+		});
 	}
 
 	/**
@@ -440,7 +458,11 @@ public class RecipeEditor extends Module {
 
 		// Load the first two steps
 		instructions.addAll(recipe.getMethodSteps());
-		nextStep();
+
+		if (!instructions.isEmpty()) {
+			firstStepText.setText(instructions.get(0));
+			secondStepText.setText(instructions.get(1));
+		}
 	}
 
 	/**
@@ -499,6 +521,13 @@ public class RecipeEditor extends Module {
 		return menu;
 	}
 
+	/**
+	 * Sets the editability of the components
+	 * 
+	 * @param b
+	 *            the boolean used to set whether the components are editable or
+	 *            not
+	 */
 	private void setEnableDisable(boolean b) {
 
 		for (Component component : editableComponents) {
