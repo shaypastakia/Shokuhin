@@ -1,5 +1,6 @@
 package recipeEditor;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -24,8 +25,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-
-import org.apache.commons.collections.iterators.ArrayListIterator;
 
 import main.Module;
 import main.ShokuhinMain;
@@ -60,7 +59,6 @@ public class RecipeEditor extends Module {
 
 	private JButton startButton = new JButton("Start Recipe");
 	private JButton previousButton = new JButton("<- Previous Step");
-	private JButton readButton = new JButton("Read out Current Step");
 	private JButton saveButton = new JButton("Save Recipe");
 	private JButton nextButton = new JButton("Next Step ->");
 	private JButton ingredientButton = new JButton("Add Ingredient");
@@ -81,6 +79,9 @@ public class RecipeEditor extends Module {
 	private JRadioButton rating5 = new JRadioButton("5");
 	private JRadioButton rating0 = new JRadioButton("0");
 
+	private Component[] editableComponents = { previousButton,
+			saveButton, nextButton, ingredientButton };
+
 	private JTextField prepTime, cookTime, serveText, tagField;
 
 	/**
@@ -98,19 +99,10 @@ public class RecipeEditor extends Module {
 
 		// If there is no recipe being loaded
 		if (recipe.getMethodSteps().isEmpty()) {
-			previousButton.setEnabled(false);
-			readButton.setEnabled(false);
-			saveButton.setEnabled(false);
-			nextButton.setEnabled(false);
-			ingredientButton.setEnabled(false);
+			setEnableDisable(false);
 		} else {
 			// if there is a recipe that this has been opened with
-			previousButton.setEnabled(true);
-			readButton.setEnabled(true);
-			saveButton.setEnabled(true);
-			nextButton.setEnabled(true);
-			startButton.setEnabled(true);
-			ingredientButton.setEnabled(true);
+			setEnableDisable(true);
 		}
 
 		// Configure the Panel structures and layouts
@@ -141,21 +133,18 @@ public class RecipeEditor extends Module {
 		secondStepPane.setViewportView(secondStepText);
 
 		// Adding to the infoPane
-		// infoPane.add(infoText);
 
 		controlPane.add(startButton);
 		controlPane.add(saveButton);
 
 		controlPane.add(ingredientButton);
 		controlPane.add(previousButton);
-		controlPane.add(readButton);
 		controlPane.add(nextButton);
 
 		// Set fonts for JButtons
 		startButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		previousButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		saveButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		readButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		nextButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		ingredientButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 
@@ -184,12 +173,7 @@ public class RecipeEditor extends Module {
 					instructions.add("Instruction " + (i + 1));
 				}
 
-				previousButton.setEnabled(true);
-				readButton.setEnabled(true);
-				saveButton.setEnabled(true);
-				nextButton.setEnabled(true);
-				startButton.setEnabled(true);
-				ingredientButton.setEnabled(true);
+				setEnableDisable(true);
 				startButton.setText("Restart Recipe");
 
 				firstStepText.setText(instructions.get(0));
@@ -281,8 +265,22 @@ public class RecipeEditor extends Module {
 				}
 
 				recipe.setTags(tagList);
-
 				
+				System.out.println("Tag List:");
+				for (String string : tagList) {
+					System.out.println(string);
+				}
+				
+				System.out.println("Ingredients");
+				for (String string : finalList) {
+					System.out.println(string);
+				}
+				
+				System.out.println("Steps:");
+				for (String string : instructions) {
+					System.out.println(string);
+				}
+
 				RecipeMethods.writeRecipe(recipe, new File(
 						"./Shokuhin/Recipes/" + recipe.getTitle() + ".rec"));
 			}
@@ -294,13 +292,7 @@ public class RecipeEditor extends Module {
 				previousStep();
 			}
 		});
-		readButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				RecipeMethods.read(firstStepText.getText());
-			}
-		});
 		nextButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -314,7 +306,6 @@ public class RecipeEditor extends Module {
 
 		firstStepText.setEditable(true);
 		secondStepText.setEditable(false);
-		// infoText.setEditable(false);
 		infoPane.setMaximumSize(new Dimension(9999, 500));
 
 		String tags = "";
@@ -506,6 +497,13 @@ public class RecipeEditor extends Module {
 
 		});
 		return menu;
+	}
+
+	private void setEnableDisable(boolean b) {
+
+		for (Component component : editableComponents) {
+			component.setEnabled(b);
+		}
 	}
 
 }
