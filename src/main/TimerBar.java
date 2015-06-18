@@ -179,7 +179,7 @@ public class TimerBar extends JPanel {
 	 *  Produce an audiovisual alarm and stop the Timer
 	 */
 	private void alert(){
-		MidiPlayer.play(MidiSongs.SPIRITED_AWAY_ALWAYS_WITH_ME); //audio
+		MidiPlayer.play(MidiSongs.FF7_PRELUDE); //audio
 		setBackground(ShokuhinMain.REDRUM_RED); //visual
 		timer.cancel();
 	}
