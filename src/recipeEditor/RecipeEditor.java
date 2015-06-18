@@ -36,7 +36,6 @@ public class RecipeEditor extends Module {
 	private static final long serialVersionUID = 306718353578602520L;
 
 	private Recipe recipe;
-	private ShokuhinMain main;
 
 	// Panel structure for Recipe Viewer, indicated by indentation
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -108,7 +107,6 @@ public class RecipeEditor extends Module {
 		super(m, recipe.getTitle());
 
 		this.recipe = recipe;
-		this.main = m;
 
 		// If there is no recipe being loaded
 		if (recipe.getMethodSteps().isEmpty()) {
@@ -167,7 +165,7 @@ public class RecipeEditor extends Module {
 		removeIngredientButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 
 		// Set up Listeners for JButtons
-		setupListeners(m);
+		setupListeners();
 
 		// Set up Text Areas
 		firstStepText.setFont(new Font("SansSerif", Font.BOLD, 18));
@@ -308,7 +306,7 @@ public class RecipeEditor extends Module {
 	 * @param m
 	 *            The ShokuhinMain used
 	 */
-	private void setupListeners(ShokuhinMain m) {
+	private void setupListeners() {
 
 		// Listens on the start button to start a new recipe.
 		startButton.addActionListener(new ActionListener() {
@@ -318,7 +316,7 @@ public class RecipeEditor extends Module {
 						.showInputDialog("Enter a name for the recipe");
 				if (!name.equals(null)) {
 					recipe.setTitle(name);
-					m.renameTab(name);
+					getPar().renameTab(name);
 				}
 
 				int steps;
@@ -545,7 +543,7 @@ public class RecipeEditor extends Module {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				main.openTab(new RecipeEditor(main, recipe));
+				getPar().openTab(new RecipeEditor(getPar(), recipe));
 			}
 
 		});
