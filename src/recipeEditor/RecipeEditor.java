@@ -6,9 +6,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -65,8 +63,11 @@ public class RecipeEditor extends Module {
 	private JButton startButton = new JButton("Start Recipe");
 	private JButton previousButton = new JButton("<- Previous Step");
 	private JButton saveButton = new JButton("Save Recipe");
+	private JButton addStepButton = new JButton("Add Step");
+	private JButton removeStepButton = new JButton("Delete Current Step");
 	private JButton nextButton = new JButton("Next Step ->");
 	private JButton ingredientButton = new JButton("Add Ingredient");
+	private JButton removeIngredientButton = new JButton("Remove Ingredient");
 
 	// Radio buttons for the meal
 	private JRadioButton breakfast = new JRadioButton("Breakfast");
@@ -89,7 +90,8 @@ public class RecipeEditor extends Module {
 
 	// Components which are editable
 	private Component[] editableComponents = { previousButton, saveButton,
-			nextButton, ingredientButton };
+			nextButton, ingredientButton, addStepButton, removeStepButton,
+			removeIngredientButton };
 
 	// Text fields used
 	private JTextField prepTime, cookTime, serveText, tagField;
@@ -147,7 +149,10 @@ public class RecipeEditor extends Module {
 		// Adding to the infoPane
 		controlPane.add(startButton);
 		controlPane.add(saveButton);
+		controlPane.add(addStepButton);
+		controlPane.add(removeStepButton);
 		controlPane.add(ingredientButton);
+		controlPane.add(removeIngredientButton);
 		controlPane.add(previousButton);
 		controlPane.add(nextButton);
 
@@ -155,8 +160,11 @@ public class RecipeEditor extends Module {
 		startButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		previousButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		saveButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		addStepButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		removeStepButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		nextButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		ingredientButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		removeIngredientButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
 
 		// Set up Listeners for JButtons
 		setupListeners(m);
@@ -446,6 +454,29 @@ public class RecipeEditor extends Module {
 				nextStep();
 			}
 		});
+
+		addStepButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addStep();
+			}
+		});
+
+		removeStepButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				removeStep();
+			}
+		});
+
+		removeIngredientButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String ingredient = ingredientsList.getSelectedValue();
+
+				listModel.removeElement(ingredient);
+			}
+		});
 	}
 
 	/**
@@ -519,6 +550,40 @@ public class RecipeEditor extends Module {
 
 		});
 		return menu;
+	}
+
+	/**
+	 * Adds a new step to the recipe
+	 */
+	private void addStep() {
+		instructions.add(currentInstruction + 1, "Added Instruction");
+		secondStepText.setText("Added Instruction");
+	}
+
+	/**
+	 * Removes the current step from the recipe
+	 */
+	private void removeStep() {
+		if (instructions.size() == 1) {
+			JOptionPane.showMessageDialog(null,
+					"There is only one instruction left!");
+		} else {
+			instructions.remove(currentInstruction);
+
+			if (currentInstruction != 0) {
+				currentInstruction--;
+			}
+
+			firstStepText.setText(instructions.get(currentInstruction));
+
+			try {
+				secondStepText
+						.setText(instructions.get(currentInstruction + 1));
+			} catch (Exception e) {
+				secondStepText.setText("End of recipe");
+			}
+		}
+
 	}
 
 	/**
