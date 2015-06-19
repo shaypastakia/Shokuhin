@@ -12,6 +12,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
+import recipe.RecipeMethods;
 import recipeSearch.RecipeSearch;
 
 /**

@@ -315,6 +315,7 @@ public class RecipeMethods {
 					player.start();
 					player.join();
 				} catch (Exception e) {
+					System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
 					Voice voice;
 					VoiceManager voiceManager = VoiceManager.getInstance();
 					voice = voiceManager.getVoice("kevin16");
