@@ -8,6 +8,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -24,6 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import javazoom.jl.decoder.JavaLayerException;
 import main.Module;
@@ -87,6 +92,15 @@ public class MP3Player extends Module {
 	 */
 	public MP3Player(ShokuhinMain m) {
 		super(m, "MP3 Player");
+
+		createGui();
+		songs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		setUpListeners();
+		setUpControls();
+		add(splitPane);
+	}
+	
+	private void createGui(){
 		// Create the MP3 player
 
 		// Create the necessary buttons
@@ -130,11 +144,6 @@ public class MP3Player extends Module {
 		next.setEnabled(false);
 		previous.setEnabled(false);
 		remove.setEnabled(false);
-
-		songs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		setUpListeners();
-		setUpControls();
-		add(splitPane);
 	}
 
 	/**
@@ -424,12 +433,98 @@ public class MP3Player extends Module {
 	@Override
 	public JMenu getFunctionMenu() {
 		JMenu menu = new JMenu("MP3 Player");
+		JMenuItem loadPlaylist = new JMenuItem("Load Playlist");
+		JMenuItem savePlaylist = new JMenuItem("Save Playlist");
+		
+		FileFilter loadFilter = new FileNameExtensionFilter("Shokuhin Playlist '.spl'", "spl");
+		loadPlaylist.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileFilter(loadFilter);
+				chooser.showOpenDialog(null);
+				File file = chooser.getSelectedFile();
+				System.out.println("5");
+				if (file == null)
+					return;
+				System.out.println("4");
+				try {
+					System.out.println("3");
+					FileInputStream in = new FileInputStream(file);
+					ObjectInputStream inStream = new ObjectInputStream(in);
+					@SuppressWarnings("unchecked")
+					ArrayList<File> files = (ArrayList<File>) inStream.readObject();
+					inStream.close();
+					System.out.println("2");
+					System.out.println("1");
+					player = null;
+					INTERRUPTED = false;
+					currentSong = -1;
+					songPaths.clear();
+					listModel.clear();
+					for (File f : files){
+						System.out.println(f.getAbsolutePath());
+						songPaths.add(f);
+						listModel.addElement(f.getName().replaceAll(".mp3", ""));
+					}
+					
+					if (songPaths.size() > 0
+							&& (player == null || player.state() != 1)) {
+						play.setEnabled(true);
+					} else {
+						play.setEnabled(false);
+					}
 
-		// A menu item that can be used when there are no functions to be
-		// displayed
-		JMenuItem noFuncs = new JMenuItem("(No functions)");
-		noFuncs.setEnabled(false);
-		menu.add(noFuncs);
+					checkForNextAndPrev();
+
+					remove.setEnabled(true);
+					// Don't need to activate pause and stop until the song
+					// is
+					// actually playing
+					if (songPaths.size() > 0) {
+						currentSong = 0;
+						update();
+					}
+					
+					/*
+					 * 		createGui();
+		songs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		setUpListeners();
+		setUpControls();
+					 */
+				} catch (Exception e1) {
+					ShokuhinMain.displayMessage("Error", "Failed to load Playlist.\n" + e1.getMessage(), JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
+		savePlaylist.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if (songPaths.isEmpty()){
+						ShokuhinMain.displayMessage("Error", "Can't save an empty Playlist.\nTry adding some songs to the Playlist first.", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					JFileChooser chooser = new JFileChooser();
+					chooser.showSaveDialog(null);
+					File file = chooser.getSelectedFile();
+					if (file == null)
+						return;
+					if (!file.getPath().endsWith(".spl"))
+						file = new File(file.getAbsoluteFile()+ ".spl");
+					FileOutputStream out = new FileOutputStream(file);
+					ObjectOutputStream outStream = new ObjectOutputStream(out);
+					outStream.writeObject(songPaths);
+					out.close();
+					ShokuhinMain.displayMessage("Success", "Successfully saved Playlist to " + file.getPath(), JOptionPane.INFORMATION_MESSAGE);
+				} catch (Exception ex){
+					ShokuhinMain.displayMessage("Error", "Failed to save Playlist.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		menu.add(loadPlaylist);
+		menu.add(savePlaylist);
 		return menu;
 	}
 
