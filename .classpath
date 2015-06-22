@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="lib/freetts/cmulex.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/en_us.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/freetts.jar"/>
+	<classpathentry kind="lib" path="lib/jl1.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

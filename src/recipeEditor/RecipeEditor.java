@@ -37,7 +37,7 @@ public class RecipeEditor extends Module {
 
 	private Recipe recipe;
 
-	// Panel structure for Recipe Viewer, indicated by indentation
+	// Panel structure for Recipe Editor, indicated by indentation
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private JScrollPane ingredientsPane = new JScrollPane();
 	private JPanel methodPane = new JPanel();
@@ -46,14 +46,14 @@ public class RecipeEditor extends Module {
 	private JPanel controlPane = new JPanel();
 	private JPanel infoPane = new JPanel();
 
-	// Data structures used in Recipe Viewer
+	// Data structures used in Recipe Editor
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
 	private ArrayList<String> instructions = new ArrayList<String>();
 
 	// Represents the current instruction one is viewing
 	private int currentInstruction = 0;
 
-	// Swing objects used in Recipe Viewer
+	// Swing objects used in Recipe Editor
 	private JList<String> ingredientsList = new JList<String>(listModel);
 	private JTextArea firstStepText = new JTextArea();
 	private JTextArea secondStepText = new JTextArea();
