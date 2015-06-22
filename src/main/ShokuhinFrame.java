@@ -112,13 +112,11 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		
 		//Add new modules to the 'Open New Tab' Menu
 		JMenu openTab = new JMenu("Open New Tab");
-		JMenuItem openTest = new JMenuItem("Test");
 		JMenuItem recipeEditor = new JMenuItem("Recipe Editor");
 		JMenuItem recipeSearch = new JMenuItem("Recipe Search");
 		JMenuItem recipeViewer = new JMenuItem("Recipe Viewer");
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
 		fileMenu.add(openTab);
-		openTab.add(openTest);
 		openTab.add(recipeEditor);
 		openTab.add(recipeSearch);
 		openTab.add(recipeViewer);
@@ -156,8 +154,6 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		//All File->Open New Tab buttons are set to trigger this method.
 		//The switch statement determines which Menu Item was pressed, then requests for ShokuhinMain to open a new tab
 			switch(e.getActionCommand()) {
-			case "Test": main.openTab(new Test(main));
-				break;
 			case "Recipe Editor": main.openTab(new RecipeEditor(main, new Recipe("test")));
 				break;
 			case "Recipe Search": main.openTab(new RecipeSearch(main));

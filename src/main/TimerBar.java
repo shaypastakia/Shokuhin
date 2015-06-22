@@ -17,6 +17,7 @@ import javax.swing.SpinnerNumberModel;
 
 import midiPlayer.MidiPlayer;
 import midiPlayer.MidiSongs;
+import mp3Player.MP3Player;
 
 /**
  * TimerBar
@@ -34,8 +35,11 @@ public class TimerBar extends JPanel {
 	JButton start = new JButton("Start");
 	JButton stop = new JButton ("Stop");
 	Timer timer = new Timer();
+	ShokuhinMain main;
+	private boolean interrupted = false;
 	
-	public TimerBar() {
+	public TimerBar(ShokuhinMain m) {
+		this.main = m;
 		setMaximumSize(new Dimension(9999, 500));
 		createGui();
 	}
@@ -126,6 +130,9 @@ public class TimerBar extends JPanel {
 				//Cancel the timer, stop the melody, disable the Stop button, enable the Start button, and restore the background colour
 				timer.cancel();
 				MidiPlayer.stop();
+				MP3Player player = main.getPlayer();
+				if (player != null && interrupted)
+					player.resume();
 				stop.setEnabled(false);
 				start.setEnabled(true);
 				setBackground(ShokuhinMain.DEFAULT_CAMPUS_FOG);
@@ -179,6 +186,15 @@ public class TimerBar extends JPanel {
 	 *  Produce an audiovisual alarm and stop the Timer
 	 */
 	private void alert(){
+		MP3Player player = main.getPlayer();
+		if (player != null){
+			if (player.getPlayerState() == 1){
+				player.interrupt();
+				interrupted = true;
+			} else {
+				interrupted = false;
+			}
+		}
 		MidiPlayer.play(MidiSongs.FF7_PRELUDE); //audio
 		setBackground(ShokuhinMain.REDRUM_RED); //visual
 		timer.cancel();

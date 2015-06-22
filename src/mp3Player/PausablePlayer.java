@@ -154,7 +154,7 @@ public class PausablePlayer {
 	}
 
 	/**
-	 * Changes the volume of the player to a specifid value
+	 * Changes the volume of the player to a specified value
 	 */
 	public void changeVolume() {
 

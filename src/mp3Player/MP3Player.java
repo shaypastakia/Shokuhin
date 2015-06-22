@@ -1,6 +1,7 @@
 package mp3Player;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -20,12 +21,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 
 import javazoom.jl.decoder.JavaLayerException;
 import main.Module;
 import main.ShokuhinMain;
+import main.TimerBar;
 
 public class MP3Player extends Module {
 	private static final long serialVersionUID = -6219613302072108822L;
@@ -66,6 +69,16 @@ public class MP3Player extends Module {
 	private JList<String> songs = new JList<String>(listModel);
 	private ArrayList<File> songPaths = new ArrayList<File>();
 
+	/**
+	 * Controls for TimerBar
+	 */
+	TimerBar bar = ShokuhinMain.timer;
+	JSeparator septimus = new JSeparator();
+	JButton playButton = new JButton("Play");
+	JButton pauseButton = new JButton("Pause");
+	JButton prevButton = new JButton("Previous");
+	JButton nextButton = new JButton("Next");
+	
 	/**
 	 * Creates an MP3Player module
 	 * 
@@ -120,6 +133,7 @@ public class MP3Player extends Module {
 
 		songs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setUpListeners();
+		setUpControls();
 		add(splitPane);
 	}
 
@@ -131,6 +145,13 @@ public class MP3Player extends Module {
 		if (player != null) {
 			player.close();
 		}
+		
+		bar.remove(septimus);
+		bar.remove(playButton);
+		bar.remove(pauseButton);
+		bar.remove(prevButton);
+		bar.remove(nextButton);
+		
 		return true;
 	}
 
@@ -328,6 +349,74 @@ public class MP3Player extends Module {
 			}
 		});
 	}
+	
+	/**
+	 * Produces the controls for the Timer Bar
+	 */
+	private void setUpControls(){
+		bar.add(septimus);
+		bar.add(playButton);
+		bar.add(pauseButton);
+		bar.add(prevButton);
+		bar.add(nextButton);
+		playButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
+		pauseButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
+		prevButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
+		nextButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
+		
+		playButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				resume();
+			}
+		});
+		
+		pauseButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				interrupt();
+			}
+		});
+		
+		nextButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (player == null || player.state() == 2
+						|| player.state() == 3) {
+					currentSong++;
+					update();
+				} else {
+					player.close();
+					currentSong++;
+					update();
+					playSong();
+				}
+
+				checkForNextAndPrev();
+			}
+		});
+
+		// Add the listener that moves to the previous song
+		prevButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (player == null || player.state() == 2
+						|| player.state() == 3) {
+					currentSong--;
+					update();
+				} else {
+					player.close();
+					currentSong--;
+					update();
+					playSong();
+				}
+
+				checkForNextAndPrev();
+			}
+		});
+	}
 
 	/**
 	 * obtains the function menu
@@ -400,18 +489,22 @@ public class MP3Player extends Module {
 			songPaths.get(currentSong + 1);
 			// There is a next song
 			next.setEnabled(true);
+			nextButton.setEnabled(true);
 		} catch (Exception e1) {
 			// There is no next song
 			next.setEnabled(false);
+			nextButton.setEnabled(false);
 		}
 
 		try {
 			songPaths.get(currentSong - 1);
 			// There is a previous song
 			previous.setEnabled(true);
+			prevButton.setEnabled(true);
 		} catch (Exception e1) {
 			// There is no previous song
 			previous.setEnabled(false);
+			prevButton.setEnabled(false);
 		}
 	}
 
@@ -437,6 +530,14 @@ public class MP3Player extends Module {
 			play.doClick();
 			INTERRUPTED = false;
 		}
+	}
+	
+	/**
+	 * Return the state of the internal Player
+	 * @return player state
+	 */
+	public int getPlayerState(){
+		return player.state();
 	}
 
 }
