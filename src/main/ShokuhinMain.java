@@ -12,7 +12,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
-import recipe.RecipeMethods;
+import mp3Player.MP3Player;
 import recipeSearch.RecipeSearch;
 
 /**
@@ -76,7 +76,7 @@ public class ShokuhinMain {
 		frame = new ShokuhinFrame("Shokuhin", this);
 		
 		//Create Timer Bar
-		timer = new TimerBar();
+		timer = new TimerBar(this);
 		//Create a Tabbed Pane to display tabs for all Modules
 		tabPane = new JTabbedPane();
 
@@ -142,20 +142,12 @@ public class ShokuhinMain {
 		tabPane.setTitleAt(tabPane.getSelectedIndex(), newName);
 	}
 	
-	/**
-	 * Add a graphical component to the Timer Bar
-	 * @param c The Component to add
-	 */
-	public static void addToTimerBar(Component c){
-		timer.add(c);
-	}
-	
-	/**
-	 * Remove a graphical component from the Timer Bar
-	 * @param c The Component to remove
-	 */
-	public static void removeFromTimerBar(Component c){
-		timer.remove(c);
+	public MP3Player getPlayer(){
+		Component[] comps = tabPane.getComponents();
+		for (Component c : comps)
+			if (c instanceof MP3Player)
+				return (MP3Player) c;
+		return null;
 	}
 	
 	/**
