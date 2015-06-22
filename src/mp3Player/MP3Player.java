@@ -36,8 +36,12 @@ public class MP3Player extends Module {
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private JScrollPane songPane = new JScrollPane();
 	private JPanel otherPane = new JPanel();
-	private JPanel songInfoPane = new JPanel();
 	private JPanel controlPane = new JPanel();
+
+	/**
+	 * Determines whether the player was interrupted or just paused;
+	 */
+	private boolean INTERRUPTED = false;
 
 	/**
 	 * Stores the index of the current song
@@ -91,14 +95,14 @@ public class MP3Player extends Module {
 		otherPane.setLayout(new BoxLayout(otherPane, BoxLayout.PAGE_AXIS));
 		controlPane.setLayout(new BoxLayout(controlPane, BoxLayout.LINE_AXIS));
 
-		otherPane.add(songInfoPane);
 		otherPane.add(controlPane);
 
 		// Set up Borders for Panels
 		songPane.setBorder(BorderFactory.createTitledBorder("Playlist: "));
-		songInfoPane.setBorder(BorderFactory
-				.createTitledBorder("Currently Playing: "));
-		controlPane.setBorder(BorderFactory.createTitledBorder("Actions: "));
+
+		controlPane.setBorder(BorderFactory
+				.createTitledBorder("Current Song: "));
+
 		controlPane.add(play);
 		controlPane.add(pause);
 		controlPane.add(stop);
@@ -139,42 +143,52 @@ public class MP3Player extends Module {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				final JFileChooser fc = new JFileChooser();
-
+				fc.setMultiSelectionEnabled(true);
 				int returnVal = fc.showOpenDialog(null);
 
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					String fileName = fc.getSelectedFile().getName();
-					File file = fc.getSelectedFile();
+					// String fileName = fc.getSelectedFile().getName();
+					// File file = fc.getSelectedFile();
 
-					if (fileName.endsWith(".mp3")) {
-						// We have an mp3 file
-						listModel.addElement(fileName.replace(".mp3", ""));
-						songPaths.add(file);
-
-						if (player == null || player.state() != 1) {
-							play.setEnabled(true);
-						} else {
-							play.setEnabled(false);
+					File[] files = fc.getSelectedFiles();
+					for (File f : files) {
+						String filename = f.getName();
+						if (filename.endsWith(".mp3")) {
+							listModel.addElement(filename.replace(".mp3", ""));
+							songPaths.add(f);
 						}
-
-						checkForNextAndPrev();
-
-						remove.setEnabled(true);
-						// Don't need to activate pause and stop until the song
-						// is
-						// actually playing
-						if (songPaths.size() == 1) {
-							currentSong = 0;
-							update();
-						}
-
-					} else {
-						// We don't have an mp3 file
-						JOptionPane.showMessageDialog(null,
-								"Only Mp3 files can be selected.");
 					}
+
+					// if (fileName.endsWith(".mp3")) {
+					// // We have an mp3 file
+					// listModel.addElement(fileName.replace(".mp3", ""));
+					// songPaths.add(file);
+
+					if (songPaths.size() > 0
+							&& (player == null || player.state() != 1)) {
+						play.setEnabled(true);
+					} else {
+						play.setEnabled(false);
+					}
+
+					checkForNextAndPrev();
+
+					remove.setEnabled(true);
+					// Don't need to activate pause and stop until the song
+					// is
+					// actually playing
+					if (songPaths.size() > 0) {
+						currentSong = 0;
+						update();
+					}
+
+				} else {
+					// We don't have an mp3 file
+					JOptionPane.showMessageDialog(null,
+							"Only Mp3 files can be selected.");
 				}
 			}
+			// }
 		});
 
 		// Adds the listener that removes a song from the playlist
@@ -225,7 +239,18 @@ public class MP3Player extends Module {
 		play.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				playSong();
+				if (player == null) {
+					playSong();
+				} else if (player.state() == 2) {
+					play.setEnabled(false);
+					pause.setEnabled(true);
+					stop.setEnabled(true);
+					player.resume();
+				} else if (player.state() == 3) {
+					currentSong = 0;
+					update();
+					playSong();
+				}
 			}
 		});
 
@@ -362,9 +387,8 @@ public class MP3Player extends Module {
 	private void update() {
 		songs.setCellRenderer(new CellRenderer(this));
 
-		songInfoPane.setBorder(BorderFactory
-				.createTitledBorder("Current Song: "
-						+ songs.getModel().getElementAt(currentSong)));
+		controlPane.setBorder(BorderFactory.createTitledBorder("Current Song: "
+				+ songs.getModel().getElementAt(currentSong)));
 	}
 
 	/**
@@ -388,6 +412,30 @@ public class MP3Player extends Module {
 		} catch (Exception e1) {
 			// There is no previous song
 			previous.setEnabled(false);
+		}
+	}
+
+	/**
+	 * Interrupts the player and pauses the current music, if music is playing
+	 */
+	public void interrupt() {
+		if (player != null && player.state() == 1) {
+			player.pause();
+			play.setEnabled(true);
+			stop.setEnabled(true);
+			pause.setEnabled(false);
+			INTERRUPTED = true;
+		}
+	}
+
+	/**
+	 * Resumes the player after an interrupt, but if the player was paused
+	 * before the interrupt was called, then the player remains paused
+	 */
+	public void resume() {
+		if (INTERRUPTED) {
+			play.doClick();
+			INTERRUPTED = false;
 		}
 	}
 
