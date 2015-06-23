@@ -117,7 +117,7 @@ public class RecipeViewer extends Module {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				RecipeMethods.read(secondStepText.getText());
+				RecipeMethods.read(secondStepText.getText(), getPar().getPlayer());
 			}
 		});
 		nextButton.addActionListener(new ActionListener() {
@@ -215,7 +215,7 @@ public class RecipeViewer extends Module {
 			previousSteps.push(s);
 			secondStepText.setText(s);
 			if (autoRead)
-				RecipeMethods.read(s);
+				RecipeMethods.read(s, getPar().getPlayer());
 			s = steps.peek();
 			thirdStepText.setText(s);
 			firstStepText.setText(temp);

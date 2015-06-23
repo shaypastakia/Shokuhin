@@ -26,6 +26,7 @@ import main.ShokuhinMain;
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
 import marytts.util.data.audio.AudioPlayer;
+import mp3Player.MP3Player;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -79,8 +80,7 @@ public class RecipeMethods {
 	 */
 	public static Recipe readRecipe(File file){
 		try {
-			String filePath = file.getAbsolutePath();
-			InputStream fileIn = Files.newInputStream(new File(filePath).toPath());
+			InputStream fileIn = Files.newInputStream(file.toPath());
 			BufferedInputStream buff = new BufferedInputStream(fileIn);
 			ObjectInputStream obj = new ObjectInputStream(buff);
 			Recipe rec = (Recipe) obj.readObject();
@@ -102,7 +102,7 @@ public class RecipeMethods {
 			
 			return rec;
 		} catch (Exception e){
-			ShokuhinMain.displayMessage("Failed to write Recipe", "Returned the error: " + e.getMessage(), JOptionPane.WARNING_MESSAGE);
+			ShokuhinMain.displayMessage("Failed to read Recipe", "Returned the error: " + e.getMessage(), JOptionPane.WARNING_MESSAGE);
 			e.printStackTrace();
 			return null;
 		}
@@ -302,11 +302,20 @@ public class RecipeMethods {
 	 * Speak out the Current Step with Mary, or fall back to Kevin if need be
 	 * @param text The text to be read out
 	 */
-	public static void read(String text){
+	public static void read(String text, MP3Player mp3Player){
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
+					boolean interrupted = false;
+					if (mp3Player != null){
+						if (mp3Player.getPlayerState() == 1){
+							mp3Player.interrupt();
+							interrupted = true;
+						} else {
+							interrupted = false;
+						}
+					}
 					MaryInterface marytts = new LocalMaryInterface();
 					Set<String> voices = marytts.getAvailableVoices();
 					marytts.setVoice(voices.iterator().next());
@@ -314,6 +323,11 @@ public class RecipeMethods {
 					AudioPlayer player = new AudioPlayer(audio);
 					player.start();
 					player.join();
+					
+					if (mp3Player != null && interrupted){
+						while(player.isAlive()){}
+						mp3Player.resume();
+					}
 				} catch (Exception e) {
 					System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
 					Voice voice;

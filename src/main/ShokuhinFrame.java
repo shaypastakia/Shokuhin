@@ -134,7 +134,7 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 				Recipe recipe = RecipeMethods.parseRecipeUrl(url);
 				//TODO Change to open in Recipe Editor
 				if (recipe != null)
-					main.openTab(new RecipeViewer(main, recipe));
+					main.openTab(new RecipeEditor(main, recipe));
 				else
 					ShokuhinMain.displayMessage("Error", "Unable to parse Recipe from " + url, JOptionPane.ERROR_MESSAGE);
 			}
