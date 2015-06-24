@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,6 +77,11 @@ public class MP3Player extends Module {
 	private ArrayList<File> songPaths = new ArrayList<File>();
 
 	/**
+	 * Handles the continuous play of the playlist
+	 */
+	private Thread nextThread;
+
+	/**
 	 * Controls for TimerBar
 	 */
 	TimerBar bar = ShokuhinMain.timer;
@@ -83,7 +90,7 @@ public class MP3Player extends Module {
 	JButton pauseButton = new JButton("Pause");
 	JButton prevButton = new JButton("Previous");
 	JButton nextButton = new JButton("Next");
-	
+
 	/**
 	 * Creates an MP3Player module
 	 * 
@@ -98,9 +105,30 @@ public class MP3Player extends Module {
 		setUpListeners();
 		setUpControls();
 		add(splitPane);
+
+		nextThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					if (player == null) {
+
+					} else if (player.state() == 3) {
+						if (next.isEnabled())
+							next.doClick();
+					}
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+
+		nextThread.start();
 	}
-	
-	private void createGui(){
+
+	private void createGui() {
 		// Create the MP3 player
 
 		// Create the necessary buttons
@@ -154,13 +182,13 @@ public class MP3Player extends Module {
 		if (player != null) {
 			player.close();
 		}
-		
+
 		bar.remove(septimus);
 		bar.remove(playButton);
 		bar.remove(pauseButton);
 		bar.remove(prevButton);
 		bar.remove(nextButton);
-		
+
 		return true;
 	}
 
@@ -177,8 +205,6 @@ public class MP3Player extends Module {
 				int returnVal = fc.showOpenDialog(null);
 
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					// String fileName = fc.getSelectedFile().getName();
-					// File file = fc.getSelectedFile();
 
 					File[] files = fc.getSelectedFiles();
 					for (File f : files) {
@@ -188,11 +214,6 @@ public class MP3Player extends Module {
 							songPaths.add(f);
 						}
 					}
-
-					// if (fileName.endsWith(".mp3")) {
-					// // We have an mp3 file
-					// listModel.addElement(fileName.replace(".mp3", ""));
-					// songPaths.add(file);
 
 					if (songPaths.size() > 0
 							&& (player == null || player.state() != 1)) {
@@ -207,10 +228,11 @@ public class MP3Player extends Module {
 					// Don't need to activate pause and stop until the song
 					// is
 					// actually playing
-					if (songPaths.size() > 0) {
+					if (songPaths.size() > 0 && currentSong == -1) {
 						currentSong = 0;
-						update();
 					}
+
+					update();
 
 				} else {
 					// We don't have an mp3 file
@@ -324,8 +346,7 @@ public class MP3Player extends Module {
 		next.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (player == null || player.state() == 2
-						|| player.state() == 3) {
+				if (player == null || player.state() == 2) {
 					currentSong++;
 					update();
 				} else {
@@ -357,12 +378,29 @@ public class MP3Player extends Module {
 				checkForNextAndPrev();
 			}
 		});
+
+		songs.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					// Double clicked
+					int index = songs.locationToIndex(e.getPoint());
+					currentSong = index;
+					update();
+
+					if (player.state() == 1) {
+						player.pause();
+					}
+
+					playSong();
+				}
+			}
+		});
 	}
-	
+
 	/**
 	 * Produces the controls for the Timer Bar
 	 */
-	private void setUpControls(){
+	private void setUpControls() {
 		bar.add(septimus);
 		bar.add(playButton);
 		bar.add(pauseButton);
@@ -372,23 +410,23 @@ public class MP3Player extends Module {
 		pauseButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
 		prevButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
 		nextButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
-		
+
 		playButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				resume();
 			}
 		});
-		
+
 		pauseButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				interrupt();
 			}
 		});
-		
+
 		nextButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -435,8 +473,9 @@ public class MP3Player extends Module {
 		JMenu menu = new JMenu("MP3 Player");
 		JMenuItem loadPlaylist = new JMenuItem("Load Playlist");
 		JMenuItem savePlaylist = new JMenuItem("Save Playlist");
-		
-		FileFilter loadFilter = new FileNameExtensionFilter("Shokuhin Playlist '.spl'", "spl");
+
+		FileFilter loadFilter = new FileNameExtensionFilter(
+				"Shokuhin Playlist '.spl'", "spl");
 		loadPlaylist.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -453,7 +492,8 @@ public class MP3Player extends Module {
 					FileInputStream in = new FileInputStream(file);
 					ObjectInputStream inStream = new ObjectInputStream(in);
 					@SuppressWarnings("unchecked")
-					ArrayList<File> files = (ArrayList<File>) inStream.readObject();
+					ArrayList<File> files = (ArrayList<File>) inStream
+							.readObject();
 					inStream.close();
 					System.out.println("2");
 					System.out.println("1");
@@ -462,12 +502,13 @@ public class MP3Player extends Module {
 					currentSong = -1;
 					songPaths.clear();
 					listModel.clear();
-					for (File f : files){
+					for (File f : files) {
 						System.out.println(f.getAbsolutePath());
 						songPaths.add(f);
-						listModel.addElement(f.getName().replaceAll(".mp3", ""));
+						listModel
+								.addElement(f.getName().replaceAll(".mp3", ""));
 					}
-					
+
 					if (songPaths.size() > 0
 							&& (player == null || player.state() != 1)) {
 						play.setEnabled(true);
@@ -485,25 +526,30 @@ public class MP3Player extends Module {
 						currentSong = 0;
 						update();
 					}
-					
+
 					/*
-					 * 		createGui();
-		songs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		setUpListeners();
-		setUpControls();
+					 * createGui();
+					 * songs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION
+					 * ); setUpListeners(); setUpControls();
 					 */
 				} catch (Exception e1) {
-					ShokuhinMain.displayMessage("Error", "Failed to load Playlist.\n" + e1.getMessage(), JOptionPane.ERROR_MESSAGE);
+					ShokuhinMain.displayMessage("Error",
+							"Failed to load Playlist.\n" + e1.getMessage(),
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
-		
+
 		savePlaylist.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (songPaths.isEmpty()){
-						ShokuhinMain.displayMessage("Error", "Can't save an empty Playlist.\nTry adding some songs to the Playlist first.", JOptionPane.ERROR_MESSAGE);
+					if (songPaths.isEmpty()) {
+						ShokuhinMain
+								.displayMessage(
+										"Error",
+										"Can't save an empty Playlist.\nTry adding some songs to the Playlist first.",
+										JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					JFileChooser chooser = new JFileChooser();
@@ -512,14 +558,18 @@ public class MP3Player extends Module {
 					if (file == null)
 						return;
 					if (!file.getPath().endsWith(".spl"))
-						file = new File(file.getAbsoluteFile()+ ".spl");
+						file = new File(file.getAbsoluteFile() + ".spl");
 					FileOutputStream out = new FileOutputStream(file);
 					ObjectOutputStream outStream = new ObjectOutputStream(out);
 					outStream.writeObject(songPaths);
 					out.close();
-					ShokuhinMain.displayMessage("Success", "Successfully saved Playlist to " + file.getPath(), JOptionPane.INFORMATION_MESSAGE);
-				} catch (Exception ex){
-					ShokuhinMain.displayMessage("Error", "Failed to save Playlist.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+					ShokuhinMain.displayMessage("Success",
+							"Successfully saved Playlist to " + file.getPath(),
+							JOptionPane.INFORMATION_MESSAGE);
+				} catch (Exception ex) {
+					ShokuhinMain.displayMessage("Error",
+							"Failed to save Playlist.\n" + ex.getMessage(),
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -626,12 +676,13 @@ public class MP3Player extends Module {
 			INTERRUPTED = false;
 		}
 	}
-	
+
 	/**
 	 * Return the state of the internal Player
+	 * 
 	 * @return player state
 	 */
-	public int getPlayerState(){
+	public int getPlayerState() {
 		return player.state();
 	}
 

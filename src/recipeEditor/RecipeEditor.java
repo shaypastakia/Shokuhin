@@ -293,6 +293,8 @@ public class RecipeEditor extends Module {
 			}
 		}
 
+		System.out.println("Tags: " + tags);
+
 		tagField.setText(tags);
 		tagPanel.add(tagField);
 		infoPane.add(tagPanel);
@@ -414,8 +416,8 @@ public class RecipeEditor extends Module {
 				// Now we must parse the tags
 				ArrayList<String> tagList = new ArrayList<String>();
 
-				for (String word : tagField.getText().split(" ")) {
-					tagList.add(word);
+				for (String word : tagField.getText().split(",")) {
+					tagList.add(word.trim());
 				}
 
 				recipe.setTags(tagList);
