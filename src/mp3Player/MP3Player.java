@@ -84,12 +84,12 @@ public class MP3Player extends Module {
 	/**
 	 * Controls for TimerBar
 	 */
-	TimerBar bar = ShokuhinMain.timer;
-	JSeparator septimus = new JSeparator();
-	JButton playButton = new JButton("Play");
-	JButton pauseButton = new JButton("Pause");
-	JButton prevButton = new JButton("Previous");
-	JButton nextButton = new JButton("Next");
+	private TimerBar bar = ShokuhinMain.timer;
+	private JSeparator septimus = new JSeparator();
+	private JButton playButton = new JButton("Play");
+	private JButton pauseButton = new JButton("Pause");
+	private JButton prevButton = new JButton("Previous");
+	private JButton nextButton = new JButton("Next");
 
 	/**
 	 * Creates an MP3Player module
@@ -293,9 +293,12 @@ public class MP3Player extends Module {
 			public void actionPerformed(ActionEvent e) {
 				if (player == null) {
 					playSong();
+					pauseButton.setEnabled(true);
 				} else if (player.state() == 2) {
 					play.setEnabled(false);
+					playButton.setEnabled(false);
 					pause.setEnabled(true);
+					pauseButton.setEnabled(true);
 					stop.setEnabled(true);
 					player.resume();
 				} else if (player.state() == 3) {
@@ -312,8 +315,10 @@ public class MP3Player extends Module {
 			public void actionPerformed(ActionEvent e) {
 				player.pause();
 				play.setEnabled(true);
+				playButton.setEnabled(true);
 				stop.setEnabled(true);
 				pause.setEnabled(false);
+				pauseButton.setEnabled(false);
 			}
 		});
 
@@ -410,11 +415,16 @@ public class MP3Player extends Module {
 		pauseButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
 		prevButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
 		nextButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
+		
+		playButton.setEnabled(false);
+		pauseButton.setEnabled(false);
 
 		playButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				playButton.setEnabled(false);
+				pauseButton.setEnabled(true);
 				resume();
 			}
 		});
@@ -423,6 +433,8 @@ public class MP3Player extends Module {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				playButton.setEnabled(true);
+				pauseButton.setEnabled(false);
 				interrupt();
 			}
 		});
