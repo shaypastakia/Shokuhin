@@ -264,7 +264,6 @@ public class RecipeSearch extends Module implements ActionListener{
 		searchResultPanel.setViewportView(searchResultList);
 		searchResultPanel.setMinimumSize(new Dimension(200, 0));
 		searchResultList.addListSelectionListener(new ListSelectionListener() {
-			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				searchImagePanel.removeAll();
@@ -283,6 +282,7 @@ public class RecipeSearch extends Module implements ActionListener{
 				try {
 					BufferedImage image = ImageIO.read(file);
 					searchImagePanel.add(new JLabel(new ImageIcon(image)));
+					if (!searchResultList.getValueIsAdjusting())
 					searchControlPanel.paintAll(searchControlPanel.getGraphics());
 					System.out.println("Painted");
 				} catch (IOException e1) {

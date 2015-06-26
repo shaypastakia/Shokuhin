@@ -2,17 +2,13 @@ package main;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -27,7 +23,6 @@ import recipe.Recipe;
 import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
 import recipeSearch.RecipeSearch;
-import recipeViewer.RecipeViewer;
 
 /**
  * ShokuhinFrame
@@ -120,14 +115,12 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		
 		//Add new modules to the 'Open New Tab' Menu
 		JMenu openTab = new JMenu("Open New Tab");
-		JMenuItem recipeEditor = new JMenuItem("Recipe Editor");
-		JMenuItem recipeSearch = new JMenuItem("Recipe Search");
-		JMenuItem recipeViewer = new JMenuItem("Recipe Viewer");
+		JMenuItem recipeEditor = new JMenuItem("Create a Recipe");
+		JMenuItem recipeSearch = new JMenuItem("Search for Recipes");
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
 		fileMenu.add(openTab);
 		openTab.add(recipeEditor);
 		openTab.add(recipeSearch);
-		openTab.add(recipeViewer);
 		openTab.add(mp3Player);
 		
 		for (Component m : openTab.getMenuComponents())
@@ -185,11 +178,9 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		//All File->Open New Tab buttons are set to trigger this method.
 		//The switch statement determines which Menu Item was pressed, then requests for ShokuhinMain to open a new tab
 			switch(e.getActionCommand()) {
-			case "Recipe Editor": main.openTab(new RecipeEditor(main, new Recipe("test")));
+			case "Create a Recipe": main.openTab(new RecipeEditor(main, new Recipe("test")));
 				break;
-			case "Recipe Search": main.openTab(new RecipeSearch(main));
-				break;
-			case "Recipe Viewer": main.openTab(new RecipeViewer(main, new Recipe("test")));
+			case "Search for Recipes": main.openTab(new RecipeSearch(main));
 				break;
 			case "MP3 Player": main.openTab(new MP3Player(main));
 			}
