@@ -3,12 +3,12 @@ package home;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -18,8 +18,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -135,11 +137,8 @@ public class ShokuhinHome extends Module implements ActionListener {
 
 		rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
 
-		JLabel bbc_good_food_label = new JLabel(
-				"Top recipes on BBC Good Food: ");
-		bbc_good_food_label.setFont(new Font("SansSerif", Font.PLAIN, 20));
-
-		rightPane.add(bbc_good_food_label);
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(5, 3));
 
 		Iterator it = map.entrySet().iterator();
 		int i = 1;
@@ -149,9 +148,6 @@ public class ShokuhinHome extends Module implements ActionListener {
 			JLabel label = new JLabel(i + ") "
 					+ pair.getKey().toString().replaceAll("&amp;", "&"));
 
-			label.setPreferredSize(new Dimension(
-					bbc_good_food_label.getWidth(), bbc_good_food_label
-							.getHeight()));
 			label.setFont(new Font("SansSerif", Font.PLAIN, 15));
 			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -181,13 +177,16 @@ public class ShokuhinHome extends Module implements ActionListener {
 			});
 
 			it.remove(); // avoids a ConcurrentModificationException
-			rightPane.add(label);
-			rightPane.add(browser);
-			rightPane.add(viewer);
+			panel.add(label);
+			panel.add(browser);
+			panel.add(viewer);
 			i++;
 		}
 
 		add(leftPane);
+		rightPane.add(panel);
+		panel.setBorder(BorderFactory
+				.createTitledBorder("Today's most popular BBC Good Food Recipes: "));
 		add(rightPane);
 	}
 
