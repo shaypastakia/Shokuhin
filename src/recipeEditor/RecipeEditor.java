@@ -66,6 +66,7 @@ public class RecipeEditor extends Module {
 	private JButton removeStepButton = new JButton("Delete Current Step");
 	private JButton nextButton = new JButton("Next Step ->");
 	private JButton ingredientButton = new JButton("Add Ingredient");
+	private JButton editIngredientButton = new JButton("Edit Ingredient");
 	private JButton removeIngredientButton = new JButton("Remove Ingredient");
 
 	// Radio buttons for the meal
@@ -90,7 +91,7 @@ public class RecipeEditor extends Module {
 	// Components which are editable
 	private Component[] editableComponents = { previousButton, saveButton,
 			nextButton, ingredientButton, addStepButton, removeStepButton,
-			removeIngredientButton };
+			removeIngredientButton, editIngredientButton };
 
 	// Text fields used
 	private JTextField prepTime, cookTime, serveText, tagField;
@@ -150,19 +151,21 @@ public class RecipeEditor extends Module {
 		controlPane.add(addStepButton);
 		controlPane.add(removeStepButton);
 		controlPane.add(ingredientButton);
+		controlPane.add(editIngredientButton);
 		controlPane.add(removeIngredientButton);
 		controlPane.add(previousButton);
 		controlPane.add(nextButton);
 
 		// Set fonts for JButtons
-		startButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		previousButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		saveButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		addStepButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		removeStepButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		nextButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		ingredientButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		removeIngredientButton.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		startButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		previousButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		saveButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		addStepButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		removeStepButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		nextButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		ingredientButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		removeIngredientButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		editIngredientButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
 
 		// Set up Listeners for JButtons
 		setupListeners();
@@ -474,7 +477,30 @@ public class RecipeEditor extends Module {
 			public void actionPerformed(ActionEvent e) {
 				String ingredient = ingredientsList.getSelectedValue();
 
-				listModel.removeElement(ingredient);
+				if (!ingredient.equals(null))
+					listModel.removeElement(ingredient);
+				else
+					JOptionPane.showMessageDialog(null,
+							"Please select a ingredient to remove");
+			}
+		});
+
+		editIngredientButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int index = ingredientsList.getSelectedIndex();
+
+				if (index > -1) {
+					String newIngredient = JOptionPane
+							.showInputDialog("Change this ingredient to what?");
+					if (!newIngredient.equals(null)) {
+						listModel.remove(index);
+						listModel.add(index, newIngredient);
+					}
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"Please select a ingredient to change");
+				}
 			}
 		});
 	}
