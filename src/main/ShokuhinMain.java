@@ -1,5 +1,7 @@
 package main;
 
+import home.ShokuhinHome;
+
 import java.awt.Color;
 import java.awt.Component;
 

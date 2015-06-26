@@ -1,6 +1,4 @@
-package main;
-
-import home.HomeMethods;
+package home;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -32,6 +30,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+
+import main.Module;
+import main.ShokuhinMain;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
