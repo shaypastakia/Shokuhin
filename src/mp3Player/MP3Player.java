@@ -79,7 +79,7 @@ public class MP3Player extends Module {
 	/**
 	 * Handles the continuous play of the playlist
 	 */
-	private Thread nextThread;
+	private NextThread nextThread;
 
 	/**
 	 * Controls for TimerBar
@@ -106,10 +106,10 @@ public class MP3Player extends Module {
 		setUpControls();
 		add(splitPane);
 
-		nextThread = new Thread(new Runnable() {
+		nextThread = new NextThread(new Runnable() {
 			@Override
 			public void run() {
-				while (true) {
+				while (nextThread.isRunnable()) {
 					if (player == null) {
 
 					} else if (player.state() == 3) {
@@ -182,6 +182,12 @@ public class MP3Player extends Module {
 		if (player != null) {
 			player.close();
 		}
+
+		nextThread.setRunnable(false);
+
+		while (nextThread.isAlive())
+			;
+		nextThread = null;
 
 		bar.remove(septimus);
 		bar.remove(playButton);
@@ -415,7 +421,7 @@ public class MP3Player extends Module {
 		pauseButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
 		prevButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
 		nextButton.setFont(new Font("Times New Roman", Font.PLAIN, 26));
-		
+
 		playButton.setEnabled(false);
 		pauseButton.setEnabled(false);
 
