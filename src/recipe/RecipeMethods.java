@@ -155,33 +155,33 @@ public class RecipeMethods {
 		
 		try {
 			System.out.println(url);
-		//Connect to the Recipe URL
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", "Chrome");
-		
-		//Get the resulting page 
-		InputStreamReader in = new InputStreamReader(connection.getInputStream());
-		BufferedReader bufIn = new BufferedReader(in);
-		String temp;
-		String response = "";
-		
-		//Write the page into a String
-		while ((temp = bufIn.readLine()) != null){
-			response = response.concat(temp);
-		}
-		bufIn.close();
-		//Produce a HTML Document from the response
-		Document doc = Jsoup.parse(response);
-		if(url.contains("bbcgoodfood"))
-			return parseBBCGoodFood(doc);
-		else if(url.contains("bbc"))
-			return parseBBC(doc);
-		else if(url.contains("allrecipes"))
-			return parseAllRecipes(doc);
-		else
-			return null;
+			//Connect to the Recipe URL
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setRequestProperty("User-Agent", "Chrome");
+			
+			//Get the resulting page 
+			InputStreamReader in = new InputStreamReader(connection.getInputStream());
+			BufferedReader bufIn = new BufferedReader(in);
+			String temp;
+			String response = "";
+			
+			//Write the page into a String
+			while ((temp = bufIn.readLine()) != null){
+				response = response.concat(temp);
+			}
+			bufIn.close();
+			//Produce a HTML Document from the response
+			Document doc = Jsoup.parse(response);
+			if(url.contains("bbcgoodfood"))
+				return parseBBCGoodFood(doc);
+			else if(url.contains("bbc"))
+				return parseBBC(doc);
+			else if(url.contains("allrecipes"))
+				return parseAllRecipes(doc);
+			else
+				return null;
 		} catch (Exception e){
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return null;
 		}
 	}
@@ -193,7 +193,7 @@ public class RecipeMethods {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
 			String titleElementText = titleElement.get(0).text();
-			parsedRecipe.setTitle(titleElementText);
+			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
 			
 			//Get the rating of the Recipe
 			String ratingValue = doc.getElementsByAttributeValue("itemprop", "ratingValue").get(0).attr("content");
@@ -228,7 +228,7 @@ public class RecipeMethods {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
 			String titleElementText = titleElement.get(0).text();
-			parsedRecipe.setTitle(titleElementText);
+			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
 			
 			//Get the rating of the Recipe
 			Element ratingElement = doc.getElementById("starRating");
@@ -271,7 +271,7 @@ public class RecipeMethods {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByClass("article-title");
 			String titleElementText = titleElement.get(0).text();
-			parsedRecipe.setTitle(titleElementText);
+			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
 			
 			//Get the ingredients of the Recipe
 			Elements ingredientsElement = doc.getElementsByAttributeValue("id", "ingredients");

@@ -2,10 +2,18 @@ package main;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -14,12 +22,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import mp3Player.MP3Player;
 import recipe.Recipe;
 import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
 import recipeSearch.RecipeSearch;
 import recipeViewer.RecipeViewer;
-import mp3Player.MP3Player;
 
 /**
  * ShokuhinFrame
@@ -130,13 +138,36 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		parse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String url = JOptionPane.showInputDialog(null,"Enter a URL for a recipe on:\nBBC Good Food (bbcgoodfood.com)\nAll Recipes (allrecipes.co.uk)\nBBC (bbc.co.uk/food)\nto parse:");
+				String copy = "";
+				try {
+					String temp = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+					if (temp.contains("bbcgoodfood.com") || temp.contains("allrecipes.co.uk") || temp.contains("bbc.co.uk/food"))
+						copy = temp;
+				} catch (Exception e1) {}
+				String url = JOptionPane.showInputDialog(null,"Enter a URL for a recipe on:\nBBC Good Food (bbcgoodfood.com)\nAll Recipes (allrecipes.co.uk)\nBBC (bbc.co.uk/food)\nto parse:", copy);
 				Recipe recipe = RecipeMethods.parseRecipeUrl(url);
-				//TODO Change to open in Recipe Editor
-				if (recipe != null)
+
+				if (recipe != null){
+					String title = JOptionPane.showInputDialog(null, "Enter a title for the recipe:", recipe.getTitle());
+					if (title == null || title.equals(""))
+						return;
+					ArrayList<String> titles = RecipeMethods.getRecipeFileNames();
+					for (String s : titles){
+						if (s.toLowerCase().equals(title.toLowerCase())){
+							ShokuhinMain.displayMessage("Error", "A Recipe with this Title already exists", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+					}
+					
+					recipe.setTitle(title);
 					main.openTab(new RecipeEditor(main, recipe));
-				else
+				}
+					
+				else {
+					if (url == null || url.equals(""))
+						return;
 					ShokuhinMain.displayMessage("Error", "Unable to parse Recipe from " + url, JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
@@ -178,6 +209,11 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		for (Component m: main.tabPane.getComponents())
 			((Module) m).close();
 
+		try {
+			new File("./log/server.log").delete();
+		} catch (Exception e1) {
+
+		}
 		System.exit(0);
 	}
 
