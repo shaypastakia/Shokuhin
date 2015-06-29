@@ -1,14 +1,22 @@
 package home;
 
 import java.awt.Desktop;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+
+import javax.imageio.ImageIO;
+
+import main.ShokuhinMain;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -93,6 +101,53 @@ public class HomeMethods {
 		}
 
 		return map;
+	}
+	
+	public static ArrayList<BufferedImage> getImages() {
+		HashMap<String, String> map = getBBCGoodFoodTopRecipes();
+		ArrayList<String> urls = new ArrayList<String>();
+		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+		urls.addAll(map.values());
+		
+		for (String url :urls){
+			HttpURLConnection connection;
+			try {
+				connection = (HttpURLConnection) new URL(url).openConnection();
+			} catch (IOException e) {
+				return null;
+			}
+			connection.setRequestProperty("User-Agent", "Chrome");
+			InputStreamReader in;
+			try {
+				in = new InputStreamReader(connection.getInputStream());
+			} catch (IOException e) {
+				return null;
+			}
+			BufferedReader bufIn = new BufferedReader(in);
+			String temp;
+			String response = "";
+			try {
+				while ((temp = bufIn.readLine()) != null) {
+					response = response.concat(temp);
+				}
+			} catch (IOException e) {
+				return null;
+			}
+			try {
+				bufIn.close();
+			} catch (IOException e) {
+				return null;
+			}
+			Document doc = Jsoup.parse(response);
+			Element e = doc.getElementsByAttributeValue("itemprop", "image").get(0);
+			try {
+				images.add(ImageIO.read(new URL(e.absUrl("src"))));
+			} catch (Exception e1) {
+				return null;
+			}
+			
+		}
+		return images;
 	}
 
 	private static void openWebpage(URI uri) {

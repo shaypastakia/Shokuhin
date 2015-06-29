@@ -3,11 +3,14 @@ package home;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -21,8 +24,9 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -142,6 +146,7 @@ public class ShokuhinHome extends Module implements ActionListener {
 
 		Iterator it = map.entrySet().iterator();
 		int i = 1;
+		ArrayList<JButton> buttons = new ArrayList<JButton>();
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
 			String url = pair.getValue().toString();
@@ -153,6 +158,8 @@ public class ShokuhinHome extends Module implements ActionListener {
 
 			JButton browser = new JButton("Open in browser");
 			JButton viewer = new JButton("Open in viewer");
+			@SuppressWarnings("unused")
+			JButton icon = null;
 
 			browser.addActionListener(new ActionListener() {
 				@Override
@@ -180,9 +187,43 @@ public class ShokuhinHome extends Module implements ActionListener {
 			panel.add(label);
 			panel.add(browser);
 			panel.add(viewer);
+			JButton button = new JButton();
+			panel.add(button);
+			buttons.add(button);
 			i++;
 		}
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				ArrayList<BufferedImage> images = HomeMethods.getImages();
+				for (BufferedImage img : images){
+					if (images != null && img != null){
+						buttons.get(images.indexOf(img)).setIcon(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_FAST)));
+						buttons.get(images.indexOf(img)).addActionListener(new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								JFrame frame = new JFrame();
+								JPanel panel = new JPanel(){
+									private static final long serialVersionUID = 2616344909729135448L;
 
+									public void paint(Graphics g){
+										g.drawImage(img, 0, 0, null);
+									}
+								};
+								frame.add(panel);
+								panel.repaint();
+								panel.setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
+								frame.pack();
+								frame.setVisible(true);
+							}
+						});
+					}
+				}
+			}
+		}).start();
 		add(leftPane);
 		rightPane.add(panel);
 		panel.setBorder(BorderFactory
