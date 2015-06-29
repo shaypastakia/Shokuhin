@@ -97,34 +97,17 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 			}
 		});
 		
-		JMenuItem closeShokuhin = new JMenuItem("Exit Shokuhin");
-		closeShokuhin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int close = JOptionPane.showConfirmDialog(new JFrame(), "Are you sure you want to exit Shokuhin?" +
-						"\nPlease make sure all tabs have been saved.", "Exit Shokuhin", JOptionPane.YES_NO_OPTION);
-				if (close == JOptionPane.YES_OPTION){
-					//Call the close() method of all Modules before closing
-					for (Component m: main.tabPane.getComponents())
-						((Module) m).close();
-
-					System.exit(0);
-				}
-					
-			}
-		});
-		
 		//Add new modules to the 'Open New Tab' Menu
-		JMenu openTab = new JMenu("Open New Tab");
 		JMenuItem recipeEditor = new JMenuItem("Create a Recipe");
 		JMenuItem recipeSearch = new JMenuItem("Search for Recipes");
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
-		fileMenu.add(openTab);
-		openTab.add(recipeEditor);
-		openTab.add(recipeSearch);
-		openTab.add(mp3Player);
+		fileMenu.add(recipeEditor);
+		fileMenu.add(recipeSearch);
+		fileMenu.add(mp3Player);
 		
-		for (Component m : openTab.getMenuComponents())
-		((JMenuItem)m).addActionListener(this);
+		recipeEditor.addActionListener(this);
+		recipeSearch.addActionListener(this);
+		mp3Player.addActionListener(this);
 		
 		//Add parsing menu item
 		JMenuItem parse = new JMenuItem("Parse Recipe");
@@ -164,11 +147,10 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 			}
 		});
 		
+		fileMenu.addSeparator();
 		fileMenu.add(closeTab);
 		fileMenu.addSeparator();
 		fileMenu.add(parse);
-		fileMenu.addSeparator();
-		fileMenu.add(closeShokuhin);
 		
 		return fileMenu;
 	}

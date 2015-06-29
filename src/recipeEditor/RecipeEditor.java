@@ -492,7 +492,7 @@ public class RecipeEditor extends Module {
 
 				if (index > -1) {
 					String newIngredient = JOptionPane
-							.showInputDialog("Change this ingredient to what?");
+							.showInputDialog("Change this ingredient to what?", listModel.getElementAt(index));
 					if (!newIngredient.equals(null)) {
 						listModel.remove(index);
 						listModel.add(index, newIngredient);
