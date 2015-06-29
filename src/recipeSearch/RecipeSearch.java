@@ -283,11 +283,11 @@ public class RecipeSearch extends Module implements ActionListener{
 					BufferedImage image = ImageIO.read(file);
 					searchImagePanel.add(new JLabel(new ImageIcon(image)));
 					if (!searchResultList.getValueIsAdjusting())
-					searchControlPanel.paintAll(searchControlPanel.getGraphics());
-					System.out.println("Painted");
+						searchControlPanel.paintAll(searchControlPanel.getGraphics());
 				} catch (IOException e1) {
 					searchImagePanel.removeAll();
-					searchControlPanel.paintAll(searchControlPanel.getGraphics());
+					if (!searchResultList.getValueIsAdjusting())
+						searchControlPanel.paintAll(searchControlPanel.getGraphics());
 				}
 			}
 		});
