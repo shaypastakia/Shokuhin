@@ -85,21 +85,6 @@ public class RecipeMethods {
 			ObjectInputStream obj = new ObjectInputStream(buff);
 			Recipe rec = (Recipe) obj.readObject();
 			obj.close();
-			
-			System.out.println("Reading recipe...");
-			System.out.println("Title: " + rec.getTitle());
-			System.out.println("Rating: " + rec.getRating());
-			System.out.println("Course: " + rec.getCourse());
-			System.out.println("Servings: " + rec.getServings());
-			System.out.println("Ingredients: ");
-			for (String str : rec.getIngredients()) {
-				System.out.println(str);
-			}
-			System.out.println("Steps: ");
-			for (String str : rec.getMethodSteps()) {
-				System.out.println(str);
-			}
-			
 			return rec;
 		} catch (Exception e){
 			ShokuhinMain.displayMessage("Failed to read Recipe", "Returned the error: " + e.getMessage(), JOptionPane.WARNING_MESSAGE);

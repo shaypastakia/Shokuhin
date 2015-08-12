@@ -1,5 +1,6 @@
 package recipeSearch;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -291,6 +292,8 @@ public class RecipeSearch extends Module implements ActionListener{
 				}
 			}
 		});
+		
+		
 		searchControlPanel.setLayout(new BoxLayout(searchControlPanel, BoxLayout.PAGE_AXIS));
 		searchButtonPanel.add(searchBackButton);
 		searchButtonPanel.add(searchOpenButton);
@@ -309,48 +312,52 @@ public class RecipeSearch extends Module implements ActionListener{
 		searchOpenButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		
 		//Add Action Listeners to buttons on second GUI
-		searchBackButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				listModel.clear();
-				remove(secondPanel);
-				add(firstPanel);
-				repaint();
-			}
-		});
+		if (searchBackButton.getActionListeners().length == 0)
+			searchBackButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					searchResultList.clearSelection();
+					listModel.clear();
+					remove(secondPanel);
+					add(firstPanel);
+					repaint();
+				}
+			});
 		
-		searchOpenButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				if (searchResultList.isSelectionEmpty()){
-					java.awt.Toolkit.getDefaultToolkit().beep();
-					return;
-				} else {
-					List<String> selection = searchResultList.getSelectedValuesList();
-					for (String s : selection){
-						getPar().openTab(new RecipeViewer(getPar(), RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec"))));
+		if (searchOpenButton.getActionListeners().length == 0)
+			searchOpenButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					if (searchResultList.isSelectionEmpty()){
+						java.awt.Toolkit.getDefaultToolkit().beep();
+						return;
+					} else {
+						List<String> selection = searchResultList.getSelectedValuesList();
+						for (String s : selection){
+							getPar().openTab(new RecipeViewer(getPar(), RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec"))));
+						}
 					}
 				}
-			}
-		});
+			});
 		
-		searchEditButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (searchResultList.isSelectionEmpty()){
-					java.awt.Toolkit.getDefaultToolkit().beep();
-					return;
-				} else {
-					List<String> selection = searchResultList.getSelectedValuesList();
-					for (String s : selection){
-						getPar().openTab(new RecipeEditor(getPar(), RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec"))));
+		if (searchEditButton.getActionListeners().length == 0)
+			searchEditButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (searchResultList.isSelectionEmpty()){
+						java.awt.Toolkit.getDefaultToolkit().beep();
+						return;
+					} else {
+						List<String> selection = searchResultList.getSelectedValuesList();
+						for (String s : selection){
+							getPar().openTab(new RecipeEditor(getPar(), RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec"))));
+						}
 					}
 				}
-			}
-		});
+			});
 		
 		secondPanel.add(searchResultPanel);
 		secondPanel.add(searchControlPanel);
