@@ -15,5 +15,7 @@
 	<classpathentry kind="lib" path="lib/freetts/en_us.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/freetts.jar"/>
 	<classpathentry kind="lib" path="lib/jl1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/apache commons/commons-net-3.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/apache commons/commons-net-3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
