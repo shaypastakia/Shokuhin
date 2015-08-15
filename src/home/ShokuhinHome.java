@@ -50,7 +50,14 @@ import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
 import recipeViewer.RecipeViewer;
 
-public class ShokuhinHome extends Module implements ActionListener {
+/**
+ * Class that represents the home page of Shokuhin
+ * 
+ * @author Samuel Barker, Shaylen Pastakia
+ *
+ */
+public class ShokuhinHome extends Module implements ActionListener
+{
 	private static final long serialVersionUID = 3395189302456031507L;
 
 	private JPanel leftPane = new JPanel();
@@ -62,8 +69,7 @@ public class ShokuhinHome extends Module implements ActionListener {
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
 	private ArrayList<String> listUrls = new ArrayList<String>();
 
-	private JLabel parentLabel = new JLabel(
-			"BBC Food & BBC Good Food Recipe Search");
+	private JLabel parentLabel = new JLabel("BBC Food & BBC Good Food Recipe Search");
 	private JLabel termLabel = new JLabel("Search Term: ");
 	private JTextField termText = new JTextField();
 	private JButton searchButton = new JButton("Search");
@@ -73,7 +79,8 @@ public class ShokuhinHome extends Module implements ActionListener {
 
 	private HashMap<String, String> map;
 
-	public ShokuhinHome(ShokuhinMain m) {
+	public ShokuhinHome(ShokuhinMain m)
+	{
 		super(m, "Home");
 
 		map = HomeMethods.getBBCGoodFoodTopRecipes();
@@ -95,47 +102,53 @@ public class ShokuhinHome extends Module implements ActionListener {
 		buttonPane.add(editButton);
 		leftPane.add(buttonPane);
 
-		termText.addKeyListener(new KeyListener() {
+		termText.addKeyListener(new KeyListener()
+		{
 			@Override
-			public void keyTyped(KeyEvent e) {
+			public void keyTyped(KeyEvent e)
+			{
 			}
 
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(KeyEvent e)
+			{
 			}
 
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(KeyEvent e)
+			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 					actionPerformed(null);
 			}
 		});
 		searchButton.addActionListener(this);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		openButton.addActionListener(new ActionListener() {
+		openButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (listModel.isEmpty()) {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (listModel.isEmpty())
+				{
 					java.awt.Toolkit.getDefaultToolkit().beep();
 					return;
 				}
-				getPar().openTab(
-						new RecipeViewer(getPar(), RecipeMethods
-								.parseRecipeUrl(listUrls.get(list
-										.getSelectedIndex()))));
+				getPar().openTab(new RecipeViewer(getPar(),
+						RecipeMethods.parseRecipeUrl(listUrls.get(list.getSelectedIndex()))));
 			}
 		});
-		editButton.addActionListener(new ActionListener() {
+		editButton.addActionListener(new ActionListener()
+		{
 
-			public void actionPerformed(ActionEvent e) {
-				if (listModel.isEmpty()) {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (listModel.isEmpty())
+				{
 					java.awt.Toolkit.getDefaultToolkit().beep();
 					return;
 				}
-				getPar().openTab(
-						new RecipeEditor(getPar(), RecipeMethods
-								.parseRecipeUrl(listUrls.get(list
-										.getSelectedIndex()))));
+				getPar().openTab(new RecipeEditor(getPar(),
+						RecipeMethods.parseRecipeUrl(listUrls.get(list.getSelectedIndex()))));
 			}
 		});
 
@@ -147,11 +160,11 @@ public class ShokuhinHome extends Module implements ActionListener {
 		Iterator it = map.entrySet().iterator();
 		int i = 1;
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			Map.Entry pair = (Map.Entry) it.next();
 			String url = pair.getValue().toString();
-			JLabel label = new JLabel(i + ") "
-					+ pair.getKey().toString().replaceAll("&amp;", "&"));
+			JLabel label = new JLabel(i + ") " + pair.getKey().toString().replaceAll("&amp;", "&"));
 
 			label.setFont(new Font("SansSerif", Font.PLAIN, 15));
 			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -161,22 +174,28 @@ public class ShokuhinHome extends Module implements ActionListener {
 			@SuppressWarnings("unused")
 			JButton icon = null;
 
-			browser.addActionListener(new ActionListener() {
+			browser.addActionListener(new ActionListener()
+			{
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					try {
+				public void actionPerformed(ActionEvent e)
+				{
+					try
+					{
 						HomeMethods.openWebpage(new URL(url));
-					} catch (MalformedURLException e1) {
-						JOptionPane
-								.showMessageDialog(null, "Cannot open link!");
+					}
+					catch (MalformedURLException e1)
+					{
+						JOptionPane.showMessageDialog(null, "Cannot open link!");
 					}
 				}
 
 			});
 
-			viewer.addActionListener(new ActionListener() {
+			viewer.addActionListener(new ActionListener()
+			{
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e)
+				{
 					Recipe rec = RecipeMethods.parseRecipeUrl(url);
 
 					getPar().openTab(new RecipeViewer(getPar(), rec));
@@ -192,24 +211,33 @@ public class ShokuhinHome extends Module implements ActionListener {
 			buttons.add(button);
 			i++;
 		}
-		
-		new Thread(new Runnable() {
-			
+
+		new Thread(new Runnable()
+		{
+
 			@Override
-			public void run() {
+			public void run()
+			{
 				ArrayList<BufferedImage> images = HomeMethods.getImages();
-				for (BufferedImage img : images){
-					if (images != null && img != null){
-						buttons.get(images.indexOf(img)).setIcon(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_FAST)));
-						buttons.get(images.indexOf(img)).addActionListener(new ActionListener() {
-							
+				for (BufferedImage img : images)
+				{
+					if (images != null && img != null)
+					{
+						buttons.get(images.indexOf(img))
+								.setIcon(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_FAST)));
+						buttons.get(images.indexOf(img)).addActionListener(new ActionListener()
+						{
+
 							@Override
-							public void actionPerformed(ActionEvent e) {
+							public void actionPerformed(ActionEvent e)
+							{
 								JFrame frame = new JFrame();
-								JPanel panel = new JPanel(){
+								JPanel panel = new JPanel()
+								{
 									private static final long serialVersionUID = 2616344909729135448L;
 
-									public void paint(Graphics g){
+									public void paint(Graphics g)
+									{
 										g.drawImage(img, 0, 0, null);
 									}
 								};
@@ -226,18 +254,19 @@ public class ShokuhinHome extends Module implements ActionListener {
 		}).start();
 		add(leftPane);
 		rightPane.add(panel);
-		panel.setBorder(BorderFactory
-				.createTitledBorder("Today's most popular BBC Good Food Recipes: "));
+		panel.setBorder(BorderFactory.createTitledBorder("Today's most popular BBC Good Food Recipes: "));
 		add(rightPane);
 	}
 
 	@Override
-	public boolean close() {
+	public boolean close()
+	{
 		return false;
 	}
 
 	@Override
-	public JMenu getFunctionMenu() {
+	public JMenu getFunctionMenu()
+	{
 		JMenu menu = new JMenu("Home");
 
 		// A menu item that can be used when there are no functions to be
@@ -249,48 +278,46 @@ public class ShokuhinHome extends Module implements ActionListener {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e)
+	{
 		listModel.clear();
 		listUrls.clear();
 		String searchTerm = termText.getText().replaceAll(" ", "\\+");
-		String url = "http://www.bbcgoodfood.com/search/recipes?query="
-				+ searchTerm;
-		String url2 = "http://www.bbc.co.uk/food/recipes/search?keywords="
-				+ searchTerm;
+		String url = "http://www.bbcgoodfood.com/search/recipes?query=" + searchTerm;
+		String url2 = "http://www.bbc.co.uk/food/recipes/search?keywords=" + searchTerm;
 
 		if (searchTerm == null || searchTerm.equals(""))
 			return;
 
-		try {
+		try
+		{
 			// Connect to the Recipe URL
-			HttpURLConnection connection = (HttpURLConnection) new URL(url)
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setRequestProperty("User-Agent", "Chrome");
 
-			HttpURLConnection connection2 = (HttpURLConnection) new URL(url2)
-					.openConnection();
+			HttpURLConnection connection2 = (HttpURLConnection) new URL(url2).openConnection();
 			connection2.setRequestProperty("User-Agent", "Chrome");
 
 			// Get the resulting page
-			InputStreamReader in = new InputStreamReader(
-					connection.getInputStream());
+			InputStreamReader in = new InputStreamReader(connection.getInputStream());
 			BufferedReader bufIn = new BufferedReader(in);
 			String temp;
 			String response = "";
 
-			InputStreamReader in2 = new InputStreamReader(
-					connection2.getInputStream());
+			InputStreamReader in2 = new InputStreamReader(connection2.getInputStream());
 			BufferedReader bufIn2 = new BufferedReader(in2);
 			String temp2;
 			String response2 = "";
 
 			// Write the page into a String
-			while ((temp = bufIn.readLine()) != null) {
+			while ((temp = bufIn.readLine()) != null)
+			{
 				response = response.concat(temp);
 			}
 			bufIn.close();
 
-			while ((temp2 = bufIn2.readLine()) != null) {
+			while ((temp2 = bufIn2.readLine()) != null)
+			{
 				response2 = response2.concat(temp2);
 			}
 			bufIn2.close();
@@ -301,28 +328,28 @@ public class ShokuhinHome extends Module implements ActionListener {
 
 			Elements links2 = doc2.select("div.left");
 			System.out.println(links2.size());
-			for (Element el : links2) {
-				listModel.addElement(new String(el.child(0).text().getBytes(),
-						"UTF-8").trim());
-				listUrls.add("http://www.bbc.co.uk"
-						+ el.child(0).child(0).attr("href"));
+			for (Element el : links2)
+			{
+				listModel.addElement(new String(el.child(0).text().getBytes(), "UTF-8").trim());
+				listUrls.add("http://www.bbc.co.uk" + el.child(0).child(0).attr("href"));
 			}
 
 			Elements links = doc.getElementsByClass("node-title");
-			for (Element el : links) {
-				listModel.addElement(new String(el.text().getBytes(), "UTF-8")
-						.trim());
+			for (Element el : links)
+			{
+				listModel.addElement(new String(el.text().getBytes(), "UTF-8").trim());
 				listUrls.add(el.select("a").get(0).attr("href"));
 			}
 
 			leftPane.paintAll(leftPane.getGraphics());
 			if (listUrls.isEmpty())
-				ShokuhinMain.displayMessage("No Results",
-						"Unable to find any results",
+				ShokuhinMain.displayMessage("No Results", "Unable to find any results",
 						JOptionPane.INFORMATION_MESSAGE);
-		} catch (Exception ex) {
-			ShokuhinMain.displayMessage("Error", "Unable to find results\n"
-					+ ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+		}
+		catch (Exception ex)
+		{
+			ShokuhinMain.displayMessage("Error", "Unable to find results\n" + ex.getMessage(),
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

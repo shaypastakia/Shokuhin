@@ -8,8 +8,10 @@ import javazoom.jl.player.Player;
 /**
  * Class used to play mp3 files
  *
+ * @author Samuel Barker
  */
-public class PausablePlayer {
+public class PausablePlayer
+{
 
 	/**
 	 * Represents the state of the player
@@ -34,39 +36,44 @@ public class PausablePlayer {
 	 */
 	private int playerStatus = NOTSTARTED;
 
-	public PausablePlayer(final InputStream inputStream)
-			throws JavaLayerException {
+	public PausablePlayer(final InputStream inputStream) throws JavaLayerException
+	{
 		this.player = new Player(inputStream);
 	}
 
-	public PausablePlayer(final InputStream inputStream,
-			final AudioDevice audioDevice) throws JavaLayerException {
+	public PausablePlayer(final InputStream inputStream, final AudioDevice audioDevice) throws JavaLayerException
+	{
 		this.player = new Player(inputStream, audioDevice);
 	}
 
 	/**
 	 * Starts playback (resumes if paused)
 	 */
-	public void play() throws JavaLayerException {
-		synchronized (playerLock) {
-			switch (playerStatus) {
-			case NOTSTARTED:
-				final Runnable r = new Runnable() {
-					public void run() {
-						playInternal();
-					}
-				};
-				final Thread t = new Thread(r);
-				t.setDaemon(true);
-				t.setPriority(Thread.MAX_PRIORITY);
-				playerStatus = PLAYING;
-				t.start();
-				break;
-			case PAUSED:
-				resume();
-				break;
-			default:
-				break;
+	public void play() throws JavaLayerException
+	{
+		synchronized (playerLock)
+		{
+			switch (playerStatus)
+			{
+				case NOTSTARTED:
+					final Runnable r = new Runnable()
+					{
+						public void run()
+						{
+							playInternal();
+						}
+					};
+					final Thread t = new Thread(r);
+					t.setDaemon(true);
+					t.setPriority(Thread.MAX_PRIORITY);
+					playerStatus = PLAYING;
+					t.start();
+					break;
+				case PAUSED:
+					resume();
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -74,9 +81,12 @@ public class PausablePlayer {
 	/**
 	 * Pauses playback. Returns true if new state is PAUSED.
 	 */
-	public boolean pause() {
-		synchronized (playerLock) {
-			if (playerStatus == PLAYING) {
+	public boolean pause()
+	{
+		synchronized (playerLock)
+		{
+			if (playerStatus == PLAYING)
+			{
 				playerStatus = PAUSED;
 			}
 			return playerStatus == PAUSED;
@@ -86,9 +96,12 @@ public class PausablePlayer {
 	/**
 	 * Resumes playback. Returns true if the new state is PLAYING.
 	 */
-	public boolean resume() {
-		synchronized (playerLock) {
-			if (playerStatus == PAUSED) {
+	public boolean resume()
+	{
+		synchronized (playerLock)
+		{
+			if (playerStatus == PAUSED)
+			{
 				playerStatus = PLAYING;
 				playerLock.notifyAll();
 			}
@@ -99,28 +112,41 @@ public class PausablePlayer {
 	/**
 	 * Stops playback. If not playing, does nothing
 	 */
-	public void stop() {
-		synchronized (playerLock) {
+	public void stop()
+	{
+		synchronized (playerLock)
+		{
 			playerStatus = FINISHED;
 			playerLock.notifyAll();
 		}
 	}
 
-	private void playInternal() {
-		while (playerStatus != FINISHED) {
-			try {
-				if (!player.play(1)) {
+	private void playInternal()
+	{
+		while (playerStatus != FINISHED)
+		{
+			try
+			{
+				if (!player.play(1))
+				{
 					break;
 				}
-			} catch (final JavaLayerException e) {
+			}
+			catch (final JavaLayerException e)
+			{
 				break;
 			}
 			// check if paused or terminated
-			synchronized (playerLock) {
-				while (playerStatus == PAUSED) {
-					try {
+			synchronized (playerLock)
+			{
+				while (playerStatus == PAUSED)
+				{
+					try
+					{
 						playerLock.wait();
-					} catch (final InterruptedException e) {
+					}
+					catch (final InterruptedException e)
+					{
 						// terminate player
 						break;
 					}
@@ -133,13 +159,18 @@ public class PausablePlayer {
 	/**
 	 * Closes the player, regardless of current state.
 	 */
-	public void close() {
-		synchronized (playerLock) {
+	public void close()
+	{
+		synchronized (playerLock)
+		{
 			playerStatus = FINISHED;
 		}
-		try {
+		try
+		{
 			player.close();
-		} catch (final Exception e) {
+		}
+		catch (final Exception e)
+		{
 			// ignore, we are terminating anyway
 		}
 	}
@@ -149,14 +180,16 @@ public class PausablePlayer {
 	 * 
 	 * @return playerStatus
 	 */
-	public int state() {
+	public int state()
+	{
 		return playerStatus;
 	}
 
 	/**
 	 * Changes the volume of the player to a specified value
 	 */
-	public void changeVolume() {
+	public void changeVolume()
+	{
 
 	}
 

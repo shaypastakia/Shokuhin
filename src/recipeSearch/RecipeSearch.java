@@ -1,6 +1,5 @@
 package recipeSearch;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -44,6 +43,11 @@ import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
 import recipeViewer.RecipeViewer;
 
+/**
+ * 
+ * @author Shaylen Pastakia
+ *
+ */
 public class RecipeSearch extends Module implements ActionListener{
 	private static final long serialVersionUID = -8627032843621798303L;
 
