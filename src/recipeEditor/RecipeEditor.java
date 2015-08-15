@@ -319,21 +319,39 @@ public class RecipeEditor extends Module {
 			public void actionPerformed(ActionEvent e) {
 				String name = JOptionPane
 						.showInputDialog("Enter a name for the recipe");
-				if (!name.equals(null)) {
-					recipe.setTitle(name);
-					getPar().renameTab(name);
+				if (name != null && !name.replaceAll(" ", "").equals("")) {
+					for (String s : RecipeMethods.getRecipeFileNames()){
+						if (s.toLowerCase().equals(name.toLowerCase())){
+							ShokuhinMain.displayMessage("Recipe Exists", "A Recipe with this title already exists.\nPlease enter a different title.", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					}
+				} else {
+					return;
 				}
 
-				int steps;
+				Integer steps;
 				while (true) {
-					String number = JOptionPane
-							.showInputDialog("How many steps does your recipe involve?");
-					steps = Integer.parseInt(number);
-					if (steps > 0) {
-						break;
+					try {
+						String number = JOptionPane
+								.showInputDialog("How many steps does your recipe involve?");
+						steps = Integer.parseInt(number);
+						if (steps == null){
+							return;
+						}
+						if (steps == 1)
+							ShokuhinMain.displayMessage("Add Steps", "A recipe should have more than one Step.", JOptionPane.INFORMATION_MESSAGE);
+						
+						if (steps > 0 && steps != 1)
+							break;
+					} catch (Exception e1){
+						System.out.println("Exception");
 					}
 				}
-
+				
+				recipe.setTitle(name);
+				getPar().renameTab(name);
+				
 				for (int i = 0; i < steps; i++) {
 					instructions.add("Instruction " + (i + 1));
 				}
