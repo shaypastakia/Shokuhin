@@ -353,25 +353,12 @@ public class RecipeEditor extends Module
 				{
 					return;
 				}
-
-<<<<<<< HEAD
 				Integer steps = null;
 				while (true) {
 					try {
 						String number = JOptionPane
 								.showInputDialog("How many steps does your recipe involve?");
 						if (steps == null){
-=======
-				Integer steps;
-				while (true)
-				{
-					try
-					{
-						String number = JOptionPane.showInputDialog("How many steps does your recipe involve?");
-						steps = Integer.parseInt(number);
-						if (steps == null)
-						{
->>>>>>> origin/master
 							return;
 						}
 						steps = Integer.parseInt(number);
@@ -382,17 +369,12 @@ public class RecipeEditor extends Module
 
 						if (steps > 0 && steps != 1)
 							break;
-<<<<<<< HEAD
-					} catch (Exception e1){}
-=======
 					}
 					catch (Exception e1)
 					{
 						System.out.println("Exception");
 					}
->>>>>>> origin/master
 				}
-
 				recipe.setTitle(name);
 				getPar().renameTab(name);
 
