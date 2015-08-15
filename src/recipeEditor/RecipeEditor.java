@@ -330,23 +330,22 @@ public class RecipeEditor extends Module {
 					return;
 				}
 
-				Integer steps;
+				Integer steps = null;
 				while (true) {
 					try {
 						String number = JOptionPane
 								.showInputDialog("How many steps does your recipe involve?");
-						steps = Integer.parseInt(number);
 						if (steps == null){
 							return;
 						}
+						steps = Integer.parseInt(number);
+
 						if (steps == 1)
 							ShokuhinMain.displayMessage("Add Steps", "A recipe should have more than one Step.", JOptionPane.INFORMATION_MESSAGE);
 						
 						if (steps > 0 && steps != 1)
 							break;
-					} catch (Exception e1){
-						System.out.println("Exception");
-					}
+					} catch (Exception e1){}
 				}
 				
 				recipe.setTitle(name);
