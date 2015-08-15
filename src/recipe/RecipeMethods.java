@@ -36,6 +36,11 @@ import org.jsoup.select.Elements;
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 
+/**
+ * 
+ * @author Shaylen Pastakia
+ *
+ */
 public class RecipeMethods {
 	
 	/**

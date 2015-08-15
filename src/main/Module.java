@@ -7,6 +7,7 @@ import javax.swing.JPanel;
  * Module
  * <br>
  * Creates a high level Object definition for all Modules.
+ * @author Shaylen Pastakia
  */
 public abstract class Module extends JPanel{
 	private static final long serialVersionUID = -1628773001939210459L;

@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="lib/jl1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/apache commons/commons-net-3.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/apache commons/commons-net-3.3.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

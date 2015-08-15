@@ -28,7 +28,7 @@ import recipeSearch.RecipeSearch;
  * ShokuhinFrame
  * <br>
  * Creates and prepares a Frame for ShokuhinMain to use
- * 
+ * @author Shaylen Pastakia
  */
 public class ShokuhinFrame extends JFrame implements ActionListener, WindowListener{
 

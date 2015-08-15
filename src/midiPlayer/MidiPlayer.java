@@ -21,6 +21,7 @@ import org.staccato.StaccatoParserListener;
  * MidiPlayer
  * <br>
  * Provides ability to play and stop MIDI songs
+ * @author Shaylen Pastakia
  */
 public class MidiPlayer {
 	

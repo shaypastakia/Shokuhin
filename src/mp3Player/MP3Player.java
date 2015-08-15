@@ -37,7 +37,14 @@ import main.Module;
 import main.ShokuhinMain;
 import main.TimerBar;
 
-public class MP3Player extends Module {
+/**
+ * Represents the MP3Player module
+ * 
+ * @author Samuel Barker
+ *
+ */
+public class MP3Player extends Module
+{
 	private static final long serialVersionUID = -6219613302072108822L;
 
 	/**
@@ -97,7 +104,8 @@ public class MP3Player extends Module {
 	 * @param m
 	 *            The ShokuhinMain used
 	 */
-	public MP3Player(ShokuhinMain m) {
+	public MP3Player(ShokuhinMain m)
+	{
 		super(m, "MP3 Player");
 
 		createGui();
@@ -106,19 +114,28 @@ public class MP3Player extends Module {
 		setUpControls();
 		add(splitPane);
 
-		nextThread = new NextThread(new Runnable() {
+		nextThread = new NextThread(new Runnable()
+		{
 			@Override
-			public void run() {
-				while (nextThread.isRunnable()) {
-					if (player == null) {
+			public void run()
+			{
+				while (nextThread.isRunnable())
+				{
+					if (player == null)
+					{
 
-					} else if (player.state() == 3) {
+					}
+					else if (player.state() == 3)
+					{
 						if (next.isEnabled())
 							next.doClick();
 					}
-					try {
+					try
+					{
 						Thread.sleep(5000);
-					} catch (InterruptedException e) {
+					}
+					catch (InterruptedException e)
+					{
 						e.printStackTrace();
 					}
 				}
@@ -128,7 +145,8 @@ public class MP3Player extends Module {
 		nextThread.start();
 	}
 
-	private void createGui() {
+	private void createGui()
+	{
 		// Create the MP3 player
 
 		// Create the necessary buttons
@@ -155,8 +173,7 @@ public class MP3Player extends Module {
 		// Set up Borders for Panels
 		songPane.setBorder(BorderFactory.createTitledBorder("Playlist: "));
 
-		controlPane.setBorder(BorderFactory
-				.createTitledBorder("Current Song: "));
+		controlPane.setBorder(BorderFactory.createTitledBorder("Current Song: "));
 
 		controlPane.add(play);
 		controlPane.add(pause);
@@ -178,8 +195,10 @@ public class MP3Player extends Module {
 	 * Closes the module
 	 */
 	@Override
-	public boolean close() {
-		if (player != null) {
+	public boolean close()
+	{
+		if (player != null)
+		{
 			player.close();
 		}
 
@@ -201,30 +220,38 @@ public class MP3Player extends Module {
 	/**
 	 * Sets up the listeners for the buttons for this module
 	 */
-	private void setUpListeners() {
+	private void setUpListeners()
+	{
 		// Adds the listener that adds a song to the playlist
-		add.addActionListener(new ActionListener() {
+		add.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				final JFileChooser fc = new JFileChooser();
 				fc.setMultiSelectionEnabled(true);
 				int returnVal = fc.showOpenDialog(null);
 
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
+				if (returnVal == JFileChooser.APPROVE_OPTION)
+				{
 
 					File[] files = fc.getSelectedFiles();
-					for (File f : files) {
+					for (File f : files)
+					{
 						String filename = f.getName();
-						if (filename.endsWith(".mp3")) {
+						if (filename.endsWith(".mp3"))
+						{
 							listModel.addElement(filename.replace(".mp3", ""));
 							songPaths.add(f);
 						}
 					}
 
-					if (songPaths.size() > 0
-							&& (player == null || player.state() != 1)) {
+					if (songPaths.size() > 0 && (player == null || player.state() != 1))
+					{
 						play.setEnabled(true);
-					} else {
+					}
+					else
+					{
 						play.setEnabled(false);
 					}
 
@@ -234,35 +261,43 @@ public class MP3Player extends Module {
 					// Don't need to activate pause and stop until the song
 					// is
 					// actually playing
-					if (songPaths.size() > 0 && currentSong == -1) {
+					if (songPaths.size() > 0 && currentSong == -1)
+					{
 						currentSong = 0;
 					}
 
 					update();
 
-				} else {
+				}
+				else
+				{
 					// We don't have an mp3 file
-					JOptionPane.showMessageDialog(null,
-							"Only Mp3 files can be selected.");
+					JOptionPane.showMessageDialog(null, "Only Mp3 files can be selected.");
 				}
 			}
 			// }
 		});
 
 		// Adds the listener that removes a song from the playlist
-		remove.addActionListener(new ActionListener() {
+		remove.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				int selected = songs.getSelectedIndex();
-				if (selected < 0) {
-					JOptionPane.showMessageDialog(null,
-							"Please select a song to be removed.");
-				} else {
+				if (selected < 0)
+				{
+					JOptionPane.showMessageDialog(null, "Please select a song to be removed.");
+				}
+				else
+				{
 
-					if (player == null) {
+					if (player == null)
+					{
 
-					} else if (selected == currentSong
-							&& (player.state() == 1 || player.state() == 2)) {
+					}
+					else if (selected == currentSong && (player.state() == 1 || player.state() == 2))
+					{
 						player.close();
 					}
 
@@ -271,7 +306,8 @@ public class MP3Player extends Module {
 					currentSong--;
 					update();
 
-					if (songPaths.size() == 0) {
+					if (songPaths.size() == 0)
+					{
 						play.setEnabled(false);
 						previous.setEnabled(false);
 						next.setEnabled(false);
@@ -280,12 +316,14 @@ public class MP3Player extends Module {
 						stop.setEnabled(false);
 					}
 
-					if (songPaths.size() == 1) {
+					if (songPaths.size() == 1)
+					{
 						currentSong = 0;
 						update();
 					}
 
-					if (songPaths.size() == 0) {
+					if (songPaths.size() == 0)
+					{
 						currentSong = -1;
 						update();
 					}
@@ -294,20 +332,27 @@ public class MP3Player extends Module {
 		});
 
 		// Adds the listener that plays the playlist
-		play.addActionListener(new ActionListener() {
+		play.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (player == null) {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (player == null)
+				{
 					playSong();
 					pauseButton.setEnabled(true);
-				} else if (player.state() == 2) {
+				}
+				else if (player.state() == 2)
+				{
 					play.setEnabled(false);
 					playButton.setEnabled(false);
 					pause.setEnabled(true);
 					pauseButton.setEnabled(true);
 					stop.setEnabled(true);
 					player.resume();
-				} else if (player.state() == 3) {
+				}
+				else if (player.state() == 3)
+				{
 					currentSong = 0;
 					update();
 					playSong();
@@ -316,9 +361,11 @@ public class MP3Player extends Module {
 		});
 
 		// Adds the listener that pauses the playlist
-		pause.addActionListener(new ActionListener() {
+		pause.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				player.pause();
 				play.setEnabled(true);
 				playButton.setEnabled(true);
@@ -329,9 +376,11 @@ public class MP3Player extends Module {
 		});
 
 		// Adds the listener that stops the playlist
-		stop.addActionListener(new ActionListener() {
+		stop.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				player.stop();
 				currentSong = 0;
 				update();
@@ -342,11 +391,14 @@ public class MP3Player extends Module {
 				add.setEnabled(true);
 				remove.setEnabled(true);
 
-				try {
+				try
+				{
 					songPaths.get(currentSong + 1);
 					// There is a next song
 					next.setEnabled(true);
-				} catch (Exception e1) {
+				}
+				catch (Exception e1)
+				{
 					// There is no next song
 					next.setEnabled(false);
 				}
@@ -354,13 +406,18 @@ public class MP3Player extends Module {
 		});
 
 		// Add the listener that moves to the next song
-		next.addActionListener(new ActionListener() {
+		next.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (player == null || player.state() == 2) {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (player == null || player.state() == 2)
+				{
 					currentSong++;
 					update();
-				} else {
+				}
+				else
+				{
 					player.close();
 					currentSong++;
 					update();
@@ -372,14 +429,18 @@ public class MP3Player extends Module {
 		});
 
 		// Add the listener that moves to the previous song
-		previous.addActionListener(new ActionListener() {
+		previous.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (player == null || player.state() == 2
-						|| player.state() == 3) {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (player == null || player.state() == 2 || player.state() == 3)
+				{
 					currentSong--;
 					update();
-				} else {
+				}
+				else
+				{
 					player.close();
 					currentSong--;
 					update();
@@ -390,15 +451,19 @@ public class MP3Player extends Module {
 			}
 		});
 
-		songs.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
+		songs.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 2)
+				{
 					// Double clicked
 					int index = songs.locationToIndex(e.getPoint());
 					currentSong = index;
 					update();
 
-					if (player.state() == 1) {
+					if (player.state() == 1)
+					{
 						player.pause();
 					}
 
@@ -411,7 +476,8 @@ public class MP3Player extends Module {
 	/**
 	 * Produces the controls for the Timer Bar
 	 */
-	private void setUpControls() {
+	private void setUpControls()
+	{
 		bar.add(septimus);
 		bar.add(playButton);
 		bar.add(pauseButton);
@@ -425,34 +491,42 @@ public class MP3Player extends Module {
 		playButton.setEnabled(false);
 		pauseButton.setEnabled(false);
 
-		playButton.addActionListener(new ActionListener() {
+		playButton.addActionListener(new ActionListener()
+		{
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				playButton.setEnabled(false);
 				pauseButton.setEnabled(true);
 				resume();
 			}
 		});
 
-		pauseButton.addActionListener(new ActionListener() {
+		pauseButton.addActionListener(new ActionListener()
+		{
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				playButton.setEnabled(true);
 				pauseButton.setEnabled(false);
 				interrupt();
 			}
 		});
 
-		nextButton.addActionListener(new ActionListener() {
+		nextButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (player == null || player.state() == 2
-						|| player.state() == 3) {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (player == null || player.state() == 2 || player.state() == 3)
+				{
 					currentSong++;
 					update();
-				} else {
+				}
+				else
+				{
 					player.close();
 					currentSong++;
 					update();
@@ -464,14 +538,18 @@ public class MP3Player extends Module {
 		});
 
 		// Add the listener that moves to the previous song
-		prevButton.addActionListener(new ActionListener() {
+		prevButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (player == null || player.state() == 2
-						|| player.state() == 3) {
+			public void actionPerformed(ActionEvent e)
+			{
+				if (player == null || player.state() == 2 || player.state() == 3)
+				{
 					currentSong--;
 					update();
-				} else {
+				}
+				else
+				{
 					player.close();
 					currentSong--;
 					update();
@@ -487,16 +565,18 @@ public class MP3Player extends Module {
 	 * obtains the function menu
 	 */
 	@Override
-	public JMenu getFunctionMenu() {
+	public JMenu getFunctionMenu()
+	{
 		JMenu menu = new JMenu("MP3 Player");
 		JMenuItem loadPlaylist = new JMenuItem("Load Playlist");
 		JMenuItem savePlaylist = new JMenuItem("Save Playlist");
 
-		FileFilter loadFilter = new FileNameExtensionFilter(
-				"Shokuhin Playlist '.spl'", "spl");
-		loadPlaylist.addActionListener(new ActionListener() {
+		FileFilter loadFilter = new FileNameExtensionFilter("Shokuhin Playlist '.spl'", "spl");
+		loadPlaylist.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileFilter(loadFilter);
 				chooser.showOpenDialog(null);
@@ -505,13 +585,13 @@ public class MP3Player extends Module {
 				if (file == null)
 					return;
 				System.out.println("4");
-				try {
+				try
+				{
 					System.out.println("3");
 					FileInputStream in = new FileInputStream(file);
 					ObjectInputStream inStream = new ObjectInputStream(in);
 					@SuppressWarnings("unchecked")
-					ArrayList<File> files = (ArrayList<File>) inStream
-							.readObject();
+					ArrayList<File> files = (ArrayList<File>) inStream.readObject();
 					inStream.close();
 					System.out.println("2");
 					System.out.println("1");
@@ -520,17 +600,19 @@ public class MP3Player extends Module {
 					currentSong = -1;
 					songPaths.clear();
 					listModel.clear();
-					for (File f : files) {
+					for (File f : files)
+					{
 						System.out.println(f.getAbsolutePath());
 						songPaths.add(f);
-						listModel
-								.addElement(f.getName().replaceAll(".mp3", ""));
+						listModel.addElement(f.getName().replaceAll(".mp3", ""));
 					}
 
-					if (songPaths.size() > 0
-							&& (player == null || player.state() != 1)) {
+					if (songPaths.size() > 0 && (player == null || player.state() != 1))
+					{
 						play.setEnabled(true);
-					} else {
+					}
+					else
+					{
 						play.setEnabled(false);
 					}
 
@@ -540,34 +622,37 @@ public class MP3Player extends Module {
 					// Don't need to activate pause and stop until the song
 					// is
 					// actually playing
-					if (songPaths.size() > 0) {
+					if (songPaths.size() > 0)
+					{
 						currentSong = 0;
 						update();
 					}
 
 					/*
-					 * createGui();
-					 * songs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION
-					 * ); setUpListeners(); setUpControls();
+					 * createGui(); songs.setSelectionMode(ListSelectionModel.
+					 * SINGLE_SELECTION ); setUpListeners(); setUpControls();
 					 */
-				} catch (Exception e1) {
-					ShokuhinMain.displayMessage("Error",
-							"Failed to load Playlist.\n" + e1.getMessage(),
+				}
+				catch (Exception e1)
+				{
+					ShokuhinMain.displayMessage("Error", "Failed to load Playlist.\n" + e1.getMessage(),
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
 
-		savePlaylist.addActionListener(new ActionListener() {
+		savePlaylist.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					if (songPaths.isEmpty()) {
-						ShokuhinMain
-								.displayMessage(
-										"Error",
-										"Can't save an empty Playlist.\nTry adding some songs to the Playlist first.",
-										JOptionPane.ERROR_MESSAGE);
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					if (songPaths.isEmpty())
+					{
+						ShokuhinMain.displayMessage("Error",
+								"Can't save an empty Playlist.\nTry adding some songs to the Playlist first.",
+								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					JFileChooser chooser = new JFileChooser();
@@ -581,12 +666,12 @@ public class MP3Player extends Module {
 					ObjectOutputStream outStream = new ObjectOutputStream(out);
 					outStream.writeObject(songPaths);
 					out.close();
-					ShokuhinMain.displayMessage("Success",
-							"Successfully saved Playlist to " + file.getPath(),
+					ShokuhinMain.displayMessage("Success", "Successfully saved Playlist to " + file.getPath(),
 							JOptionPane.INFORMATION_MESSAGE);
-				} catch (Exception ex) {
-					ShokuhinMain.displayMessage("Error",
-							"Failed to save Playlist.\n" + ex.getMessage(),
+				}
+				catch (Exception ex)
+				{
+					ShokuhinMain.displayMessage("Error", "Failed to save Playlist.\n" + ex.getMessage(),
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
@@ -599,9 +684,12 @@ public class MP3Player extends Module {
 	/**
 	 * Plays the current song
 	 */
-	private void playSong() {
-		if (currentSong >= 0) {
-			try {
+	private void playSong()
+	{
+		if (currentSong >= 0)
+		{
+			try
+			{
 				// if there is a next song or if there is a
 				// previous
 				// song
@@ -611,15 +699,17 @@ public class MP3Player extends Module {
 				pause.setEnabled(true);
 				stop.setEnabled(true);
 
-				player = new PausablePlayer(new BufferedInputStream(
-						new FileInputStream(songPaths.get(currentSong))));
+				player = new PausablePlayer(new BufferedInputStream(new FileInputStream(songPaths.get(currentSong))));
 				player.play();
-			} catch (FileNotFoundException | JavaLayerException e2) {
-				JOptionPane.showMessageDialog(null,
-						"Error playing the current song.");
+			}
+			catch (FileNotFoundException | JavaLayerException e2)
+			{
+				JOptionPane.showMessageDialog(null, "Error playing the current song.");
 			}
 
-		} else {
+		}
+		else
+		{
 			JOptionPane.showMessageDialog(null, "There are no songs to play!");
 		}
 	}
@@ -629,42 +719,51 @@ public class MP3Player extends Module {
 	 * 
 	 * @return currentSong
 	 */
-	public int getCurrentSong() {
+	public int getCurrentSong()
+	{
 		return currentSong;
 	}
 
 	/**
 	 * Updates the JList handling the playlist, as well as labels
 	 */
-	private void update() {
+	private void update()
+	{
 		songs.setCellRenderer(new CellRenderer(this));
 
-		controlPane.setBorder(BorderFactory.createTitledBorder("Current Song: "
-				+ songs.getModel().getElementAt(currentSong)));
+		controlPane.setBorder(
+				BorderFactory.createTitledBorder("Current Song: " + songs.getModel().getElementAt(currentSong)));
 	}
 
 	/**
 	 * Checks whether there is a next or previous song and disables and enables
 	 * the buttons accordingly
 	 */
-	private void checkForNextAndPrev() {
-		try {
+	private void checkForNextAndPrev()
+	{
+		try
+		{
 			songPaths.get(currentSong + 1);
 			// There is a next song
 			next.setEnabled(true);
 			nextButton.setEnabled(true);
-		} catch (Exception e1) {
+		}
+		catch (Exception e1)
+		{
 			// There is no next song
 			next.setEnabled(false);
 			nextButton.setEnabled(false);
 		}
 
-		try {
+		try
+		{
 			songPaths.get(currentSong - 1);
 			// There is a previous song
 			previous.setEnabled(true);
 			prevButton.setEnabled(true);
-		} catch (Exception e1) {
+		}
+		catch (Exception e1)
+		{
 			// There is no previous song
 			previous.setEnabled(false);
 			prevButton.setEnabled(false);
@@ -674,8 +773,10 @@ public class MP3Player extends Module {
 	/**
 	 * Interrupts the player and pauses the current music, if music is playing
 	 */
-	public void interrupt() {
-		if (player != null && player.state() == 1) {
+	public void interrupt()
+	{
+		if (player != null && player.state() == 1)
+		{
 			player.pause();
 			play.setEnabled(true);
 			stop.setEnabled(true);
@@ -688,8 +789,10 @@ public class MP3Player extends Module {
 	 * Resumes the player after an interrupt, but if the player was paused
 	 * before the interrupt was called, then the player remains paused
 	 */
-	public void resume() {
-		if (INTERRUPTED) {
+	public void resume()
+	{
+		if (INTERRUPTED)
+		{
 			play.doClick();
 			INTERRUPTED = false;
 		}
@@ -700,7 +803,8 @@ public class MP3Player extends Module {
 	 * 
 	 * @return player state
 	 */
-	public int getPlayerState() {
+	public int getPlayerState()
+	{
 		return player.state();
 	}
 

@@ -32,7 +32,14 @@ import main.ShokuhinMain;
 import recipe.Recipe;
 import recipe.RecipeMethods;
 
-public class RecipeEditor extends Module {
+/**
+ * Represents the recipe editor
+ * 
+ * @author Samuel Barker, Shaylen Pastakia
+ *
+ */
+public class RecipeEditor extends Module
+{
 	private static final long serialVersionUID = 306718353578602520L;
 
 	private Recipe recipe;
@@ -89,9 +96,8 @@ public class RecipeEditor extends Module {
 	private JRadioButton rating0 = new JRadioButton("0");
 
 	// Components which are editable
-	private Component[] editableComponents = { previousButton, saveButton,
-			nextButton, ingredientButton, addStepButton, removeStepButton,
-			removeIngredientButton, editIngredientButton };
+	private Component[] editableComponents = { previousButton, saveButton, nextButton, ingredientButton, addStepButton,
+			removeStepButton, removeIngredientButton, editIngredientButton };
 
 	// Text fields used
 	private JTextField prepTime, cookTime, serveText, tagField;
@@ -104,15 +110,19 @@ public class RecipeEditor extends Module {
 	 * @param recipe
 	 *            The Recipe to view
 	 */
-	public RecipeEditor(ShokuhinMain m, Recipe recipe) {
+	public RecipeEditor(ShokuhinMain m, Recipe recipe)
+	{
 		super(m, recipe.getTitle());
 
 		this.recipe = recipe;
 
 		// If there is no recipe being loaded
-		if (recipe.getMethodSteps().isEmpty()) {
+		if (recipe.getMethodSteps().isEmpty())
+		{
 			setEnableDisable(false);
-		} else {
+		}
+		else
+		{
 			// if there is a recipe that this has been opened with
 			setEnableDisable(true);
 		}
@@ -136,8 +146,7 @@ public class RecipeEditor extends Module {
 		methodPane.add(infoPane);
 
 		// Set up Borders for Panels
-		firstStepPane.setBorder(BorderFactory
-				.createTitledBorder("Current Step"));
+		firstStepPane.setBorder(BorderFactory.createTitledBorder("Current Step"));
 		secondStepPane.setBorder(BorderFactory.createTitledBorder("Next Step"));
 		infoPane.setBorder(BorderFactory.createTitledBorder("Information"));
 
@@ -201,19 +210,20 @@ public class RecipeEditor extends Module {
 		infoPane.add(buttonPanel);
 
 		// Append Course to info
-		switch (recipe.getCourse()) {
-		case Recipe.BREAKFAST:
-			breakfast.setSelected(true);
-		case Recipe.LUNCH:
-			lunch.setSelected(true);
-		case Recipe.DINNER:
-			dinner.setSelected(true);
-		case Recipe.DESSERT:
-			dessert.setSelected(true);
-		case Recipe.SNACK:
-			snack.setSelected(true);
-		case Recipe.GENERAL:
-			general.setSelected(true);
+		switch (recipe.getCourse())
+		{
+			case Recipe.BREAKFAST:
+				breakfast.setSelected(true);
+			case Recipe.LUNCH:
+				lunch.setSelected(true);
+			case Recipe.DINNER:
+				dinner.setSelected(true);
+			case Recipe.DESSERT:
+				dessert.setSelected(true);
+			case Recipe.SNACK:
+				snack.setSelected(true);
+			case Recipe.GENERAL:
+				general.setSelected(true);
 		}
 		add(splitPane);
 
@@ -239,19 +249,20 @@ public class RecipeEditor extends Module {
 		buttonPanel.add(rating5);
 
 		// Append Course to info
-		switch (rating) {
-		case 0:
-			rating0.setSelected(true);
-		case 1:
-			rating1.setSelected(true);
-		case 2:
-			rating2.setSelected(true);
-		case 3:
-			rating3.setSelected(true);
-		case 4:
-			rating4.setSelected(true);
-		case 5:
-			rating5.setSelected(true);
+		switch (rating)
+		{
+			case 0:
+				rating0.setSelected(true);
+			case 1:
+				rating1.setSelected(true);
+			case 2:
+				rating2.setSelected(true);
+			case 3:
+				rating3.setSelected(true);
+			case 4:
+				rating4.setSelected(true);
+			case 5:
+				rating5.setSelected(true);
 		}
 
 		// Get the cooking and prep times
@@ -287,11 +298,15 @@ public class RecipeEditor extends Module {
 
 		String tags = "";
 		// Append Tags to info String tags = "Tags: ";
-		for (String s : recipe.getTags()) {
+		for (String s : recipe.getTags())
+		{
 			tags = tags.concat(s);
-			if (recipe.getTags().indexOf(s) < recipe.getTags().size() - 1) {
+			if (recipe.getTags().indexOf(s) < recipe.getTags().size() - 1)
+			{
 				tags = tags.concat(", ");
-			} else {
+			}
+			else
+			{
 				tags = tags.concat(".").trim();
 			}
 		}
@@ -311,47 +326,78 @@ public class RecipeEditor extends Module {
 	 * @param m
 	 *            The ShokuhinMain used
 	 */
-	private void setupListeners() {
+	private void setupListeners()
+	{
 
 		// Listens on the start button to start a new recipe.
-		startButton.addActionListener(new ActionListener() {
+		startButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane
-						.showInputDialog("Enter a name for the recipe");
-				if (name != null && !name.replaceAll(" ", "").equals("")) {
-					for (String s : RecipeMethods.getRecipeFileNames()){
-						if (s.toLowerCase().equals(name.toLowerCase())){
-							ShokuhinMain.displayMessage("Recipe Exists", "A Recipe with this title already exists.\nPlease enter a different title.", JOptionPane.INFORMATION_MESSAGE);
+			public void actionPerformed(ActionEvent e)
+			{
+				String name = JOptionPane.showInputDialog("Enter a name for the recipe");
+				if (name != null && !name.replaceAll(" ", "").equals(""))
+				{
+					for (String s : RecipeMethods.getRecipeFileNames())
+					{
+						if (s.toLowerCase().equals(name.toLowerCase()))
+						{
+							ShokuhinMain.displayMessage("Recipe Exists",
+									"A Recipe with this title already exists.\nPlease enter a different title.",
+									JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
 					}
-				} else {
+				}
+				else
+				{
 					return;
 				}
 
+<<<<<<< HEAD
 				Integer steps = null;
 				while (true) {
 					try {
 						String number = JOptionPane
 								.showInputDialog("How many steps does your recipe involve?");
 						if (steps == null){
+=======
+				Integer steps;
+				while (true)
+				{
+					try
+					{
+						String number = JOptionPane.showInputDialog("How many steps does your recipe involve?");
+						steps = Integer.parseInt(number);
+						if (steps == null)
+						{
+>>>>>>> origin/master
 							return;
 						}
 						steps = Integer.parseInt(number);
 
 						if (steps == 1)
-							ShokuhinMain.displayMessage("Add Steps", "A recipe should have more than one Step.", JOptionPane.INFORMATION_MESSAGE);
-						
+							ShokuhinMain.displayMessage("Add Steps", "A recipe should have more than one Step.",
+									JOptionPane.INFORMATION_MESSAGE);
+
 						if (steps > 0 && steps != 1)
 							break;
+<<<<<<< HEAD
 					} catch (Exception e1){}
+=======
+					}
+					catch (Exception e1)
+					{
+						System.out.println("Exception");
+					}
+>>>>>>> origin/master
 				}
-				
+
 				recipe.setTitle(name);
 				getPar().renameTab(name);
-				
-				for (int i = 0; i < steps; i++) {
+
+				for (int i = 0; i < steps; i++)
+				{
 					instructions.add("Instruction " + (i + 1));
 				}
 
@@ -359,22 +405,27 @@ public class RecipeEditor extends Module {
 				startButton.setText("Restart Recipe");
 
 				firstStepText.setText(instructions.get(0));
-				if (currentInstruction == instructions.size()) {
+				if (currentInstruction == instructions.size())
+				{
 					secondStepText.setText("");
-				} else {
+				}
+				else
+				{
 					secondStepText.setText(instructions.get(1));
 				}
 			}
 		});
 
 		// Adds an ingredient
-		ingredientButton.addActionListener(new ActionListener() {
+		ingredientButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				String ingred = JOptionPane
-						.showInputDialog("Which ingredient would you like to"
-								+ " add? And how much?");
-				if (!ingred.equals(null)) {
+						.showInputDialog("Which ingredient would you like to" + " add? And how much?");
+				if (!ingred.equals(null))
+				{
 					listModel.addElement(ingred);
 				}
 			}
@@ -382,41 +433,65 @@ public class RecipeEditor extends Module {
 		});
 
 		// Saves the recipe
-		saveButton.addActionListener(new ActionListener() {
+		saveButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 
 				instructions.set(currentInstruction, firstStepText.getText());
 
 				int mealType;
 
-				if (breakfast.isSelected()) {
+				if (breakfast.isSelected())
+				{
 					mealType = Recipe.BREAKFAST;
-				} else if (lunch.isSelected()) {
+				}
+				else if (lunch.isSelected())
+				{
 					mealType = Recipe.LUNCH;
-				} else if (dinner.isSelected()) {
+				}
+				else if (dinner.isSelected())
+				{
 					mealType = Recipe.DINNER;
-				} else if (dessert.isSelected()) {
+				}
+				else if (dessert.isSelected())
+				{
 					mealType = Recipe.DESSERT;
-				} else if (snack.isSelected()) {
+				}
+				else if (snack.isSelected())
+				{
 					mealType = Recipe.SNACK;
-				} else {
+				}
+				else
+				{
 					mealType = Recipe.GENERAL;
 				}
 
 				int rating;
 
-				if (rating0.isSelected()) {
+				if (rating0.isSelected())
+				{
 					rating = 0;
-				} else if (rating1.isSelected()) {
+				}
+				else if (rating1.isSelected())
+				{
 					rating = 1;
-				} else if (rating2.isSelected()) {
+				}
+				else if (rating2.isSelected())
+				{
 					rating = 2;
-				} else if (rating3.isSelected()) {
+				}
+				else if (rating3.isSelected())
+				{
 					rating = 3;
-				} else if (rating4.isSelected()) {
+				}
+				else if (rating4.isSelected())
+				{
 					rating = 4;
-				} else {
+				}
+				else
+				{
 					rating = 5;
 				}
 
@@ -424,19 +499,20 @@ public class RecipeEditor extends Module {
 				int cook = Integer.parseInt(cookTime.getText());
 				int serves = Integer.parseInt(serveText.getText());
 
-				ArrayList<Object> tagArrList = new ArrayList<Object>(Arrays
-						.asList(listModel.toArray()));
+				ArrayList<Object> tagArrList = new ArrayList<Object>(Arrays.asList(listModel.toArray()));
 
 				ArrayList<String> finalList = new ArrayList<String>();
 
-				for (Object obj : tagArrList) {
+				for (Object obj : tagArrList)
+				{
 					finalList.add(obj.toString());
 				}
 
 				// Now we must parse the tags
 				ArrayList<String> tagList = new ArrayList<String>();
 
-				for (String word : tagField.getText().split(",")) {
+				for (String word : tagField.getText().split(","))
+				{
 					tagList.add(word.trim());
 				}
 
@@ -449,74 +525,87 @@ public class RecipeEditor extends Module {
 				recipe.setMethodSteps(instructions);
 				recipe.setIngredients(finalList);
 
-				if (Files.exists(new File("./Shokuhin/Recipes/"
-						+ recipe.getTitle() + ".rec").toPath())) {
+				if (Files.exists(new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec").toPath()))
+				{
 					RecipeMethods.deleteRecipe(recipe);
 				}
 
-				RecipeMethods.writeRecipe(recipe, new File(
-						"./Shokuhin/Recipes/" + recipe.getTitle() + ".rec"));
+				RecipeMethods.writeRecipe(recipe, new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec"));
 
 				JOptionPane.showMessageDialog(null, "Recipe saved!");
 			}
 		});
 
-		previousButton.addActionListener(new ActionListener() {
+		previousButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				previousStep();
 			}
 		});
 
-		nextButton.addActionListener(new ActionListener() {
+		nextButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				nextStep();
 			}
 		});
 
-		addStepButton.addActionListener(new ActionListener() {
+		addStepButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				addStep();
 			}
 		});
 
-		removeStepButton.addActionListener(new ActionListener() {
+		removeStepButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				removeStep();
 			}
 		});
 
-		removeIngredientButton.addActionListener(new ActionListener() {
+		removeIngredientButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				String ingredient = ingredientsList.getSelectedValue();
 
 				if (!ingredient.equals(null))
 					listModel.removeElement(ingredient);
 				else
-					JOptionPane.showMessageDialog(null,
-							"Please select a ingredient to remove");
+					JOptionPane.showMessageDialog(null, "Please select a ingredient to remove");
 			}
 		});
 
-		editIngredientButton.addActionListener(new ActionListener() {
+		editIngredientButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				int index = ingredientsList.getSelectedIndex();
 
-				if (index > -1) {
-					String newIngredient = JOptionPane
-							.showInputDialog("Change this ingredient to what?", listModel.getElementAt(index));
-					if (!newIngredient.equals(null)) {
+				if (index > -1)
+				{
+					String newIngredient = JOptionPane.showInputDialog("Change this ingredient to what?",
+							listModel.getElementAt(index));
+					if (!newIngredient.equals(null))
+					{
 						listModel.remove(index);
 						listModel.add(index, newIngredient);
 					}
-				} else {
-					JOptionPane.showMessageDialog(null,
-							"Please select a ingredient to change");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null, "Please select a ingredient to change");
 				}
 			}
 		});
@@ -525,7 +614,8 @@ public class RecipeEditor extends Module {
 	/**
 	 * Populate fields with details of the Recipe
 	 */
-	private void displayRecipe() {
+	private void displayRecipe()
+	{
 		// Add all Ingredients to the JList
 		for (String s : recipe.getIngredients())
 			listModel.addElement(s);
@@ -533,7 +623,8 @@ public class RecipeEditor extends Module {
 		// Load the first two steps
 		instructions.addAll(recipe.getMethodSteps());
 
-		if (!instructions.isEmpty()) {
+		if (!instructions.isEmpty())
+		{
 			firstStepText.setText(instructions.get(0));
 			secondStepText.setText(instructions.get(1));
 		}
@@ -542,8 +633,10 @@ public class RecipeEditor extends Module {
 	/**
 	 * Move back to the previous step in the Method
 	 */
-	private void previousStep() {
-		if (currentInstruction > 0) {
+	private void previousStep()
+	{
+		if (currentInstruction > 0)
+		{
 			instructions.set(currentInstruction, firstStepText.getText());
 			currentInstruction--;
 			firstStepText.setText(instructions.get(currentInstruction));
@@ -554,29 +647,35 @@ public class RecipeEditor extends Module {
 	/**
 	 * Move forward to the next step in the Method
 	 */
-	private void nextStep() {
+	private void nextStep()
+	{
 		int max_instruction = instructions.size() - 1;
 
-		if (currentInstruction < max_instruction) {
+		if (currentInstruction < max_instruction)
+		{
 			instructions.set(currentInstruction, firstStepText.getText());
 			currentInstruction++;
 			firstStepText.setText(instructions.get(currentInstruction));
-			if (currentInstruction == max_instruction) {
+			if (currentInstruction == max_instruction)
+			{
 				secondStepText.setText("End of recipe.");
-			} else {
-				secondStepText
-						.setText(instructions.get(currentInstruction + 1));
+			}
+			else
+			{
+				secondStepText.setText(instructions.get(currentInstruction + 1));
 			}
 		}
 	}
 
 	@Override
-	public boolean close() {
+	public boolean close()
+	{
 		return true;
 	}
 
 	@Override
-	public JMenu getFunctionMenu() {
+	public JMenu getFunctionMenu()
+	{
 		JMenu menu = new JMenu("Recipe Editor");
 
 		// A menu item that can be used when there are no functions to be
@@ -584,10 +683,12 @@ public class RecipeEditor extends Module {
 		JMenuItem new_tab = new JMenuItem("New tab");
 		new_tab.setEnabled(true);
 		menu.add(new_tab);
-		new_tab.addActionListener(new ActionListener() {
+		new_tab.addActionListener(new ActionListener()
+		{
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				getPar().openTab(new RecipeEditor(getPar(), recipe));
 			}
 
@@ -598,7 +699,8 @@ public class RecipeEditor extends Module {
 	/**
 	 * Adds a new step to the recipe
 	 */
-	private void addStep() {
+	private void addStep()
+	{
 		instructions.add(currentInstruction + 1, "Added Instruction");
 		secondStepText.setText("Added Instruction");
 	}
@@ -606,23 +708,29 @@ public class RecipeEditor extends Module {
 	/**
 	 * Removes the current step from the recipe
 	 */
-	private void removeStep() {
-		if (instructions.size() == 1) {
-			JOptionPane.showMessageDialog(null,
-					"There is only one instruction left!");
-		} else {
+	private void removeStep()
+	{
+		if (instructions.size() == 1)
+		{
+			JOptionPane.showMessageDialog(null, "There is only one instruction left!");
+		}
+		else
+		{
 			instructions.remove(currentInstruction);
 
-			if (currentInstruction != 0) {
+			if (currentInstruction != 0)
+			{
 				currentInstruction--;
 			}
 
 			firstStepText.setText(instructions.get(currentInstruction));
 
-			try {
-				secondStepText
-						.setText(instructions.get(currentInstruction + 1));
-			} catch (Exception e) {
+			try
+			{
+				secondStepText.setText(instructions.get(currentInstruction + 1));
+			}
+			catch (Exception e)
+			{
 				secondStepText.setText("End of recipe");
 			}
 		}
@@ -636,9 +744,11 @@ public class RecipeEditor extends Module {
 	 *            the boolean used to set whether the components are editable or
 	 *            not
 	 */
-	private void setEnableDisable(boolean b) {
+	private void setEnableDisable(boolean b)
+	{
 
-		for (Component component : editableComponents) {
+		for (Component component : editableComponents)
+		{
 			component.setEnabled(b);
 		}
 	}

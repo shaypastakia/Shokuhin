@@ -24,6 +24,7 @@ import mp3Player.MP3Player;
  * <br>
  * Produces the Timer Bar for the Main Interface
  * 
+ * @author Shaylen Pastakia
  */
 public class TimerBar extends JPanel {
 	private static final long serialVersionUID = 7320494451364057870L;

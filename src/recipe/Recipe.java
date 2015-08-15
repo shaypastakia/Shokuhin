@@ -3,6 +3,11 @@ package recipe;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author Shaylen Pastakia
+ *
+ */
 public class Recipe implements Serializable{
 	private static final long serialVersionUID = -800402407141475554L;
 	

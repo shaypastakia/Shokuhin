@@ -10,8 +10,10 @@ import javax.swing.ListCellRenderer;
 /**
  * Class to deal with colour changes of playing tracks
  *
+ * @author Samuel Barker
  */
-public class CellRenderer extends JLabel implements ListCellRenderer {
+public class CellRenderer extends JLabel implements ListCellRenderer
+{
 
 	private static final long serialVersionUID = 2644181371111623670L;
 
@@ -23,7 +25,8 @@ public class CellRenderer extends JLabel implements ListCellRenderer {
 	/**
 	 * Creates a CellRenderer
 	 */
-	public CellRenderer(MP3Player mp3) {
+	public CellRenderer(MP3Player mp3)
+	{
 		setOpaque(true);
 		this.mp3 = mp3;
 	}
@@ -31,22 +34,29 @@ public class CellRenderer extends JLabel implements ListCellRenderer {
 	/**
 	 * obtains the cell renderer component
 	 */
-	public Component getListCellRendererComponent(JList list, Object value,
-			int index, boolean isSelected, boolean cellHasFocus) {
+	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+			boolean cellHasFocus)
+	{
 		// Assumes the stuff in the list has a pretty toString
 		setText(value.toString());
 
 		// based on the index you set the color. This produces the every other
 		// effect.
-		if (isSelected) {
+		if (isSelected)
+		{
 			setBackground(Color.LIGHT_GRAY);
-		} else {
+		}
+		else
+		{
 			setBackground(Color.WHITE);
 		}
 
-		if (index == mp3.getCurrentSong()) {
+		if (index == mp3.getCurrentSong())
+		{
 			setForeground(Color.RED);
-		} else {
+		}
+		else
+		{
 			setForeground(Color.BLACK);
 		}
 

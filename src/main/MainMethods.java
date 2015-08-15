@@ -19,6 +19,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
+/**
+ * 
+ * @author Shaylen Pastakia
+ *
+ */
 public class MainMethods {
 	
 	//Format to store Dates in.

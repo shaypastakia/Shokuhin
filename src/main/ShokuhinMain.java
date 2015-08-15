@@ -24,6 +24,7 @@ import recipeSearch.RecipeSearch;
  * <br>
  * Welcome to Shokuhin!
  *
+ * @author Shaylen Pastakia
  */
 public class ShokuhinMain {
 	//Static fields for the (text-safe) Colours used in Shokuhin
