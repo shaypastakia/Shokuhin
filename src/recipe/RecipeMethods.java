@@ -352,4 +352,16 @@ public class RecipeMethods {
 		
 		ShokuhinMain.displayMessage("Exported File", "Successfully exported " + recipe.getTitle() + " to " + saveFile.getAbsolutePath(), JOptionPane.INFORMATION_MESSAGE);
 	}
+	
+	public static void exportAll(){
+		try {
+		for (String s : getRecipeFileNames()){
+			Recipe r = readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec"));
+			Files.createFile(new File("C://Users/Shaylen/Desktop/Recipes/" + s + ".html").toPath());
+			Files.write(new File("C://Users/Shaylen/Desktop/Recipes/" + s + ".html").toPath(), new RecipeHTML(r).getHTML().getBytes(), StandardOpenOption.CREATE);
+		}
+		} catch (Exception e){
+			System.out.println("Failed\n" + e.getMessage());
+		}
+	}
 }
