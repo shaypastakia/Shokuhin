@@ -358,10 +358,11 @@ public class RecipeEditor extends Module
 					try {
 						String number = JOptionPane
 								.showInputDialog("How many steps does your recipe involve?");
-						if (steps == null){
+
+						steps = Integer.parseInt(number);
+						if (steps == 0){
 							return;
 						}
-						steps = Integer.parseInt(number);
 
 						if (steps == 1)
 							ShokuhinMain.displayMessage("Add Steps", "A recipe should have more than one Step.",

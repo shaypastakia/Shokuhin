@@ -31,6 +31,8 @@ import mp3Player.MP3Player;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import com.sun.speech.freetts.Voice;
@@ -190,10 +192,30 @@ public class RecipeMethods {
 			parsedRecipe.setRating((int) Math.round(Double.parseDouble(ratingValue)));
 			
 			//Get the ingredients of the Recipe
-			Elements ingredientsElement = doc.getElementsByAttributeValue("itemprop", "ingredients");
+			Elements ingredientsElement = doc.getElementsByClass("ingredients-list__item");
 			ArrayList<String> ingredients = new ArrayList<String>();
 			for (Element e : ingredientsElement){
-				ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+				if (e.getAllElements().size() == 1){
+					ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+				} else if (e.getAllElements().size() > 1){
+					String temp = "";
+					Elements elems = e.getAllElements();
+					for (Element elem : elems){
+						if (elem.children().size() != 0)
+							temp += elem.ownText().trim();
+						else {
+							//Parse Ingredients differently, depending on whether Chef Recipe or User Recipe
+							Element recipeType = doc.getElementById("main-content");
+							System.out.println(recipeType.attr("class"));
+							if (recipeType.attr("class").contains("user"))
+								temp += " " + elem.select("span").text().trim();
+							else 
+								temp += " " + elem.select("a.ingredients-list__glossary-link").text().trim();
+						}
+					}
+					ingredients.add(new String(temp.replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+				}
+				
 			}
 			parsedRecipe.setIngredients(ingredients);
 			
@@ -259,12 +281,12 @@ public class RecipeMethods {
 		
 		try {
 			//Get the title of the Recipe
-			Elements titleElement = doc.getElementsByClass("article-title");
+			Elements titleElement = doc.getElementsByClass("content-title__text");
 			String titleElementText = titleElement.get(0).text();
 			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
 			
 			//Get the ingredients of the Recipe
-			Elements ingredientsElement = doc.getElementsByAttributeValue("id", "ingredients");
+			Elements ingredientsElement = doc.getElementsByClass("recipe-ingredients-wrapper");
 			ingredientsElement = Jsoup.parse(ingredientsElement.html()).select("li");
 			ArrayList<String> ingredients = new ArrayList<String>();
 			for (Element e : ingredientsElement){
@@ -273,17 +295,20 @@ public class RecipeMethods {
 			parsedRecipe.setIngredients(ingredients);
 			
 			//Get the method steps of the Recipe
-			Elements methodElement = doc.getElementsByClass("instructions");
+			Elements methodElement = doc.getElementsByClass("recipe-method-wrapper");
 			methodElement = Jsoup.parse(methodElement.html()).select("li");
 			ArrayList<String> methodSteps = new ArrayList<String>();
 			for (Element e : methodElement){
 					Elements el = e.select("p");
+					System.out.println(el.get(0).ownText());
 					methodSteps.add(new String(el.get(0).ownText().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
 				}
 			parsedRecipe.setMethodSteps(methodSteps);
 
 			return parsedRecipe;
 		} catch (Exception e){
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}

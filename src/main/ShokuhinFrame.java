@@ -18,6 +18,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import cloudManager.CloudManager;
 import mp3Player.MP3Player;
 import recipe.Recipe;
 import recipe.RecipeMethods;
@@ -101,13 +102,16 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		JMenuItem recipeEditor = new JMenuItem("Create a Recipe");
 		JMenuItem recipeSearch = new JMenuItem("Search for Recipes");
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
+		JMenuItem cloudManager = new JMenuItem("Cloud Manager");
 		fileMenu.add(recipeEditor);
 		fileMenu.add(recipeSearch);
 		fileMenu.add(mp3Player);
+		fileMenu.add(cloudManager);
 		
 		recipeEditor.addActionListener(this);
 		recipeSearch.addActionListener(this);
 		mp3Player.addActionListener(this);
+		cloudManager.addActionListener(this);
 		
 		//Add parsing menu item
 		JMenuItem parse = new JMenuItem("Parse Recipe");
@@ -165,6 +169,8 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 			case "Search for Recipes": main.openTab(new RecipeSearch(main));
 				break;
 			case "MP3 Player": main.openTab(new MP3Player(main));
+				break;
+			case "Cloud Manager": main.openTab(new CloudManager(main));
 			}
 	}
 
