@@ -3,6 +3,9 @@ package recipeEditor;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -305,10 +308,6 @@ public class RecipeEditor extends Module
 			{
 				tags = tags.concat(", ");
 			}
-			else
-			{
-				tags = tags.concat(".").trim();
-			}
 		}
 
 		System.out.println("Tags: " + tags);
@@ -405,9 +404,8 @@ public class RecipeEditor extends Module
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String ingred = JOptionPane
-						.showInputDialog("Which ingredient would you like to" + " add? And how much?");
-				if (!ingred.equals(null))
+				String ingred = new IngredientsDialog().ingredientText;
+				if (!ingred.equals(""))
 				{
 					listModel.addElement(ingred);
 				}
@@ -676,6 +674,34 @@ public class RecipeEditor extends Module
 			}
 
 		});
+		
+		JMenu fractions = new JMenu("Fractions to Clipboard");
+		JMenuItem half = new JMenuItem("\u00BD");
+		JMenuItem third = new JMenuItem("\u2153");
+		JMenuItem twoThird = new JMenuItem("\u2154");
+		JMenuItem quart = new JMenuItem("\u00BC");
+		JMenuItem threeQuart = new JMenuItem("\u00BE");
+		
+		fractions.add(half);
+		fractions.add(third);
+		fractions.add(twoThird);
+		fractions.add(quart);
+		fractions.add(threeQuart);
+		
+		int max = fractions.getItemCount();
+		for (int i = 0; i < max; i++){
+			fractions.getItem(i).setFont(new Font("Times New Roman", Font.PLAIN, 20));
+			fractions.getItem(i).addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Clipboard clpbrd = Toolkit.getDefaultToolkit ().getSystemClipboard ();
+			        clpbrd.setContents (new StringSelection(e.getActionCommand()), null);
+				}
+			});
+		}
+		
+		menu.add(fractions);
 		return menu;
 	}
 

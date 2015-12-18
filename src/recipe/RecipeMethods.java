@@ -22,21 +22,19 @@ import javax.sound.sampled.AudioInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
+
 import main.ShokuhinMain;
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
 import marytts.util.data.audio.AudioPlayer;
 import mp3Player.MP3Player;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.select.Elements;
-
-import com.sun.speech.freetts.Voice;
-import com.sun.speech.freetts.VoiceManager;
 
 /**
  * 
@@ -206,7 +204,6 @@ public class RecipeMethods {
 						else {
 							//Parse Ingredients differently, depending on whether Chef Recipe or User Recipe
 							Element recipeType = doc.getElementById("main-content");
-							System.out.println(recipeType.attr("class"));
 							if (recipeType.attr("class").contains("user"))
 								temp += " " + elem.select("span").text().trim();
 							else 

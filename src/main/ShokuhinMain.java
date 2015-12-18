@@ -2,8 +2,6 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.util.Date;
-import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -14,12 +12,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
-import org.apache.commons.net.ftp.FTPClient;
-
-import cloudManager.CloudManager;
 import home.ShokuhinHome;
 import mp3Player.MP3Player;
-import recipe.RecipeMethods;
 import recipeSearch.RecipeSearch;
 
 /**
