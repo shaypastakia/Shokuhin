@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,6 +42,7 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 	private JButton twoThird = new JButton("\u2154");
 	private JButton quart = new JButton("\u00BC");
 	private JButton threeQuart = new JButton("\u00BE");
+	private JCheckBox header = new JCheckBox("Sub-Heading");
 	
 	private String title = "Enter the Quantity and Name of Ingredient";
 	
@@ -54,7 +56,7 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 		this.setTitle(title);
 		initialise();
 		this.setContentPane((panel));
-		setMinimumSize(new Dimension(400, 160));
+		setMinimumSize(new Dimension(400, 190));
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
@@ -84,6 +86,7 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 			});
 		}
 		
+		buttonPanel.add(header);
 		new BoxLayout(okPanel, BoxLayout.LINE_AXIS);
 		okPanel.add(cancelButton);
 		okPanel.add(okButton);
@@ -92,7 +95,11 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ingredientText = ingredient.getText();
+				if (header.isSelected()){
+					ingredientText = "<html><b>" + ingredient.getText() + "</b></html>";
+				} else {
+					ingredientText = ingredient.getText();
+				}
 				dispose();
 			}
 		});

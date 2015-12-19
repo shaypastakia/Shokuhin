@@ -12,6 +12,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import home.ShokuhinHome;
 import mp3Player.MP3Player;
 import recipeSearch.RecipeSearch;
