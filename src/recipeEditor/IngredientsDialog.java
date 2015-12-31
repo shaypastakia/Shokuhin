@@ -50,21 +50,25 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 	
 	public IngredientsDialog(){
 		super();
+		initialise();
+	}
+	
+	public IngredientsDialog(String edit){
+		super();
+		
+		ingredientText = edit;
+		fillDialog();
+		initialise();
+	}
+	
+	public void initialise(){
 		
 		new BoxLayout(panel, BoxLayout.PAGE_AXIS);
 		this.setModalityType(ModalityType.APPLICATION_MODAL);
 		this.setTitle(title);
-		initialise();
-		this.setContentPane((panel));
-		setMinimumSize(new Dimension(400, 190));
-		this.setLocationRelativeTo(null);
-		this.setVisible(true);
-	}
-	
-	public void initialise(){
 
 		ingredient.setColumns(25);
-		ingredient.addKeyListener(this);;
+		ingredient.addKeyListener(this);
 		
 		new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS);
 		buttonPanel.add(half);
@@ -119,6 +123,19 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 		panel.add(buttonPanel);
 		panel.add(new JSeparator(SwingConstants.VERTICAL));
 		panel.add(okPanel);
+		
+		this.setContentPane((panel));
+		setMinimumSize(new Dimension(400, 190));
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);
+	}
+	
+	private void fillDialog(){
+		if (ingredientText.startsWith("<html><b>")){
+			ingredientText = ingredientText.replaceAll("<html><b>|</b></html>", "");
+			header.setSelected(true);
+		}
+		ingredient.setText(ingredientText);
 	}
 
 	@Override

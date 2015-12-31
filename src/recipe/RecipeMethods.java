@@ -49,7 +49,9 @@ public class RecipeMethods {
 	 * @param file The file representing the file path to be written to
 	 * @return True if the file write succeeded
 	 */
-	public static boolean writeRecipe(Recipe rec, File file){
+	public static boolean writeRecipe(Recipe rec){
+		File file = new File("./Shokuhin/Recipes/" + rec.getTitle() + ".rec");
+		
 		String filePath = file.getAbsolutePath();
 		String[] split = filePath.split("\\\\");
 		int end = split.length-1;
@@ -85,7 +87,7 @@ public class RecipeMethods {
 	 */
 	public static Recipe readRecipe(File file){
 		try {
-			InputStream fileIn = Files.newInputStream(file.toPath());
+			InputStream fileIn = Files.newInputStream(file.toPath(), StandardOpenOption.READ);
 			BufferedInputStream buff = new BufferedInputStream(fileIn);
 			ObjectInputStream obj = new ObjectInputStream(buff);
 			Recipe rec = (Recipe) obj.readObject();
@@ -111,7 +113,7 @@ public class RecipeMethods {
 	
 	/**
 	 * Get all Filenames from the Recipes folder
-	 * @return An ArrayList of Strings, containing the Recipe names
+	 * @return An ArrayList of Strings, containing the Recipe names (e.g. "Victoria Sponge")
 	 */
 	public static ArrayList<String> getRecipeFileNames(){
 		File parent = new File("./Shokuhin/Recipes/");
@@ -122,6 +124,29 @@ public class RecipeMethods {
 		}
 		
 		return files;
+	}
+	
+	public static ArrayList<String> getRemoteRecipeFileNames(String url){
+		try {
+            ArrayList<String> temp = new ArrayList<String>();
+            ArrayList<String> temp2 = new ArrayList<String>();
+            Document doc = Jsoup.connect(url).get();
+            for (Element file : doc.select("a")) {
+                temp.add(file.attr("href"));
+            }
+
+            for (String s : temp){
+                if (s.endsWith(".rec")){
+                    String s2 = s.replaceAll("%20", " ").replaceAll(".rec", "");
+                    temp2.add(s2);
+                }
+            }
+            temp.clear();
+            return temp2;
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
 	}
 	
 	/**
@@ -341,6 +366,7 @@ public class RecipeMethods {
 						mp3Player.resume();
 					}
 				} catch (Exception e) {
+					e.printStackTrace();
 					System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
 					Voice voice;
 					VoiceManager voiceManager = VoiceManager.getInstance();
@@ -353,6 +379,10 @@ public class RecipeMethods {
 		thread.start();
 	}
 
+	/**
+	 * Export a single recipe in HTML format
+	 * @param recipe
+	 */
 	public static void exportHTML(Recipe recipe){
 		JFileChooser chooser = new JFileChooser();
 		chooser.showSaveDialog(null);
@@ -375,6 +405,9 @@ public class RecipeMethods {
 		ShokuhinMain.displayMessage("Exported File", "Successfully exported " + recipe.getTitle() + " to " + saveFile.getAbsolutePath(), JOptionPane.INFORMATION_MESSAGE);
 	}
 	
+	/**
+	 * Export all Recipes to HTML
+	 */
 	public static void exportAll(){
 		try {
 		for (String s : getRecipeFileNames()){

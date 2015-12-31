@@ -230,7 +230,7 @@ public class RecipeSearch extends Module implements ActionListener{
 		SpinnerNumberModel timeModel = new SpinnerNumberModel(0, 0, 999, 1);
 		totalTime.setModel(timeModel);
 		totalTimePanel.setMaximumSize(new Dimension(9999, 80));
-		totalTimePanel.add(new JLabel("Enter a maximum cooking Time. Select 0 for any time: "));
+		totalTimePanel.add(new JLabel("Enter a maximum total cooking Time. Select 0 for any time: "));
 		totalTimePanel.add(totalTime);
 		
 		coursesPanel.setBorder(BorderFactory.createTitledBorder("Course"));

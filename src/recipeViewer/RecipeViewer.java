@@ -29,7 +29,7 @@ import recipeEditor.RecipeEditor;
 /**
  * Represents the Recipe viewer
  * 
- * @author Samuel Barker, Shaylen Pastakia
+ * @author Shaylen Pastakia
  *
  */
 public class RecipeViewer extends Module

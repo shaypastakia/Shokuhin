@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -49,7 +50,7 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		//Perform standard setting up for a Frame
 		this.main = main;
 		this.setTitle(title);
-		
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(this);
 		this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 		//Set the window size to the minimally standard resolution of a Laptop
@@ -164,7 +165,18 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		//All File->Open New Tab buttons are set to trigger this method.
 		//The switch statement determines which Menu Item was pressed, then requests for ShokuhinMain to open a new tab
 			switch(e.getActionCommand()) {
-			case "Create a Recipe": main.openTab(new RecipeEditor(main, new Recipe("test")));
+			case "Create a Recipe": 
+				String name = JOptionPane.showInputDialog("Please enter a name for the new Recipe.");
+				if (name == null || name.trim().equals(""))
+					return;
+				ArrayList<String> names = RecipeMethods.getRecipeFileNames();
+				for (String s : names){
+					if (s.toLowerCase().trim().equals(name.toLowerCase().trim())){
+						ShokuhinMain.displayMessage("Recipe Exists", "A Recipe with this title already exists.", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
+				}
+				main.openTab(new RecipeEditor(main, name));
 				break;
 			case "Search for Recipes": main.openTab(new RecipeSearch(main));
 				break;
@@ -185,15 +197,19 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 	@Override
 	public void windowClosing(WindowEvent e) {
 		//Call the close() method in all Modules before Closing
-		for (Component m: main.tabPane.getComponents())
-			((Module) m).close();
+		int count = -1;
+		for (Component m: main.tabPane.getComponents()){
+			if (!((Module) m).close())
+				count++;
+		}
 
 		try {
-			new File("./log/server.log").delete();
+			Files.deleteIfExists(new File("./log/server.log").toPath());
 		} catch (Exception e1) {
 
 		}
-		System.exit(0);
+		if (count == 0)
+			System.exit(0);
 	}
 
 	@Override

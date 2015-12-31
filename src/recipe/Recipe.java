@@ -2,6 +2,7 @@ package recipe;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * 
@@ -28,12 +29,23 @@ public class Recipe implements Serializable{
 	private int rating = 0; //The user's rating for the dish. Assert value between 0-5, where 0 is no rating applied
 	private int servings; //The number of servings this Recipe caters for
 	
+	private Date lastModifiedDate; //The Date this recipe was last modified. Used for synchronisation.
+	
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(Date lastModified) {
+		this.lastModifiedDate = lastModified;
+	}
+
 	/**
 	 * Constructor
 	 * @param title The title and filename to give this Recipe
 	 */
 	public Recipe(String title) {
 		this.title = title;
+		this.lastModifiedDate = new Date();
 	}
 	
 	public String getTitle() {

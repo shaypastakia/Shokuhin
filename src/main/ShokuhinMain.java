@@ -2,6 +2,13 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -11,10 +18,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import home.ShokuhinHome;
 import mp3Player.MP3Player;
@@ -39,6 +42,9 @@ public class ShokuhinMain {
 	public static final Color FIFTY_SHADES_OF_WHITE = new Color(240, 240, 240);
 	public static final Color ANY_COLOUR_SO_LONG_AS_IT_IS_BLACK = new Color(0, 0, 0);
 	public static final Color DEFAULT_CAMPUS_FOG = new Color(214, 217, 223);
+	
+	//Format to store Dates in.
+	public static final DateFormat format = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
 	
 	//Create fields to store the Main class, as well as the Voice Command class.
 	public static ShokuhinMain main;
@@ -167,6 +173,7 @@ public class ShokuhinMain {
             @Override
             public void run() {
                 try {
+//                	test();
 //                	MidiPlayer.play(new Pattern(MidiPlayer.getPattern(new File("INSERT '.mid' FILENAME HERE"))));
                     main = new ShokuhinMain();
                 } catch (Exception e) {
@@ -176,4 +183,24 @@ public class ShokuhinMain {
         });
 	} //closes main method */
 
+	public static void test() throws ClassNotFoundException, SQLException{
+		 final String DB_URL = "";
+		 final String USER = "";
+		 final String PASS = "";
+		 Class.forName("com.mysql.jdbc.Driver");
+		 
+		 Connection conn = null;
+		 Statement stmt = null;
+		 conn = DriverManager.getConnection(DB_URL,USER,PASS);
+		 
+		 String sql = "SELECT title FROM Shokuhin";
+		 ResultSet rs = stmt.executeQuery(sql);
+		 while(rs.next()){
+			 System.out.println(rs.getString("title"));
+		 }
+		 
+		 rs.close();
+	      stmt.close();
+	      conn.close();
+	}
 } //closes class definition

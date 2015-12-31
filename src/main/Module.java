@@ -29,6 +29,10 @@ public abstract class Module extends JPanel{
 		return name;
 	}
 	
+	public void setName(String s){
+		name = s;
+	}
+	
 	/**
 	 * 
 	 * @return The ShokuhinMain associated with the implementing Module
