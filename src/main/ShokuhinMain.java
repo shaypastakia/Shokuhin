@@ -2,6 +2,9 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -111,6 +114,21 @@ public class ShokuhinMain {
 		openTab(new RecipeSearch(this));
 		tabPane.setSelectedIndex(0);
 		
+		/**
+		 * Code based on: http://stackoverflow.com/questions/5344823/
+		 * how-can-i-listen-for-key-presses-within-java-swing-across-all-components
+		 * <br>
+		 * Answer by: Matt Crinklaw-Vogt
+		 */
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+		  .addKeyEventDispatcher(new KeyEventDispatcher() {
+		      @Override
+		      public boolean dispatchKeyEvent(KeyEvent e) {
+		        ((Module)tabPane.getSelectedComponent()).KeyPressed(e);
+		        return false;
+		      }
+		});
+		//End Code Based On
 	} //closes constructor
 	
 	/**

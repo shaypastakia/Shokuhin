@@ -352,4 +352,10 @@ public class ShokuhinHome extends Module implements ActionListener
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
+
+	@Override
+	public void KeyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

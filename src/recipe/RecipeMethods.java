@@ -70,7 +70,8 @@ public class RecipeMethods {
 			ObjectOutputStream obj = new ObjectOutputStream(buff);
 			obj.writeObject(rec);
 			obj.close();
-			
+			buff.close();
+			fileOut.close();
 			return true;
 		} catch (Exception e){
 			ShokuhinMain.displayMessage("Failed to write Recipe", "Returned the error: " + e.getMessage(), JOptionPane.WARNING_MESSAGE);
@@ -92,6 +93,7 @@ public class RecipeMethods {
 			ObjectInputStream obj = new ObjectInputStream(buff);
 			Recipe rec = (Recipe) obj.readObject();
 			obj.close();
+			fileIn.close();
 			return rec;
 		} catch (Exception e){
 			ShokuhinMain.displayMessage("Failed to read Recipe", "Returned the error: " + e.getMessage(), JOptionPane.WARNING_MESSAGE);

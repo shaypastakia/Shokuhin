@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.Stack;
 
@@ -98,7 +99,7 @@ public class RecipeViewer extends Module
 
 		// Set up Borders for Panels
 		firstStepPane.setBorder(BorderFactory.createTitledBorder("Previous Step"));
-		secondStepPane.setBorder(BorderFactory.createTitledBorder("Current Step"));
+		secondStepPane.setBorder(BorderFactory.createTitledBorder("Current Step (Use Arrow Keys to traverse steps, and Space button to Read Step)"));
 		thirdStepPane.setBorder(BorderFactory.createTitledBorder("Next Step"));
 		infoPane.setBorder(BorderFactory.createTitledBorder("Information"));
 
@@ -306,6 +307,19 @@ public class RecipeViewer extends Module
 		menu.add(exportRecipe);
 		menu.add(autoReadOption);
 		return menu;
+	}
+
+	/**
+	 * Use arrow keys to traverse Method Steps. Also use Space to Speak.
+	 */
+	@Override
+	public void KeyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getID() == KeyEvent.KEY_RELEASED)
+			readButton.doClick();
+		else if (e.getKeyCode() == KeyEvent.VK_LEFT && e.getID() == KeyEvent.KEY_RELEASED)
+			previousButton.doClick();
+		else if (e.getKeyCode() == KeyEvent.VK_RIGHT && e.getID() == KeyEvent.KEY_RELEASED)
+			nextButton.doClick();
 	}
 
 }

@@ -1,5 +1,7 @@
 package main;
 
+import java.awt.event.KeyEvent;
+
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 
@@ -58,4 +60,9 @@ public abstract class Module extends JPanel{
 	 */
 	public abstract JMenu getFunctionMenu();
 	
+	/**
+	 * Allows a Module to react to Key Presses, regardless of component focus.
+	 * @param e
+	 */
+	public abstract void KeyPressed(KeyEvent e);
 }

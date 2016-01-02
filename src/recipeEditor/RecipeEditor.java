@@ -7,13 +7,14 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -49,8 +50,7 @@ import recipe.RecipeMethods;
  * @author Shaylen Pastakia
  *
  */
-public class RecipeEditor extends Module
-{
+public class RecipeEditor extends Module{
 	private static final long serialVersionUID = 2180887752409681176L;
 	private Recipe recipe;
 	
@@ -139,7 +139,7 @@ public class RecipeEditor extends Module
 		ingredientsPane.add(ingredientsScroll);
 		ingredientsPane.add(ingredientsButtonPane);
 		ingredientsPane.setMinimumSize(new Dimension(300, 0));
-		ingredientsPane.setBorder(BorderFactory.createTitledBorder("Ingredients"));
+		ingredientsPane.setBorder(BorderFactory.createTitledBorder("Ingredients (Drag to reorder)"));
 		
 		//Code from http://stackoverflow.com/questions/3804361/how-to-enable-drag-and-drop-inside-jlist, by Grains
 		MyMouseAdaptor adaptor = new MyMouseAdaptor(ingredientsList, listModel);
@@ -247,17 +247,6 @@ public class RecipeEditor extends Module
 					temp.add(enumer.nextElement());
 				
 				recipe.setIngredients(temp);
-				steps.removeIf(new Predicate<String>() {
-
-					@Override
-					public boolean test(String t) {
-						if (t == null || t.equals(""))
-							return true;
-						else
-							return false;
-					}
-					
-				});
 				recipe.setMethodSteps(steps);
 				
 				recipe.setCookTime((int)cookSpinner.getValue());
@@ -274,8 +263,11 @@ public class RecipeEditor extends Module
 				
 				recipe.setLastModifiedDate(new Date());
 				
-				if (Files.exists(new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec").toPath()))
-						RecipeMethods.deleteRecipe(recipe);
+				if (Files.exists(new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec").toPath())){
+					if (!RecipeMethods.deleteRecipe(recipe))
+						ShokuhinMain.displayMessage("Failed", "Unable to delete old Recipe", JOptionPane.WARNING_MESSAGE);
+				}
+						
 				
 				if (RecipeMethods.writeRecipe(recipe))
 					ShokuhinMain.displayMessage("Success", recipe.getTitle() + " has been saved.", JOptionPane.INFORMATION_MESSAGE);
@@ -308,6 +300,23 @@ public class RecipeEditor extends Module
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				listModel.remove(ingredientsList.getSelectedIndex());
+			}
+		});
+		
+		methodText.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				steps.set(index, methodText.getText());				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				
 			}
 		});
 	}
@@ -475,6 +484,15 @@ public class RecipeEditor extends Module
 		noFuncs.setEnabled(false);
 		menu.add(noFuncs);
 		return menu;
+	}
+
+	/**
+	 * Save when CTRL + S is pressed
+	 */
+	@Override
+	public void KeyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_S && e.isControlDown() && e.getID() == KeyEvent.KEY_RELEASED)
+			saveButton.doClick();
 	}
 
 }

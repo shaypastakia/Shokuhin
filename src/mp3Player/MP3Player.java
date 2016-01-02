@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
@@ -806,6 +807,12 @@ public class MP3Player extends Module
 	public int getPlayerState()
 	{
 		return player.state();
+	}
+
+	@Override
+	public void KeyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

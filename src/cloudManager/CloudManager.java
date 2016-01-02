@@ -3,16 +3,11 @@ package cloudManager;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -503,9 +498,10 @@ public class CloudManager extends Module implements KeyListener{
 			client.logout();
 			client.disconnect();
 		} catch (IOException e) {
-			postOutput("Unable to disconnect from Server");
-			e.printStackTrace();
-			return false;
+//			postOutput("Unable to disconnect from Server");
+//			e.printStackTrace();
+//			return false;
+			return true;
 		}
 		return true;
 	}
@@ -608,5 +604,12 @@ public class CloudManager extends Module implements KeyListener{
 			if (e.getKeyChar() == KeyEvent.VK_ENTER){
 				process(getInput());
 			}
+	}
+
+	/**
+	 * Don't need to do anything
+	 */
+	@Override
+	public void KeyPressed(KeyEvent e) {
 	}
 }

@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -158,18 +157,18 @@ public class RecipeSearch extends Module implements ActionListener{
 			}
 		});
 		
-		titleText.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent arg0) {}
-			@Override
-			public void keyPressed(KeyEvent arg0) {}
-			
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-				if (arg0.getKeyCode() == KeyEvent.VK_ENTER)
-					actionPerformed(null);
-			}
-		});
+//		titleText.addKeyListener(new KeyListener() {
+//			@Override
+//			public void keyTyped(KeyEvent arg0) {}
+//			@Override
+//			public void keyPressed(KeyEvent arg0) {}
+//			
+//			@Override
+//			public void keyReleased(KeyEvent arg0) {
+//				if (arg0.getKeyCode() == KeyEvent.VK_ENTER)
+//					actionPerformed(null);
+//			}
+//		});
 		
 		//Group Radio Controls together
 		ButtonGroup group = new ButtonGroup();
@@ -744,5 +743,14 @@ public class RecipeSearch extends Module implements ActionListener{
 		searchEditButton.setEnabled(false);
 		searchOpenButton.setEnabled(false);
 		System.out.println("Failed on: " + s);
+	}
+
+	/**
+	 * Search when Enter is pressed
+	 */
+	@Override
+	public void KeyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER && e.getID() == KeyEvent.KEY_RELEASED)
+			actionPerformed(null);
 	}
 }
