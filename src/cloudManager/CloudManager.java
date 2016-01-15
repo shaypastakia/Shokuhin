@@ -49,7 +49,6 @@ public class CloudManager extends Module implements KeyListener{
 	private static final String UPLOAD_UPDATED_LOCAL = "upload updated local";
 	private static final String DOWNLOAD_UPDATED_REMOTE = "download updated remote";
 	private static final String CLEAR = "clear";
-	private static final String SYNC = "sync";
 	private static final String HELP = "help";
 	
 	private static final int DELETE = 0;
@@ -269,6 +268,24 @@ public class CloudManager extends Module implements KeyListener{
 		} else if (cmd.equals(LIST_UPDATED_REMOTE)){
 			return listUpdated(LIST_UPDATED_REMOTE);
 		} else if (cmd.equals(UPLOAD_UPDATED_LOCAL)){
+			if (localModel.size() == 0){
+				postOutput("The Remote List is empty.\nCannot download Recipes.\n"
+						+ "Try using the 'list updated remote' command.");
+				return true;
+			}
+			
+			if (localList.getSelectedValuesList().size() == 0){
+				for (int i = 0; i < localModel.size(); i++){
+					String s = localModel.getElementAt(i);
+					putLocalFile(s, true);
+				}
+			} else {
+				for (String s : localList.getSelectedValuesList()){
+					putLocalFile(s, true);
+				}
+			}
+			process(LIST_UPDATED_LOCAL);
+			
 			return true;
 		} else if (cmd.equals(DOWNLOAD_UPDATED_REMOTE)){
 			if (remoteModel.size() == 0){
@@ -289,13 +306,6 @@ public class CloudManager extends Module implements KeyListener{
 			}
 			process(LIST_UPDATED_REMOTE);
 			return true;
-		} else if (cmd.contains(SYNC)){
-			user = "spastakia";
-			pass = "99161277";
-			server = "194.83.236.93";
-			firstConnect();
-			process(LIST_UPDATED_LOCAL);
-			return true;
 		} else if (cmd.equals(HELP) || cmd.equals("?")){
 			return true;
 		} else if (cmd.equals("exit")){
@@ -304,11 +314,7 @@ public class CloudManager extends Module implements KeyListener{
 			postOutput("Invalid command.\nPlease use 'help' for a list of commands.");
 			return true;
 		}
-		//TODO 'upload updated local'
-		//TODO 'download updated remote' *COMPLETED*
-		//TODO 'sync <password>'
 		//TODO 'help'
-		//TODO Invalid command
 		return true;
 	}
 	
@@ -339,9 +345,6 @@ public class CloudManager extends Module implements KeyListener{
 			getRemoteFile(f, DONT_DELETE_OR_OUTPUT);
 			remoteRec.add(RecipeMethods.readRecipe(f));
 		}
-		
-//		if (1==1)
-//		return true;
 		
 		localModel.clear();
 		remoteModel.clear();
@@ -417,18 +420,10 @@ public class CloudManager extends Module implements KeyListener{
 			client.enterLocalPassiveMode();
 			client.setFileType(FTP.BINARY_FILE_TYPE);
 			
-			
-			
 			//Code based on: http://stackoverflow.com/questions/16439054/download-file-from-remote-ftp-server-file-downloaded-empty
 			//Question by: EL Kamel Malek
 			OutputStream outputStream = Files.newOutputStream(f.toPath());
 			client.retrieveFile(f.getName(), outputStream);
-//            InputStream inputStream = client.retrieveFileStream(f.getName());
-//            byte[] bytesArray = new byte[4096];
-//            int length;
-//            while ((length = inputStream.read(bytesArray)) > 0){
-//                outputStream.write(bytesArray, 0, length);
-//            }
 
 			outputStream.flush();
 			outputStream.close();
@@ -444,7 +439,7 @@ public class CloudManager extends Module implements KeyListener{
 			for (String s1 : client.getReplyStrings())
 				temp += s1 + "\n";
 			System.out.println("Deleted on getRemoteFile 2");
-			postOutput("Failed to download " + name + ", with error:\n" + temp);
+			postOutput("Failed to download " + f.getName() + ", with error:\n" + temp);
 			return false;
 		}
 	}
@@ -498,9 +493,6 @@ public class CloudManager extends Module implements KeyListener{
 			client.logout();
 			client.disconnect();
 		} catch (IOException e) {
-//			postOutput("Unable to disconnect from Server");
-//			e.printStackTrace();
-//			return false;
 			return true;
 		}
 		return true;

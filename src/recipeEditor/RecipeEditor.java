@@ -157,7 +157,7 @@ public class RecipeEditor extends Module{
 		controlPane.setLayout(new FlowLayout());
 		controlPane.add(firstStepPane);
 		firstStepPane.setViewportView(methodText);
-		firstStepPane.setBorder(BorderFactory.createTitledBorder("Method Step"));
+		firstStepPane.setBorder(BorderFactory.createTitledBorder("Method Step (Press CTRL + S to Save)"));
 		buttonPane.add(previousButton);
 		stepCurrent.setPreferredSize(new Dimension(50, 30));
 		stepMax.setPreferredSize(new Dimension(50, 30));
