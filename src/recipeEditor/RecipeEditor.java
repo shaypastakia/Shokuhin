@@ -12,6 +12,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Files;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -261,7 +262,7 @@ public class RecipeEditor extends Module{
 					temp2.add(s.trim());
 				recipe.setTags(temp2);
 				
-				recipe.setLastModifiedDate(new Date());
+				recipe.setLastModificationDate(new Timestamp(new Date().getTime()));
 				
 				if (Files.exists(new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec").toPath())){
 					if (!RecipeMethods.deleteRecipe(recipe))

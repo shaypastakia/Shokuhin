@@ -356,7 +356,7 @@ public class CloudManager extends Module implements KeyListener{
 				if (rem == null)
 					break;
 				System.out.println(loc.getTitle());
-				if (loc.getLastModifiedDate().after(rem.getLastModifiedDate()))
+				if (loc.getLastModificationDate().after(rem.getLastModificationDate()))
 					localModel.addElement(loc.getTitle());
 			}
 				
@@ -377,7 +377,7 @@ public class CloudManager extends Module implements KeyListener{
 				File temp = new File("./Shokuhin/temp/" + s + ".rec");
 				Recipe rem = RecipeMethods.readRecipe(temp);
 				
-				if (rem.getLastModifiedDate().after(loc.getLastModifiedDate()))
+				if (rem.getLastModificationDate().after(loc.getLastModificationDate()))
 					remoteModel.addElement(rem.getTitle());
 				
 				if(!temp.delete())

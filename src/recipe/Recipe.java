@@ -1,6 +1,7 @@
 package recipe;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -29,14 +30,14 @@ public class Recipe implements Serializable{
 	private int rating = 0; //The user's rating for the dish. Assert value between 0-5, where 0 is no rating applied
 	private int servings; //The number of servings this Recipe caters for
 	
-	private Date lastModifiedDate; //The Date this recipe was last modified. Used for synchronisation.
+	private Timestamp lastModificationDate; //The SQL compatible date, for synchronisation.
 	
-	public Date getLastModifiedDate() {
-		return lastModifiedDate;
+	public Timestamp getLastModificationDate() {
+		return lastModificationDate;
 	}
 
-	public void setLastModifiedDate(Date lastModified) {
-		this.lastModifiedDate = lastModified;
+	public void setLastModificationDate(Timestamp lastModification) {
+		this.lastModificationDate = lastModification;
 	}
 
 	/**
@@ -45,7 +46,7 @@ public class Recipe implements Serializable{
 	 */
 	public Recipe(String title) {
 		this.title = title;
-		this.lastModifiedDate = new Date();
+		this.lastModificationDate = new Timestamp(new Date().getTime());
 	}
 	
 	public String getTitle() {

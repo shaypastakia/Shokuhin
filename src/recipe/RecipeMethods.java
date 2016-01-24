@@ -128,6 +128,7 @@ public class RecipeMethods {
 		return files;
 	}
 	
+	@Deprecated
 	public static ArrayList<String> getRemoteRecipeFileNames(String url){
 		try {
             ArrayList<String> temp = new ArrayList<String>();

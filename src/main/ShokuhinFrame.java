@@ -9,8 +9,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -25,6 +27,7 @@ import recipe.Recipe;
 import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
 import recipeSearch.RecipeSearch;
+import sqlEngine.AuthenticationPanel;
 
 /**
  * ShokuhinFrame
@@ -104,15 +107,18 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		JMenuItem recipeSearch = new JMenuItem("Search for Recipes");
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
 		JMenuItem cloudManager = new JMenuItem("Cloud Manager");
+		JMenuItem sqlSync = new JMenuItem("Synchronise with Server");
+		
 		fileMenu.add(recipeEditor);
 		fileMenu.add(recipeSearch);
 		fileMenu.add(mp3Player);
 		fileMenu.add(cloudManager);
-		
+		fileMenu.add(sqlSync);
 		recipeEditor.addActionListener(this);
 		recipeSearch.addActionListener(this);
 		mp3Player.addActionListener(this);
 		cloudManager.addActionListener(this);
+		sqlSync.addActionListener(this);
 		
 		//Add parsing menu item
 		JMenuItem parse = new JMenuItem("Parse Recipe");
@@ -183,7 +189,22 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 			case "MP3 Player": main.openTab(new MP3Player(main));
 				break;
 			case "Cloud Manager": main.openTab(new CloudManager(main));
+				break;
+			case "Synchronise with Server": authAndSync();
+            	break;
 			}
+	}
+	
+	private void authAndSync(){
+		AuthenticationPanel panel = new AuthenticationPanel();
+    	if (panel.succeeded()){
+    		try {
+    			List<String> details = panel.getDetails();
+    			main.synchronise(details);
+    		} catch (IOException ex){
+    			ShokuhinMain.displayMessage("Token Error", "Unable to read details from 'token.mkey'.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+    		}
+    	}
 	}
 
 	@Override

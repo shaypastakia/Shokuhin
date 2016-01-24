@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -25,6 +26,7 @@ import javax.swing.plaf.ColorUIResource;
 import home.ShokuhinHome;
 import mp3Player.MP3Player;
 import recipeSearch.RecipeSearch;
+import sqlEngine.SQLEngine;
 
 /**
  * ShokuhinMain
@@ -57,6 +59,9 @@ public class ShokuhinMain {
 	static ShokuhinFrame frame;
 	public static TimerBar timer;
 	
+	//SQL Engine for server synchronisation
+	private SQLEngine engine;
+	
 	/**
 	 * Constructor
 	 * <br>
@@ -64,7 +69,16 @@ public class ShokuhinMain {
 	 * <br>
 	 * Performs the Setup necessary for Shokuhin to run. 
 	 */
-	public ShokuhinMain() {
+	public ShokuhinMain(String[] args) {
+		
+		//Initialise JDBC
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e){
+			engine = null;
+			displayMessage("SQL Failed", "Failed to initialise JDBC", JOptionPane.ERROR_MESSAGE);
+		}
+		
 		/*Try to set the theme the Nimbus (Cross Platform - Win/Lin/MacOS)
 		  Failing that, set the theme to the System Theme
 		  If that fails, assume there's some deep, underlying issue,
@@ -114,7 +128,7 @@ public class ShokuhinMain {
 		openTab(new RecipeSearch(this));
 		tabPane.setSelectedIndex(0);
 		
-		/**
+		/*
 		 * Code based on: http://stackoverflow.com/questions/5344823/
 		 * how-can-i-listen-for-key-presses-within-java-swing-across-all-components
 		 * <br>
@@ -174,12 +188,34 @@ public class ShokuhinMain {
 		tabPane.setTitleAt(tabPane.getSelectedIndex(), newName);
 	}
 	
+	/**
+	 * 
+	 * @return The first instance of an MP3Player Module
+	 */
 	public MP3Player getPlayer(){
 		Component[] comps = tabPane.getComponents();
 		for (Component c : comps)
 			if (c instanceof MP3Player)
 				return (MP3Player) c;
 		return null;
+	}
+
+	/**
+	 * Synchronise Recipes with an SQL Server
+	 * <br>
+	 * ShokuhinFrame elicits the server's details, then passes them here.
+	 * @param details A List containing: Database URL, Database Username, Database Password
+	 */
+	public boolean synchronise(List<String> details){
+		if (details == null || details.size() != 3){
+			displayMessage("Sync Error", "The Details List is an invalid size.", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		if (engine == null)
+			engine = new SQLEngine(details.get(0), details.get(1), details.get(2));
+		
+		return true;
 	}
 	
 	/**
@@ -193,7 +229,7 @@ public class ShokuhinMain {
                 try {
 //                	test();
 //                	MidiPlayer.play(new Pattern(MidiPlayer.getPattern(new File("INSERT '.mid' FILENAME HERE"))));
-                    main = new ShokuhinMain();
+                    main = new ShokuhinMain(args);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -202,16 +238,16 @@ public class ShokuhinMain {
 	} //closes main method */
 
 	public static void test() throws ClassNotFoundException, SQLException{
-		 final String DB_URL = "";
-		 final String USER = "";
+		 final String DB_URL = "jdbc:mysql://www.db4free.net:3306/shokuhin";
+		 final String USER = "shokuhin";
 		 final String PASS = "";
 		 Class.forName("com.mysql.jdbc.Driver");
 		 
 		 Connection conn = null;
 		 Statement stmt = null;
 		 conn = DriverManager.getConnection(DB_URL,USER,PASS);
-		 
-		 String sql = "SELECT title FROM Shokuhin";
+		 stmt = conn.createStatement();
+		 String sql = "SELECT * FROM recipe";
 		 ResultSet rs = stmt.executeQuery(sql);
 		 while(rs.next()){
 			 System.out.println(rs.getString("title"));
@@ -220,5 +256,6 @@ public class ShokuhinMain {
 		 rs.close();
 	      stmt.close();
 	      conn.close();
+	     System.exit(0);
 	}
 } //closes class definition
