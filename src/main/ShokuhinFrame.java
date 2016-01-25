@@ -60,7 +60,7 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setMinimumSize(new Dimension(1366,768));
 		this.setJMenuBar(createMenu());
-		this.setVisible(true);
+//		this.setVisible(true);
 	}
 	
 	/**
@@ -196,11 +196,19 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 	}
 	
 	private void authAndSync(){
+		if (main.getSQLEngine() != null){
+			main.getSQLEngine().synchronise(false);
+			return;
+		}
+		
 		AuthenticationPanel panel = new AuthenticationPanel();
     	if (panel.succeeded()){
     		try {
     			List<String> details = panel.getDetails();
-    			main.synchronise(details);
+    			if (details != null){
+	    			main.initialiseSQLEngine(details);
+	    			main.getSQLEngine().synchronise(false);
+    			}
     		} catch (IOException ex){
     			ShokuhinMain.displayMessage("Token Error", "Unable to read details from 'token.mkey'.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
     		}
@@ -217,6 +225,10 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 
 	@Override
 	public void windowClosing(WindowEvent e) {
+		if (ShokuhinMain.getSync()){
+			ShokuhinMain.displayMessage("Please Wait", "Please allow the SQL Synchronisation to complete before exiting.", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 		//Call the close() method in all Modules before Closing
 		int count = -1;
 		for (Component m: main.tabPane.getComponents()){

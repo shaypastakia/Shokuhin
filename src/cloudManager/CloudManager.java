@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -242,6 +244,7 @@ public class CloudManager extends Module implements KeyListener{
 			}
 			process(LIST_NEW_REMOTE);
 		} else if (cmd.equals(UPLOAD_NEW_LOCAL)){
+			Instant start = Instant.now();
 			if (!reconnect())
 				return false;
 			
@@ -260,6 +263,8 @@ public class CloudManager extends Module implements KeyListener{
 					putLocalFile(s, false);
 				}
 			}
+			Instant end = Instant.now();
+			System.out.println("Completed Synchronisation in " + Duration.between(start, end).getSeconds() + " seconds.");
 			process(LIST_NEW_LOCAL);
 		} else if (cmd.equals(CLEAR)){
 			outputText.setText("");

@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -258,11 +259,14 @@ public class RecipeEditor extends Module{
 				recipe.setCourse(courseCombo.getSelectedIndex());
 				
 				ArrayList<String> temp2 = new ArrayList<String>();
-				for (String s : tagsText.getText().split(","))
-					temp2.add(s.trim());
+				if (tagsText.getText() != null && !tagsText.getText().trim().equals("")){
+					for (String s : tagsText.getText().split(","))
+						temp2.add(s.trim());
+					recipe.setTags(temp2);
+				}
 				recipe.setTags(temp2);
 				
-				recipe.setLastModificationDate(new Timestamp(new Date().getTime()));
+				recipe.setLastModificationDate(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
 				
 				if (Files.exists(new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec").toPath())){
 					if (!RecipeMethods.deleteRecipe(recipe))

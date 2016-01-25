@@ -2,12 +2,16 @@ package main;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,10 +37,10 @@ public class TimerBar extends JPanel {
 	private JSpinner mins;
 	private JLabel septimusPrime = new JLabel(":");
 	private JSpinner secs;
-	JButton start = new JButton("Start");
-	JButton stop = new JButton ("Stop");
-	Timer timer = new Timer();
-	ShokuhinMain main;
+	private JButton start = new JButton("Start");
+	private JButton stop = new JButton ("Stop");
+	private Timer timer = new Timer();
+	private ShokuhinMain main;
 	private boolean interrupted = false;
 	
 	public TimerBar(ShokuhinMain m) {
@@ -48,7 +52,7 @@ public class TimerBar extends JPanel {
 	/**
 	 * Produce the controls to add to this JPanel
 	 */
-	public void createGui(){
+	private void createGui(){
 		//Create Number Models (99 hours, 60 mins, 60 secs) for Spinners
 		SpinnerNumberModel modelH = new SpinnerNumberModel(0, 0, 99, 1);
 		SpinnerNumberModel modelM = new SpinnerNumberModel(0, 0, 60, 1);
@@ -79,7 +83,23 @@ public class TimerBar extends JPanel {
 		spinnerEditor = (JSpinner.DefaultEditor)secs.getEditor();
 		spinnerEditor.getTextField().setHorizontalAlignment(JTextField.CENTER);
 		
-		//Add all elements to the TimeBar
+		//Add all elements to the TimerBar
+		
+		try {
+			//Adding Image code based on http://stackoverflow.com/questions/3775373/java-how-to-add-image-to-jlabel, Answer by Tomas Narros
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			InputStream input = classLoader.getResourceAsStream("ShokuhinLogo.png");
+			Image image = ImageIO.read(input);
+			image = image.getScaledInstance(65, 55, Image.SCALE_SMOOTH);
+			ImageIcon icon = new ImageIcon(image); 
+			JLabel thumb = new JLabel();
+			thumb.setIcon(icon);
+			add(thumb);
+		} catch (Exception e){
+			System.out.println(e.getMessage());
+			//Don't bother doing anything
+		}
+		
 		add(hour);
 		add(septimus);
 		add(mins);

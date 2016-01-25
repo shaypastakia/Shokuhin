@@ -5,14 +5,16 @@ import java.awt.Component;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -60,7 +62,10 @@ public class ShokuhinMain {
 	public static TimerBar timer;
 	
 	//SQL Engine for server synchronisation
-	private SQLEngine engine;
+	private SQLEngine sqlEngine;
+	private static boolean sync = false;
+	
+	public String[] args;
 	
 	/**
 	 * Constructor
@@ -70,12 +75,29 @@ public class ShokuhinMain {
 	 * Performs the Setup necessary for Shokuhin to run. 
 	 */
 	public ShokuhinMain(String[] args) {
+		//Assign the first Argument
+		if (args.length > 0)
+			this.args = args;
+		
+		//Set Up Folder structure, if necessary
+		if (Files.notExists(new File("./Shokuhin/").toPath())){
+			try {
+				Files.createDirectories(new File("./Shokuhin/Images/").toPath());
+				Files.createDirectories(new File("./Shokuhin/Recipes/").toPath());
+			} catch (IOException e1) {
+				displayMessage("Unable to create Folders", "Wasn't able to create Shokuhin folders at current working directory.\n" + e1.getMessage(), JOptionPane.ERROR_MESSAGE);
+				e1.printStackTrace();
+			}
+			
+		}
 		
 		//Initialise JDBC
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
+			if (args != null && args.length == 3)
+				initialiseSQLEngine(new ArrayList<String>(Arrays.asList(args)));
 		} catch (ClassNotFoundException e){
-			engine = null;
+			sqlEngine = null;
 			displayMessage("SQL Failed", "Failed to initialise JDBC", JOptionPane.ERROR_MESSAGE);
 		}
 		
@@ -108,6 +130,7 @@ public class ShokuhinMain {
 		
 		//Create Timer Bar
 		timer = new TimerBar(this);
+		
 		//Create a Tabbed Pane to display tabs for all Modules
 		tabPane = new JTabbedPane();
 
@@ -124,9 +147,12 @@ public class ShokuhinMain {
 		//Add the Tabbed Pane to the Window
 		frame.add(tabPane);
 		frame.add(timer);
+		
 		openTab(new ShokuhinHome(this));
 		openTab(new RecipeSearch(this));
 		tabPane.setSelectedIndex(0);
+		
+		frame.setVisible(true);
 		
 		/*
 		 * Code based on: http://stackoverflow.com/questions/5344823/
@@ -143,6 +169,10 @@ public class ShokuhinMain {
 		      }
 		});
 		//End Code Based On
+		
+		if (sqlEngine != null)
+			sqlEngine.synchronise(true);
+		
 	} //closes constructor
 	
 	/**
@@ -199,23 +229,45 @@ public class ShokuhinMain {
 				return (MP3Player) c;
 		return null;
 	}
-
+	
 	/**
-	 * Synchronise Recipes with an SQL Server
-	 * <br>
-	 * ShokuhinFrame elicits the server's details, then passes them here.
-	 * @param details A List containing: Database URL, Database Username, Database Password
+	 * Initialise the SQLEngine
+	 * @param details
+	 * @return True, if the SQLEngine has been instantiated
 	 */
-	public boolean synchronise(List<String> details){
+	public boolean initialiseSQLEngine(List<String> details){
 		if (details == null || details.size() != 3){
 			displayMessage("Sync Error", "The Details List is an invalid size.", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
-		if (engine == null)
-			engine = new SQLEngine(details.get(0), details.get(1), details.get(2));
+		sqlEngine = new SQLEngine(details.get(0), details.get(1), details.get(2));
 		
 		return true;
+	}
+
+	/**
+	 * 
+	 * @return The SQLEngine used for interacting with the SQL Server
+	 */
+	public SQLEngine getSQLEngine(){
+		return sqlEngine;
+	}
+	
+	/**
+	 * 
+	 * @return True, if the SQL Engine is currently synchronising
+	 */
+	public static boolean getSync(){
+		return sync;
+	}
+	
+	/**
+	 * Set the sync flag, to indicate if the SQL Engine is currently synchronising
+	 * @param _sync True, if the SQL Engine is busy, False otherwise.
+	 */
+	public static void setSync(boolean _sync){
+		sync = _sync;
 	}
 	
 	/**
@@ -238,24 +290,36 @@ public class ShokuhinMain {
 	} //closes main method */
 
 	public static void test() throws ClassNotFoundException, SQLException{
+		
+//		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+//		InputStream input = classLoader.getResourceAsStream("Shokuhin Logo.png");
+//		Image logo = ImageIO.read(input);
+		
+//		for (Recipe r : RecipeMethods.readAllRecipes()){
+//			r.setLastModificationDate(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+//			RecipeMethods.writeRecipe(r);
+//		}
+		
+		System.exit(0);
+		
 		 final String DB_URL = "jdbc:mysql://www.db4free.net:3306/shokuhin";
 		 final String USER = "shokuhin";
 		 final String PASS = "";
-		 Class.forName("com.mysql.jdbc.Driver");
 		 
-		 Connection conn = null;
-		 Statement stmt = null;
-		 conn = DriverManager.getConnection(DB_URL,USER,PASS);
-		 stmt = conn.createStatement();
-		 String sql = "SELECT * FROM recipe";
-		 ResultSet rs = stmt.executeQuery(sql);
-		 while(rs.next()){
-			 System.out.println(rs.getString("title"));
-		 }
+		 System.out.println("Enter Password:");
+		 Scanner sc = new Scanner(System.in);
+		 SQLEngine engine = new SQLEngine(DB_URL, USER, sc.nextLine());
+//		 ArrayList<Recipe> temp = RecipeMethods.readAllRecipes();
+//		 for (Recipe r : RecipeMethods.readAllRecipes())
+//		 try {
+//			engine.addRecipe(r);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		 engine.deleteRecipe(r);
 		 
-		 rs.close();
-	      stmt.close();
-	      conn.close();
-	     System.exit(0);
+		 sc.close();
+		 System.exit(0);
+
 	}
 } //closes class definition

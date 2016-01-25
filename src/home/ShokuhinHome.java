@@ -355,7 +355,6 @@ public class ShokuhinHome extends Module implements ActionListener
 
 	@Override
 	public void KeyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 }

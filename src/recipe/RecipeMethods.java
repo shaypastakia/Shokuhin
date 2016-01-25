@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ import com.sun.speech.freetts.VoiceManager;
 import main.ShokuhinMain;
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
+import marytts.util.Pair;
 import marytts.util.data.audio.AudioPlayer;
 import mp3Player.MP3Player;
 
@@ -84,7 +86,7 @@ public class RecipeMethods {
 	/**
 	 * Read a Recipe from the hard drive.
 	 * @param file The file representing the file path to be read as a Recipe object
-	 * @return The Recipe read in from the specified file
+	 * @return The Recipe read in from the specified file. Returns null if the recipe cannot be read.
 	 */
 	public static Recipe readRecipe(File file){
 		try {
@@ -102,6 +104,20 @@ public class RecipeMethods {
 		}
 	}
 	
+	public static ArrayList<Recipe> readAllRecipes(){
+		ArrayList<Recipe> temp = new ArrayList<Recipe>();
+		for (String s : getRecipeFileNames()){
+			temp.add(readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec")));
+		}
+		
+		return temp;
+	}
+	
+	/**
+	 * Delete a recipe from the Shokuhin directory
+	 * @param recipe The Recipe to delete
+	 * @return True, if the method succeeds without exception
+	 */
 	public static boolean deleteRecipe(Recipe recipe){
 		File file = new File("./Shokuhin/Recipes/" + recipe.getTitle() + ".rec");
 		try {
@@ -150,6 +166,20 @@ public class RecipeMethods {
             e.printStackTrace();
             return null;
         }
+	}
+	
+	/**
+	 * Produce a list of all recipes, as well as their date of last modification.
+	 * @return An ArrayList of Pairs, where the Pair contains the Recipe Title, and the LastModificationDate
+	 */
+	public static ArrayList<Pair<String, Timestamp>> getLastModificationDates(){
+		ArrayList<Recipe> recs = readAllRecipes();
+		ArrayList<Pair<String, Timestamp>> temp = new ArrayList<Pair<String, Timestamp>>();
+		
+		for (Recipe r : recs)
+			temp.add(new Pair<String, Timestamp>(r.getTitle(), r.getLastModificationDate()));
+		
+		return temp;
 	}
 	
 	/**

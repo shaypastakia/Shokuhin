@@ -203,8 +203,13 @@ public class AuthenticationPanel extends JDialog {
 	 */
 	public List<String> getDetails() throws IOException{
 		List<String> details = Files.readAllLines(new File(root.concat("token.mkey")).toPath());
-		details.set(2, new CryptEngine(password).decrypt(details.get(2)));
-		return details;
+		String pass = new CryptEngine(password).decrypt(details.get(2));
+		if (pass != null){
+			details.set(2, pass);
+			return details;
+		} else {
+			return null;
+		}
 	}
 	
 	public boolean succeeded(){
