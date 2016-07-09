@@ -9,10 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -27,6 +29,8 @@ import javax.swing.plaf.ColorUIResource;
 
 import home.ShokuhinHome;
 import mp3Player.MP3Player;
+import recipe.Recipe;
+import recipe.RecipeMethods;
 import recipeSearch.RecipeSearch;
 import sqlEngine.SQLEngine;
 
@@ -93,7 +97,8 @@ public class ShokuhinMain {
 		
 		//Initialise JDBC
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName("org.postgresql.Driver");
+//			Class.forName("com.mysql.Driver");
 			if (args != null && args.length == 3)
 				initialiseSQLEngine(new ArrayList<String>(Arrays.asList(args)));
 		} catch (ClassNotFoundException e){
@@ -177,9 +182,9 @@ public class ShokuhinMain {
 	
 	/**
 	 * Can be called by any Class to display a Message Window
-	 * @param title
-	 * @param message
-	 * @param type
+	 * @param title A title to display in the Window title
+	 * @param message The message to put in the body of the window
+	 * @param type e.g. JOptionPane.WARNING_MESSAGE, JOptionPane.ERROR_MESSAGE, JOptionPane.INFORMATION_MESSAGE
 	 */
 	public static void displayMessage(String title, String message, int type){
 		JOptionPane.showMessageDialog(null, message, title, type);
@@ -189,7 +194,7 @@ public class ShokuhinMain {
 	 * Take a new ModulePanel, and add it to Shokuhin
 	 * <br>
 	 * Certain modules cannot have multiple instances
-	 * @param m
+	 * @param m The module to open. Must implement the Module Interface.
 	 */
 	public void openTab(Module m){
 		tabPane.add((Component) m);
@@ -279,7 +284,7 @@ public class ShokuhinMain {
             @Override
             public void run() {
                 try {
-//                	test();
+//            			test();
 //                	MidiPlayer.play(new Pattern(MidiPlayer.getPattern(new File("INSERT '.mid' FILENAME HERE"))));
                     main = new ShokuhinMain(args);
                 } catch (Exception e) {
@@ -290,25 +295,18 @@ public class ShokuhinMain {
 	} //closes main method */
 
 	public static void test() throws ClassNotFoundException, SQLException{
-		
 //		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 //		InputStream input = classLoader.getResourceAsStream("Shokuhin Logo.png");
 //		Image logo = ImageIO.read(input);
 		
-//		for (Recipe r : RecipeMethods.readAllRecipes()){
-//			r.setLastModificationDate(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
-//			RecipeMethods.writeRecipe(r);
-//		}
-		
-		System.exit(0);
-		
-		 final String DB_URL = "jdbc:mysql://www.db4free.net:3306/shokuhin";
-		 final String USER = "shokuhin";
-		 final String PASS = "";
+		 final String DB_URL = "jdbc:postgresql://localhost:5432/shokuhin";
+		 final String USER = "read";
+		 final String PASS = "read";
 		 
-		 System.out.println("Enter Password:");
-		 Scanner sc = new Scanner(System.in);
-		 SQLEngine engine = new SQLEngine(DB_URL, USER, sc.nextLine());
+//		 System.out.println("Enter Password:");
+//		 Scanner sc = new Scanner(System.in);
+		 SQLEngine engine = new SQLEngine(DB_URL, USER, PASS);//sc.nextLine());
+		 
 //		 ArrayList<Recipe> temp = RecipeMethods.readAllRecipes();
 //		 for (Recipe r : RecipeMethods.readAllRecipes())
 //		 try {
@@ -316,9 +314,8 @@ public class ShokuhinMain {
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //		}
-//		 engine.deleteRecipe(r);
-		 
-		 sc.close();
+		 System.out.println(engine.execute("SELECT * FROM recipes;"));
+//		 sc.close();
 		 System.exit(0);
 
 	}

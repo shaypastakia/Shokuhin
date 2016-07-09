@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -129,10 +130,13 @@ public class SQLEngine {
 		}
 		
 		System.out.println("Beginning Synchronisation");
+		int total = remoteUpdates.size() + localUpdates.size() + newRemote.size() + newLocal.size();
+		
 		new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
+				int current = 1;
 				ShokuhinMain.setSync(true);
 				JLabel label = new JLabel("Preparing to sync...");
 				label.setFont(new Font("Times New Roman", Font.BOLD, 18));
@@ -147,45 +151,41 @@ public class SQLEngine {
 				
 //				Download the updated recipes from the Server.
 				if (remoteUpdates.size() > 0){
-					int i = 1;
+					
 					for (String s : remoteUpdates){
-						label.setText("Downloading " + i + " of " + remoteUpdates.size());
+						label.setText("Synchronising file " + current + " of " + total);
 						RecipeMethods.deleteRecipe(new Recipe(s));
 						RecipeMethods.writeRecipe(getRecipe(s));
-						i++;
+						current++;
 						System.out.println("Downloaded " + s);
 					}
 				}
 //				Upload the updated recipes from the Local Machine.
 				if (localUpdates.size() > 0){
-					int i = 1;
 					for (String s : localUpdates){
-						label.setText("Uploading " + i + " of " + localUpdates.size());
-						deleteRecipe(new Recipe(s));
-						addRecipe(RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec")));
-						i++;
+						label.setText("Synchronising file " + current + " of " + total);
+						updateRecipe(RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec")));
+						current++;
 						System.out.println("Uploaded " + s);
 					}
 				}
 				
 //				Download the updated recipes from the Server.
 				if (newRemote.size() > 0){
-					int i = 1;
 					for (String s : newRemote){
-						label.setText("Downloading " + i + " of " + newRemote.size());
+						label.setText("Synchronising file " + current + " of " + total);
 						RecipeMethods.writeRecipe(getRecipe(s));
-						i++;
+						current++;
 						System.out.println("Downloaded " + s);
 					}
 				}
 				
 //				Upload the new recipes from the Local Machine.
 				if (newLocal.size() > 0){
-					int i = 1;
 					for (String s : newLocal){
-						label.setText("Uploading " + i + " of " + newLocal.size());
+						label.setText("Synchronising file " + current + " of " + total);
 						addRecipe(RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/" + s + ".rec")));
-						i++;
+						current++;
 						System.out.println("Uploaded " + s);
 					}
 				}
@@ -233,6 +233,7 @@ public class SQLEngine {
 			ResultSet rs = stmt.executeQuery();
 			
 			rs.next();
+			System.out.println(rs.getInt("total"));
 			if (rs.getInt("total") > 0){
 				return exists.YES;
 			}
@@ -268,7 +269,7 @@ public class SQLEngine {
 			insertMethodSteps(r);
 			
 		    stmt.close();
-		    conn.close();
+//		    conn.close();
 			
 			return true;
 		} catch (SQLException e){
@@ -280,9 +281,11 @@ public class SQLEngine {
 	
 	
 	public boolean updateRecipe(Recipe newRec){
+		
 		if (!connect())
 			return false;
 		
+		Instant start = Instant.now();
 		exists check = recipeExists(newRec);
 		if (check == exists.NO){
 			ShokuhinMain.displayMessage("Failed to update Recipe", "The Recipe " + newRec.getTitle() + " does not exist on the SQL Server", JOptionPane.ERROR_MESSAGE);
@@ -296,8 +299,11 @@ public class SQLEngine {
 			ShokuhinMain.displayMessage("Error Updating", "Cannot read or find the existing " + newRec.getTitle() + " recipe.", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
+		Instant end = Instant.now();
+		System.out.println(1 + " " + Duration.between(start, end));
 		
 		try {
+			start = Instant.now();
 			//UPDATE the fields stored within the 'recipes' table.
 			//UPDATE course, prepTime, cookTime, rating, servings, lastModificationDate WHERE title
 			sql = "UPDATE recipes SET course = ?, prepTime = ?, cookTime = ?, rating = ?, servings = ?, lastModificationDate = ? WHERE title = ?";
@@ -311,7 +317,10 @@ public class SQLEngine {
 			stmt.setString(7, newRec.getTitle());
 			stmt.execute();
 			System.out.println("Updated 'recipes'");
-
+			end = Instant.now();
+			System.out.println(2 + " " + Duration.between(start, end));
+			
+			start = Instant.now();
 			//DELETE and INSERT ingredients if and only if the ingredients have been changed.
 			if (!selectIngredients(oldRec).equals(newRec.getIngredients())){
 				sql = "DELETE FROM ingredients WHERE title = ?";
@@ -341,6 +350,10 @@ public class SQLEngine {
 				insertTags(newRec);
 				System.out.println("Updated 'tags'");
 			}
+			
+			end = Instant.now();
+			
+			System.out.println(3 + " " + Duration.between(start, end));
 			
 			return true;
 		} catch (IOException | SQLException e){
@@ -468,6 +481,24 @@ public class SQLEngine {
 	}
 	
 	/**
+	 * Remove this method once complete
+	 */
+	public boolean execute(String s){
+		if (!connect())
+			return false;
+
+		try {
+			sql = s;
+			stmt = conn.prepareStatement(sql);
+			return stmt.execute();
+		} catch (SQLException e){
+			e.printStackTrace();
+			ShokuhinMain.displayMessage("Failed to retrieve titles", "Failed to read from SQL Server." + "\n" + e.getMessage(), JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+	}
+	
+	/**
 	 * Helper method for add and update methods
 	 * @param r 
 	 * @throws SQLException
@@ -539,9 +570,10 @@ public class SQLEngine {
 		sql = "INSERT INTO methodSteps VALUES (?,?)";
 		stmt = conn.prepareStatement(sql);
 		for (String s : r.getMethodSteps()){
-			StringReader sr = new StringReader(s);
+//			StringReader sr = new StringReader(s);
 			stmt.setString(1, r.getTitle());
-			stmt.setCharacterStream(2, sr);
+//			stmt.setCharacterStream(2, sr);
+			stmt.setString(2, s);
 			stmt.addBatch();
 		}
 		stmt.executeBatch();
@@ -663,10 +695,12 @@ public class SQLEngine {
 			if (conn != null && conn.isValid(5))
 				return true;
 			
+			System.out.println("Connecting");
 			conn = DriverManager.getConnection(db_url, user, pass);
 			return true;
 			
 		} catch (SQLException e){
+			e.printStackTrace();
 			return false;
 		}
 	}

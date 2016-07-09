@@ -175,6 +175,11 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 				String name = JOptionPane.showInputDialog("Please enter a name for the new Recipe.");
 				if (name == null || name.trim().equals(""))
 					return;
+				
+				if (name.contains("&")){
+					ShokuhinMain.displayMessage("Invalid Character", "Recipe names cannot contain '&'.", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				ArrayList<String> names = RecipeMethods.getRecipeFileNames();
 				for (String s : names){
 					if (s.toLowerCase().trim().equals(name.toLowerCase().trim())){

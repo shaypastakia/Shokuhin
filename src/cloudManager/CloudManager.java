@@ -64,7 +64,7 @@ public class CloudManager extends Module implements KeyListener{
 	
 	//Recipe Lists
 	ArrayList<String> local = RecipeMethods.getRecipeFileNames();
-	ArrayList<String> remote = RecipeMethods.getRemoteRecipeFileNames(def);
+	ArrayList<String> remote;// = RecipeMethods.getRemoteRecipeFileNames(def);
 	ArrayList<Recipe> localRec = new ArrayList<Recipe>();
 	ArrayList<Recipe> remoteRec = new ArrayList<Recipe>();
 

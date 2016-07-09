@@ -32,10 +32,35 @@ public class Recipe implements Serializable{
 	
 	private Timestamp lastModificationDate; //The SQL compatible date, for synchronisation.
 	
+	/**
+	 * Create a full recipe
+	 * <br>
+	 * Populate every field when creating a new recipe
+	 */
+	public Recipe (String title, ArrayList<String> ingredients, ArrayList<String> methodSteps,
+			   int course, ArrayList<String> tags, int prepTime, int cookTime, int rating, int servings){
+		this.title = title;
+		this.ingredients = ingredients;
+		this.methodSteps = methodSteps;
+		this.course = course;
+		this.tags = tags;
+		this.prepTime = prepTime;
+		this.cookTime = cookTime;
+		this.rating = rating;
+		this.servings = servings;
+		this.lastModificationDate = new Timestamp(new Date().getTime());
+	}
+	
 	public Timestamp getLastModificationDate() {
 		return lastModificationDate;
 	}
 
+	/**
+	 * Sets the date of a Recipe
+	 * @param lastModification The date the recipe was last modified.
+	 * <br>
+	 * Use the ridiculous value of: Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
+	 */
 	public void setLastModificationDate(Timestamp lastModification) {
 		this.lastModificationDate = lastModification;
 	}

@@ -1,0 +1,15 @@
+System.out.println(engine.execute("CREATE TABLE recipes (title varchar(100) NOT NULL,course int NOT NULL,prepTime int NOT NULL,cookTime int NOT NULL, rating int NOT NULL,servings int NOT NULL,lastModificationDate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP);"));
+
+System.out.println(engine.execute("ALTER TABLE recipes ADD PRIMARY KEY (title);"));
+
+System.out.println(engine.execute("CREATE TABLE ingredients (title varchar(100) NOT NULL,ingredient varchar(500));"));
+
+System.out.println(engine.execute("ALTER TABLE ingredients ADD CONSTRAINT ingredients_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
+
+System.out.println(engine.execute("CREATE TABLE tags (title varchar(100) NOT NULL, tag text);");
+
+System.out.println(engine.execute("ALTER TABLE tags ADD CONSTRAINT tags_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
+
+System.out.println(engine.execute("CREATE TABLE tags (title varchar(100) NOT NULL, tag text);"));
+
+System.out.println(engine.execute("ALTER TABLE tags ADD CONSTRAINT tags_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
