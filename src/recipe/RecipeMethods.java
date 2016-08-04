@@ -48,7 +48,6 @@ public class RecipeMethods {
 	/**
 	 * Write a Recipe to the hard drive, allowing it to be persistently stored.
 	 * @param rec The Recipe to write to disk
-	 * @param file The file representing the file path to be written to
 	 * @return True if the file write succeeded
 	 */
 	public static boolean writeRecipe(Recipe rec){
@@ -198,7 +197,7 @@ public class RecipeMethods {
 		}
 		
 		//Add protocol if it isn't already there
-		if(!url.startsWith("http://"))
+		if(!url.startsWith("http://")) //TODO This might be wrong. Try removing the "www.bbcgoofood.com" part, leaving "http://"
 			url = "http://www.bbcgoodfood.com".concat(url);
 		
 		try {

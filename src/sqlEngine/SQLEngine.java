@@ -4,9 +4,9 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,7 +17,6 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -40,7 +39,7 @@ public class SQLEngine {
 	private String user; //shokuhin
 	private String pass;
 	
-	private Connection conn = null;
+	public Connection conn = null;
 	private PreparedStatement stmt = null;
 
 	private String sql;
@@ -267,9 +266,10 @@ public class SQLEngine {
 			insertIngredients(r);
 			insertTags(r);
 			insertMethodSteps(r);
+			if (!insertImage(r))
+				System.out.println(r.getTitle() + " has no image.");
 			
 		    stmt.close();
-//		    conn.close();
 			
 			return true;
 		} catch (SQLException e){
@@ -405,12 +405,18 @@ public class SQLEngine {
 	/**
 	 * Delete a Recipe from the SQL Server.
 	 * <br>
-	 * Deletes from the 'recipes' table, which cascades to ingredients, methodSteps, and tags.
+	 * Deletes from the 'recipes' table, which cascades to ingredients, methodSteps, tags, and images.
 	 * @param r The Recipe to delete from the SQL Server.
 	 * @return True, if the code runs without any Exceptions.
 	 */
 	public boolean deleteRecipe(Recipe r){
 		if (!connect())
+			return false;
+		
+		if (recipeExists(r) == exists.NO)
+			return false;
+		
+		if (recipeExists(r) == exists.FAILED)
 			return false;
 
 		try {
@@ -483,7 +489,7 @@ public class SQLEngine {
 	/**
 	 * Remove this method once complete
 	 */
-	public boolean execute(String s){
+	private boolean execute(String s){
 		if (!connect())
 			return false;
 
@@ -570,13 +576,38 @@ public class SQLEngine {
 		sql = "INSERT INTO methodSteps VALUES (?,?)";
 		stmt = conn.prepareStatement(sql);
 		for (String s : r.getMethodSteps()){
-//			StringReader sr = new StringReader(s);
 			stmt.setString(1, r.getTitle());
-//			stmt.setCharacterStream(2, sr);
 			stmt.setString(2, s);
 			stmt.addBatch();
 		}
 		stmt.executeBatch();
+	}
+	
+	/**
+	 * Helper method for add method
+	 * @param r 
+	 * @throws SQLException
+	 */
+	private boolean insertImage(Recipe r){
+		String title = r.getTitle();
+		File file = new File("./Shokuhin/Images/" + title + ".jpg");
+		if (!file.exists())
+			return false;
+		
+		try {
+			//As per https://www.postgresql.org/docs/7.4/static/jdbc-binary-data.html
+			FileInputStream fis;
+			fis = new FileInputStream(file);
+			stmt = conn.prepareStatement("INSERT INTO images VALUES (?, ?)");
+			stmt.setString(1, title);
+			stmt.setBinaryStream(2, fis, file.length());
+			stmt.executeUpdate();
+			fis.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	/**
@@ -685,7 +716,7 @@ public class SQLEngine {
 	/**
 	 * Connect to the SQL Server
 	 */
-	private boolean connect(){
+	public boolean connect(){
 		if (db_url == null || db_url.equals("") || user == null){
 			ShokuhinMain.displayMessage("Uninitialised", "The SQLEngine has not been initialised with server details.", JOptionPane.ERROR_MESSAGE);
 			return false;

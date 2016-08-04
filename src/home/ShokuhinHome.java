@@ -37,14 +37,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
-import main.Module;
-import main.ShokuhinMain;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import main.Module;
+import main.ShokuhinMain;
 import recipe.Recipe;
 import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;

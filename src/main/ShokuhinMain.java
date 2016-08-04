@@ -6,17 +6,16 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -295,26 +294,26 @@ public class ShokuhinMain {
 	} //closes main method */
 
 	public static void test() throws ClassNotFoundException, SQLException{
-//		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-//		InputStream input = classLoader.getResourceAsStream("Shokuhin Logo.png");
-//		Image logo = ImageIO.read(input);
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e){
+			displayMessage("SQL Failed", "Failed to initialise JDBC", JOptionPane.ERROR_MESSAGE);
+		}
 		
-		 final String DB_URL = "jdbc:postgresql://localhost:5432/shokuhin";
-		 final String USER = "read";
-		 final String PASS = "read";
-		 
+//		 final String DB_URL = "jdbc:postgresql://localhost:5432/shokuhin";
+		 final String DB_URL = "jdbc:postgresql://ec2-54-75-243-54.eu-west-1.compute.amazonaws.com:5432/dbf52rl6p5vle7?sslmode=require";
+		 final String USER = "xcdfcxbkrhkdse";
+		 final String PASS = "";
+//		 final String USER = "read";////
+//		 final String PASS = "";
 //		 System.out.println("Enter Password:");
 //		 Scanner sc = new Scanner(System.in);
 		 SQLEngine engine = new SQLEngine(DB_URL, USER, PASS);//sc.nextLine());
-		 
-//		 ArrayList<Recipe> temp = RecipeMethods.readAllRecipes();
-//		 for (Recipe r : RecipeMethods.readAllRecipes())
-//		 try {
-//			engine.addRecipe(r);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-		 System.out.println(engine.execute("SELECT * FROM recipes;"));
+		 for (String s : RecipeMethods.getRecipeFileNames()){
+			 engine.deleteRecipe(new Recipe(s));
+		 }
+		 Recipe old = RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/Brioche.rec"));
+
 //		 sc.close();
 		 System.exit(0);
 

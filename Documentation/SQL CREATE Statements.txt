@@ -6,10 +6,15 @@ System.out.println(engine.execute("CREATE TABLE ingredients (title varchar(100) 
 
 System.out.println(engine.execute("ALTER TABLE ingredients ADD CONSTRAINT ingredients_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
 
-System.out.println(engine.execute("CREATE TABLE tags (title varchar(100) NOT NULL, tag text);");
-
-System.out.println(engine.execute("ALTER TABLE tags ADD CONSTRAINT tags_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
-
 System.out.println(engine.execute("CREATE TABLE tags (title varchar(100) NOT NULL, tag text);"));
 
 System.out.println(engine.execute("ALTER TABLE tags ADD CONSTRAINT tags_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
+
+System.out.println(engine.execute("CREATE TABLE methodSteps (title varchar(500) NOT NULL, methodstep text);"));
+
+System.out.println(engine.execute("ALTER TABLE methodSteps ADD CONSTRAINT methodsteps_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
+
+System.out.println(engine.execute("CREATE TABLE images (title varchar(100) NOT NULL,image bytea);"));
+
+System.out.println(engine.execute("ALTER TABLE images ADD CONSTRAINT images_ibfk_1 FOREIGN KEY (title) REFERENCES recipes (title) ON DELETE CASCADE ON UPDATE CASCADE;"));
+		 

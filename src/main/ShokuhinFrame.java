@@ -108,17 +108,20 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
 		JMenuItem cloudManager = new JMenuItem("Cloud Manager");
 		JMenuItem sqlSync = new JMenuItem("Synchronise with Server");
+		JMenuItem sqlDel = new JMenuItem("Delete from Server");
 		
 		fileMenu.add(recipeEditor);
 		fileMenu.add(recipeSearch);
 		fileMenu.add(mp3Player);
 		fileMenu.add(cloudManager);
 		fileMenu.add(sqlSync);
+		fileMenu.add(sqlDel);
 		recipeEditor.addActionListener(this);
 		recipeSearch.addActionListener(this);
 		mp3Player.addActionListener(this);
 		cloudManager.addActionListener(this);
 		sqlSync.addActionListener(this);
+		sqlDel.addActionListener(this);
 		
 		//Add parsing menu item
 		JMenuItem parse = new JMenuItem("Parse Recipe");
@@ -197,7 +200,34 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 				break;
 			case "Synchronise with Server": authAndSync();
             	break;
+			case "Delete from Server": deleteFromServer();
 			}
+	}
+	
+	private void deleteFromServer(){
+		if (main.getSQLEngine() == null){
+			AuthenticationPanel panel = new AuthenticationPanel();
+	    	if (panel.succeeded()){
+	    		try {
+	    			List<String> details = panel.getDetails();
+	    			if (details != null){
+		    			main.initialiseSQLEngine(details);
+	    			}
+	    		} catch (IOException ex){
+	    			ShokuhinMain.displayMessage("Token Error", "Unable to read details from 'token.mkey'.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+	    		}
+	    	}
+		}
+		
+		String name = JOptionPane.showInputDialog("Please enter the name of the Recipe to delete.");
+		if (name == null || name.trim().equals(""))
+			return;
+		
+		if (main.getSQLEngine().deleteRecipe(new Recipe(name))){
+			ShokuhinMain.displayMessage("Success", name + " was deleted from the Server.", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			ShokuhinMain.displayMessage("Failed", "Unable to delete " + name + " from the Server.", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 	
 	private void authAndSync(){
