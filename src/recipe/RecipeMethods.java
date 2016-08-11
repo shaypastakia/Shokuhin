@@ -11,15 +11,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Set;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -31,11 +29,8 @@ import org.jsoup.select.Elements;
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 
+import main.Pair;
 import main.ShokuhinMain;
-import marytts.LocalMaryInterface;
-import marytts.MaryInterface;
-import marytts.util.Pair;
-import marytts.util.data.audio.AudioPlayer;
 import mp3Player.MP3Player;
 
 /**
@@ -171,12 +166,12 @@ public class RecipeMethods {
 	 * Produce a list of all recipes, as well as their date of last modification.
 	 * @return An ArrayList of Pairs, where the Pair contains the Recipe Title, and the LastModificationDate
 	 */
-	public static ArrayList<Pair<String, Timestamp>> getLastModificationDates(){
+	public static ArrayList<Pair> getLastModificationDates(){
 		ArrayList<Recipe> recs = readAllRecipes();
-		ArrayList<Pair<String, Timestamp>> temp = new ArrayList<Pair<String, Timestamp>>();
+		ArrayList<Pair> temp = new ArrayList<Pair>();
 		
 		for (Recipe r : recs)
-			temp.add(new Pair<String, Timestamp>(r.getTitle(), r.getLastModificationDate()));
+			temp.add(new Pair(r.getTitle(), r.getLastModificationDate()));
 		
 		return temp;
 	}
@@ -203,22 +198,7 @@ public class RecipeMethods {
 		try {
 			System.out.println(url);
 			//Connect to the Recipe URL
-			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.setRequestProperty("User-Agent", "Chrome");
-			
-			//Get the resulting page 
-			InputStreamReader in = new InputStreamReader(connection.getInputStream());
-			BufferedReader bufIn = new BufferedReader(in);
-			String temp;
-			String response = "";
-			
-			//Write the page into a String
-			while ((temp = bufIn.readLine()) != null){
-				response = response.concat(temp);
-			}
-			bufIn.close();
-			//Produce a HTML Document from the response
-			Document doc = Jsoup.parse(response);
+			Document doc = getDocument(url);
 			if(url.contains("bbcgoodfood"))
 				return parseBBCGoodFood(doc);
 			else if(url.contains("bbc"))
@@ -233,25 +213,51 @@ public class RecipeMethods {
 		}
 	}
 	
+	/**
+	 * Use JSoup to retrieve a Document from a given URL (as a String)
+	 * @param url The URL to obtain as a Document
+	 * @return the webpage from the URL as a Document
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
+	public static Document getDocument(String url) throws MalformedURLException, IOException {
+//		return Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6").get();
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		connection.setRequestProperty("User-Agent", "Chrome");
+		
+		//Get the resulting page 
+		InputStreamReader in = new InputStreamReader(connection.getInputStream(), "UTF-8");
+		BufferedReader bufIn = new BufferedReader(in);
+		String temp;
+		String response = "";
+		
+		//Write the page into a String
+		while ((temp = bufIn.readLine()) != null){
+			response = response.concat(temp);
+		}
+		bufIn.close();
+		//Produce a HTML Document from the response
+		Document doc = Jsoup.parse(response);
+		return doc;
+	}
+	
 	private static Recipe parseBBCGoodFood(Document doc){
 		Recipe parsedRecipe = new Recipe("");
 		
 		try {
 			//Get the title of the Recipe
 			Elements titleElement = doc.getElementsByAttributeValue("itemprop", "name");
-			String titleElementText = titleElement.get(0).text();
-			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
-			
-			//Get the rating of the Recipe
-			String ratingValue = doc.getElementsByAttributeValue("itemprop", "ratingValue").get(0).attr("content");
-			parsedRecipe.setRating((int) Math.round(Double.parseDouble(ratingValue)));
-			
+			String titleElementText = titleElement.first().ownText();
+//			parsedRecipe.setTitle(new String(titleElementText.getBytes(), "UTF-8"));
+			parsedRecipe.setTitle(titleElementText);
+
 			//Get the ingredients of the Recipe
 			Elements ingredientsElement = doc.getElementsByClass("ingredients-list__item");
 			ArrayList<String> ingredients = new ArrayList<String>();
 			for (Element e : ingredientsElement){
 				if (e.getAllElements().size() == 1){
-					ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+//					ingredients.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+					ingredients.add(e.text().replaceAll("\\. ", "\\.\n"));
 				} else if (e.getAllElements().size() > 1){
 					String temp = "";
 					Elements elems = e.getAllElements();
@@ -267,7 +273,8 @@ public class RecipeMethods {
 								temp += " " + elem.select("a.ingredients-list__glossary-link").text().trim();
 						}
 					}
-					ingredients.add(new String(temp.replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+//					ingredients.add(new String(temp.replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+					ingredients.add(temp.replaceAll("\\. ", "\\.\n"));
 				}
 				
 			}
@@ -277,12 +284,14 @@ public class RecipeMethods {
 			Elements methodElement = doc.getElementsByAttributeValue("itemprop", "recipeInstructions");
 			ArrayList<String> methodSteps = new ArrayList<String>();
 			for (Element e : methodElement){
-				methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+//				methodSteps.add(new String(e.text().replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
+				methodSteps.add(e.text().replaceAll("\\. ", "\\.\n"));
 			}
 			parsedRecipe.setMethodSteps(methodSteps);
 					
 			return parsedRecipe;
 		} catch (Exception e){
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -385,26 +394,19 @@ public class RecipeMethods {
 							interrupted = false;
 						}
 					}
-					MaryInterface marytts = new LocalMaryInterface();
-					Set<String> voices = marytts.getAvailableVoices();
-					marytts.setVoice(voices.iterator().next());
-					AudioInputStream audio = marytts.generateAudio(text);
-					AudioPlayer player = new AudioPlayer(audio);
-					player.start();
-					player.join();
-					
-					if (mp3Player != null && interrupted){
-						while(player.isAlive()){}
-						mp3Player.resume();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
 					System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
 					Voice voice;
 					VoiceManager voiceManager = VoiceManager.getInstance();
 					voice = voiceManager.getVoice("kevin16");
 					voice.allocate();
 					voice.speak(text);
+					
+					if (mp3Player != null && interrupted){
+						while(voice.isLoaded()){}
+						mp3Player.resume();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		});

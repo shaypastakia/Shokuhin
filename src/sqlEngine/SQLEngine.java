@@ -23,8 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
+import main.Pair;
 import main.ShokuhinMain;
-import marytts.util.Pair;
 import recipe.Recipe;
 import recipe.RecipeMethods;
 
@@ -68,15 +68,15 @@ public class SQLEngine {
 		final ArrayList<String> originalLocal = RecipeMethods.getRecipeFileNames();
 		final ArrayList<String> originalRemote = getAllRecipeTitles();
 		
-		final ArrayList<Pair<String, Timestamp>> originalLocalUpdate = RecipeMethods.getLastModificationDates();
-		final ArrayList<Pair<String, Timestamp>> originalRemoteUpdate = getLastModificationDates();
+		final ArrayList<Pair> originalLocalUpdate = RecipeMethods.getLastModificationDates();
+		final ArrayList<Pair> originalRemoteUpdate = getLastModificationDates();
 		
 		ArrayList<String> localUpdates = new ArrayList<String>();
 		ArrayList<String> remoteUpdates = new ArrayList<String>();
 		
 //		List the updated recipes on the Server as well as on the Local Machine
-		for (Pair<String, Timestamp> loc : originalLocalUpdate){
-			for (Pair<String, Timestamp> rem : originalRemoteUpdate){
+		for (Pair loc : originalLocalUpdate){
+			for (Pair rem : originalRemoteUpdate){
 				if (loc.getFirst().equals(rem.getFirst())){
 					if (loc.getSecond().before(rem.getSecond()))
 						remoteUpdates.add(rem.getFirst());
@@ -436,19 +436,19 @@ public class SQLEngine {
 	 * Get all the recipe titles, and their last modification dates.
 	 * @return A list of Pairs. Each Pair contains the name of all recipes, and the date they were last modified.
 	 */
-	public ArrayList<Pair<String, Timestamp>> getLastModificationDates(){
+	public ArrayList<Pair> getLastModificationDates(){
 		if (!connect())
 			return null;
 
 		try {
-		ArrayList<Pair<String, Timestamp>> temp = new ArrayList<Pair<String, Timestamp>>();
+		ArrayList<Pair> temp = new ArrayList<Pair>();
 		
 		sql = "SELECT title, lastModificationDate FROM recipes";
 		stmt = conn.prepareStatement(sql);
 		ResultSet result = stmt.executeQuery();
 		
 		while (result.next()){
-			temp.add(new Pair<String, Timestamp>(result.getString(1), result.getTimestamp(2)));
+			temp.add(new Pair(result.getString(1), result.getTimestamp(2)));
 		}
 		
 		return temp;
@@ -489,7 +489,7 @@ public class SQLEngine {
 	/**
 	 * Remove this method once complete
 	 */
-	private boolean execute(String s){
+	public boolean execute(String s){
 		if (!connect())
 			return false;
 

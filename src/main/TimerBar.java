@@ -88,8 +88,11 @@ public class TimerBar extends JPanel {
 		try {
 			//Adding Image code based on http://stackoverflow.com/questions/3775373/java-how-to-add-image-to-jlabel, Answer by Tomas Narros
 			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-			InputStream input = classLoader.getResourceAsStream("ShokuhinLogo.png");
+			InputStream input = classLoader.getResourceAsStream("src/ShokuhinLogo.png");
+			if (input == null)
+				input = classLoader.getResourceAsStream("ShokuhinLogo.png");
 			Image image = ImageIO.read(input);
+			
 			image = image.getScaledInstance(65, 55, Image.SCALE_SMOOTH);
 			ImageIcon icon = new ImageIcon(image); 
 			JLabel thumb = new JLabel();

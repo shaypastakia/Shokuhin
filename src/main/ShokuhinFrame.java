@@ -26,7 +26,6 @@ import mp3Player.MP3Player;
 import recipe.Recipe;
 import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
-import recipeSearch.RecipeSearch;
 import sqlEngine.AuthenticationPanel;
 
 /**
@@ -61,6 +60,7 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		this.setMinimumSize(new Dimension(1366,768));
 		this.setJMenuBar(createMenu());
 //		this.setVisible(true);
+		
 	}
 	
 	/**
@@ -103,24 +103,15 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		});
 		
 		//Add new modules to the 'Open New Tab' Menu
-		JMenuItem recipeEditor = new JMenuItem("Create a Recipe");
-		JMenuItem recipeSearch = new JMenuItem("Search for Recipes");
 		JMenuItem mp3Player = new JMenuItem("MP3 Player");
 		JMenuItem cloudManager = new JMenuItem("Cloud Manager");
-		JMenuItem sqlSync = new JMenuItem("Synchronise with Server");
 		JMenuItem sqlDel = new JMenuItem("Delete from Server");
 		
-		fileMenu.add(recipeEditor);
-		fileMenu.add(recipeSearch);
 		fileMenu.add(mp3Player);
 		fileMenu.add(cloudManager);
-		fileMenu.add(sqlSync);
 		fileMenu.add(sqlDel);
-		recipeEditor.addActionListener(this);
-		recipeSearch.addActionListener(this);
 		mp3Player.addActionListener(this);
 		cloudManager.addActionListener(this);
-		sqlSync.addActionListener(this);
 		sqlDel.addActionListener(this);
 		
 		//Add parsing menu item
@@ -141,6 +132,10 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 					String title = JOptionPane.showInputDialog(null, "Enter a title for the recipe:", recipe.getTitle());
 					if (title == null || title.equals(""))
 						return;
+					if (title.contains("&")){
+						ShokuhinMain.displayMessage("Invalid Character", "Recipe names cannot contain '&'.", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					ArrayList<String> titles = RecipeMethods.getRecipeFileNames();
 					for (String s : titles){
 						if (s.toLowerCase().equals(title.toLowerCase())){
@@ -174,32 +169,10 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		//All File->Open New Tab buttons are set to trigger this method.
 		//The switch statement determines which Menu Item was pressed, then requests for ShokuhinMain to open a new tab
 			switch(e.getActionCommand()) {
-			case "Create a Recipe": 
-				String name = JOptionPane.showInputDialog("Please enter a name for the new Recipe.");
-				if (name == null || name.trim().equals(""))
-					return;
-				
-				if (name.contains("&")){
-					ShokuhinMain.displayMessage("Invalid Character", "Recipe names cannot contain '&'.", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				ArrayList<String> names = RecipeMethods.getRecipeFileNames();
-				for (String s : names){
-					if (s.toLowerCase().trim().equals(name.toLowerCase().trim())){
-						ShokuhinMain.displayMessage("Recipe Exists", "A Recipe with this title already exists.", JOptionPane.WARNING_MESSAGE);
-						return;
-					}
-				}
-				main.openTab(new RecipeEditor(main, name));
-				break;
-			case "Search for Recipes": main.openTab(new RecipeSearch(main));
-				break;
 			case "MP3 Player": main.openTab(new MP3Player(main));
 				break;
 			case "Cloud Manager": main.openTab(new CloudManager(main));
 				break;
-			case "Synchronise with Server": authAndSync();
-            	break;
 			case "Delete from Server": deleteFromServer();
 			}
 	}
@@ -216,6 +189,8 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 	    		} catch (IOException ex){
 	    			ShokuhinMain.displayMessage("Token Error", "Unable to read details from 'token.mkey'.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
 	    		}
+	    	} else {
+	    		return;
 	    	}
 		}
 		
@@ -230,26 +205,6 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		}
 	}
 	
-	private void authAndSync(){
-		if (main.getSQLEngine() != null){
-			main.getSQLEngine().synchronise(false);
-			return;
-		}
-		
-		AuthenticationPanel panel = new AuthenticationPanel();
-    	if (panel.succeeded()){
-    		try {
-    			List<String> details = panel.getDetails();
-    			if (details != null){
-	    			main.initialiseSQLEngine(details);
-	    			main.getSQLEngine().synchronise(false);
-    			}
-    		} catch (IOException ex){
-    			ShokuhinMain.displayMessage("Token Error", "Unable to read details from 'token.mkey'.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
-    		}
-    	}
-	}
-
 	@Override
 	public void windowActivated(WindowEvent e) {
 	}

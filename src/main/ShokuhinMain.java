@@ -2,19 +2,19 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -30,7 +30,7 @@ import home.ShokuhinHome;
 import mp3Player.MP3Player;
 import recipe.Recipe;
 import recipe.RecipeMethods;
-import recipeSearch.RecipeSearch;
+import sqlEngine.AuthenticationPanel;
 import sqlEngine.SQLEngine;
 
 /**
@@ -52,6 +52,11 @@ public class ShokuhinMain {
 	public static final Color FIFTY_SHADES_OF_WHITE = new Color(240, 240, 240);
 	public static final Color ANY_COLOUR_SO_LONG_AS_IT_IS_BLACK = new Color(0, 0, 0);
 	public static final Color DEFAULT_CAMPUS_FOG = new Color(214, 217, 223);
+	public static final Color PRETENTIOUS_ROYAL_PURPLE = new Color(128, 0, 128);
+	public static final Color FAR_MORE_PALETABLE_BLUE = new Color(0, 153, 255);
+	
+	public static Color themeColour;
+	public static String themeFontName;
 	
 	//Format to store Dates in.
 	public static final DateFormat format = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
@@ -61,7 +66,7 @@ public class ShokuhinMain {
 	
 	//Store the main components of the Window
 	JTabbedPane tabPane;
-	static ShokuhinFrame frame;
+	public static ShokuhinFrame frame;
 	public static TimerBar timer;
 	
 	//SQL Engine for server synchronisation
@@ -69,6 +74,7 @@ public class ShokuhinMain {
 	private static boolean sync = false;
 	
 	public String[] args;
+	
 	
 	/**
 	 * Constructor
@@ -78,6 +84,14 @@ public class ShokuhinMain {
 	 * Performs the Setup necessary for Shokuhin to run. 
 	 */
 	public ShokuhinMain(String[] args) {
+		//Assign the colour to use as the Home Theme
+		themeColour = FAR_MORE_PALETABLE_BLUE;
+		themeFontName = "Sans Serif";
+		
+		if (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
+			Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+			themeColour = PRETENTIOUS_ROYAL_PURPLE;
+		
 		//Assign the first Argument
 		if (args.length > 0)
 			this.args = args;
@@ -153,7 +167,6 @@ public class ShokuhinMain {
 		frame.add(timer);
 		
 		openTab(new ShokuhinHome(this));
-		openTab(new RecipeSearch(this));
 		tabPane.setSelectedIndex(0);
 		
 		frame.setVisible(true);
@@ -274,6 +287,26 @@ public class ShokuhinMain {
 		sync = _sync;
 	}
 	
+	public void authAndSync(){
+		if (getSQLEngine() != null){
+			getSQLEngine().synchronise(false);
+			return;
+		}
+		
+		AuthenticationPanel panel = new AuthenticationPanel();
+    	if (panel.succeeded()){
+    		try {
+    			List<String> details = panel.getDetails();
+    			if (details != null){
+	    			main.initialiseSQLEngine(details);
+	    			main.getSQLEngine().synchronise(false);
+    			}
+    		} catch (IOException ex){
+    			ShokuhinMain.displayMessage("Token Error", "Unable to read details from 'token.mkey'.\n" + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+    		}
+    	}
+	}
+	
 	/**
 	 * Main
 	 * Initialises a running instance of Shokuhin
@@ -301,17 +334,15 @@ public class ShokuhinMain {
 		}
 		
 //		 final String DB_URL = "jdbc:postgresql://localhost:5432/shokuhin";
-		 final String DB_URL = "jdbc:postgresql://ec2-54-75-243-54.eu-west-1.compute.amazonaws.com:5432/dbf52rl6p5vle7?sslmode=require";
-		 final String USER = "xcdfcxbkrhkdse";
-		 final String PASS = "";
-//		 final String USER = "read";////
+//		 final String USER = "read";
+//		 final String PASS = "read";
+//		 final String DB_URL = "jdbc:postgresql://ec2-54-75-243-54.eu-west-1.compute.amazonaws.com:5432/dbf52rl6p5vle7?sslmode=require";
+//		 final String USER = "xcdfcxbkrhkdse";
 //		 final String PASS = "";
 //		 System.out.println("Enter Password:");
 //		 Scanner sc = new Scanner(System.in);
-		 SQLEngine engine = new SQLEngine(DB_URL, USER, PASS);//sc.nextLine());
-		 for (String s : RecipeMethods.getRecipeFileNames()){
-			 engine.deleteRecipe(new Recipe(s));
-		 }
+//		 SQLEngine engine = new SQLEngine(DB_URL, USER, PASS);//sc.nextLine());
+
 		 Recipe old = RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/Brioche.rec"));
 
 //		 sc.close();

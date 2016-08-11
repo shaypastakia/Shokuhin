@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/jfugue-5.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/JavaMediaPlayer.jar"/>
-	<classpathentry kind="lib" path="lib/jsoup-1.8.1.jar"/>
-	<classpathentry kind="lib" path="lib/marytts/marytts-lang-en-5.1.2.jar"/>
-	<classpathentry kind="lib" path="lib/marytts/icu4j-54.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/marytts/marytts-runtime-5.1.2-jar-with-dependencies.jar"/>
-	<classpathentry kind="lib" path="lib/marytts/voice-cmu-slt-hsmm-5.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/cmu_us_kal.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/cmulex.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/en_us.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/freetts.jar"/>
 	<classpathentry kind="lib" path="lib/jl1.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/apache commons/commons-net-3.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/apache commons/commons-net-3.3.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar"/>
-	<classpathentry kind="lib" path="lib/jasypt-1.9.2-lite.jar"/>
-	<classpathentry kind="lib" path="lib/postgresql-9.4.1208.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
