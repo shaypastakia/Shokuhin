@@ -12,12 +12,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jfugue-5.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/JavaMediaPlayer.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/cmu_us_kal.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/cmulex.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/en_us.jar"/>
 	<classpathentry kind="lib" path="lib/freetts/freetts.jar"/>
-	<classpathentry kind="lib" path="lib/jl1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/JavaMediaPlayer.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

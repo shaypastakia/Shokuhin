@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.sql.Timestamp;
@@ -38,9 +37,8 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.event.MouseInputAdapter;
 
+import generalResources.MyMouseAdapter;
 import main.Module;
 import main.ShokuhinMain;
 import recipe.Recipe;
@@ -144,7 +142,7 @@ public class RecipeEditor extends Module{
 		ingredientsPane.setBorder(BorderFactory.createTitledBorder("Ingredients (Drag to reorder)"));
 		
 		//Code from http://stackoverflow.com/questions/3804361/how-to-enable-drag-and-drop-inside-jlist, by Grains
-		MyMouseAdaptor adaptor = new MyMouseAdaptor(ingredientsList, listModel);
+		MyMouseAdapter<String> adaptor = new MyMouseAdapter<String>(ingredientsList, listModel);
 		ingredientsList.addMouseListener(adaptor);
 		ingredientsList.addMouseMotionListener(adaptor);
 		//End code from
@@ -484,7 +482,8 @@ public class RecipeEditor extends Module{
 	public JMenu getFunctionMenu(){
 		JMenu menu = new JMenu("Recipe Editor");
 		
-		//A menu item that can be used when there are no functions to be displayed
+		// A menu item that can be used when there are no functions to be
+		// displayed
 		JMenuItem noFuncs = new JMenuItem("(No functions)");
 		noFuncs.setEnabled(false);
 		menu.add(noFuncs);
@@ -500,52 +499,4 @@ public class RecipeEditor extends Module{
 			saveButton.doClick();
 	}
 
-}
-
-/**
- * Class Code almost entirely from: http://stackoverflow.com/questions/3804361/how-to-enable-drag-and-drop-inside-jlist,
- * answer by Grains
- * @author Grains
- *
- */
-class MyMouseAdaptor extends MouseInputAdapter {
-    private boolean mouseDragging = false;
-    private int dragSourceIndex;
-    
-    //Addition to pass list and listModel
-    private JList<String> myList;
-    private DefaultListModel<String> myListModel;
-    
-    public MyMouseAdaptor(JList<String> list, DefaultListModel<String> model) {
-		myList = list;
-		myListModel = model;
-	}
-    //End addition
-    
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e)) {
-            dragSourceIndex = myList.getSelectedIndex();
-            mouseDragging = true;
-        }
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        mouseDragging = false;
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        if (mouseDragging) {
-            int currentIndex = myList.locationToIndex(e.getPoint());
-            if (currentIndex != dragSourceIndex) {
-                int dragTargetIndex = myList.getSelectedIndex();
-                String dragElement = myListModel.get(dragSourceIndex);
-                myListModel.remove(dragSourceIndex);
-                myListModel.add(dragTargetIndex, dragElement);
-                dragSourceIndex = currentIndex;
-            }
-        }
-    }
 }

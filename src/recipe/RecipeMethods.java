@@ -29,9 +29,9 @@ import org.jsoup.select.Elements;
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 
-import main.Pair;
+import generalResources.Pair;
 import main.ShokuhinMain;
-import mp3Player.MP3Player;
+import musicPlayer.MusicPlayer;
 
 /**
  * 
@@ -274,7 +274,7 @@ public class RecipeMethods {
 						}
 					}
 //					ingredients.add(new String(temp.replaceAll("\\. ", "\\.\n").getBytes(), "UTF-8"));
-					ingredients.add(temp.replaceAll("\\. ", "\\.\n"));
+					ingredients.add(temp.replaceAll("\\. ", "\\.\n").trim());
 				}
 				
 			}
@@ -380,20 +380,12 @@ public class RecipeMethods {
 	 * Speak out the Current Step with Mary, or fall back to Kevin if need be
 	 * @param text The text to be read out
 	 */
-	public static void read(String text, MP3Player mp3Player){
+	public static void read(String text, MusicPlayer musicPlayer){
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					boolean interrupted = false;
-					if (mp3Player != null){
-						if (mp3Player.getPlayerState() == 1){
-							mp3Player.interrupt();
-							interrupted = true;
-						} else {
-							interrupted = false;
-						}
-					}
+					//TODO PAUSE MEDIA PLAYER
 					System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
 					Voice voice;
 					VoiceManager voiceManager = VoiceManager.getInstance();
@@ -401,10 +393,7 @@ public class RecipeMethods {
 					voice.allocate();
 					voice.speak(text);
 					
-					if (mp3Player != null && interrupted){
-						while(voice.isLoaded()){}
-						mp3Player.resume();
-					}
+					//TODO RESUME MUSIC PLAYER
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -21,7 +21,7 @@ import javax.swing.SpinnerNumberModel;
 
 import midiPlayer.MidiPlayer;
 import midiPlayer.MidiSongs;
-import mp3Player.MP3Player;
+import musicPlayer.MusicPlayer;
 
 /**
  * TimerBar
@@ -65,15 +65,15 @@ public class TimerBar extends JPanel {
 		
 		//Set the size and font of Spinners, Colon labels and Start/Stop Buttons
 		hour.setMaximumSize(new Dimension(100, 500));
-		hour.setFont(new Font("Times New Roman", Font.PLAIN, 26));
-		septimus.setFont(new Font("Times New Roman", Font.BOLD, 30));
+		hour.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+		septimus.setFont(new Font("Sans Serif", Font.BOLD, 30));
 		mins.setMaximumSize(new Dimension(100, 500));
-		mins.setFont(new Font("Times New Roman", Font.PLAIN, 26));
-		septimusPrime.setFont(new Font("Times New Roman", Font.BOLD, 30));
+		mins.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+		septimusPrime.setFont(new Font("Sans Serif", Font.BOLD, 30));
 		secs.setMaximumSize(new Dimension(100, 500));
-		secs.setFont(new Font("Times New Roman", Font.PLAIN, 26));
-		start.setFont(new Font("Times New Roman", Font.PLAIN, 26));
-		stop.setFont(new Font("Times New Roman", Font.PLAIN, 26));
+		secs.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+		start.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+		stop.setFont(new Font("Sans Serif", Font.PLAIN, 26));
 		
 		//Center the text of all Spinners
 		JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)hour.getEditor();
@@ -154,9 +154,12 @@ public class TimerBar extends JPanel {
 				//Cancel the timer, stop the melody, disable the Stop button, enable the Start button, and restore the background colour
 				timer.cancel();
 				MidiPlayer.stop();
-				MP3Player player = main.getPlayer();
-				if (player != null && interrupted)
-					player.resume();
+				MusicPlayer player = main.getPlayer();
+				//TODO RESUME THE MP3 PLAYER
+				if (interrupted){
+					interrupted = false;
+					player.interruptPlay();
+				}
 				stop.setEnabled(false);
 				start.setEnabled(true);
 				setBackground(ShokuhinMain.DEFAULT_CAMPUS_FOG);
@@ -210,15 +213,13 @@ public class TimerBar extends JPanel {
 	 *  Produce an audiovisual alarm and stop the Timer
 	 */
 	private void alert(){
-		MP3Player player = main.getPlayer();
-		if (player != null){
-			if (player.getPlayerState() == 1){
-				player.interrupt();
-				interrupted = true;
-			} else {
-				interrupted = false;
-			}
+		MusicPlayer player = main.getPlayer();
+		//TODO PAUSE MUSIC WHEN NECESSARY
+		if (player.isPlaying()){
+			player.interruptPause();
+			interrupted = true;
 		}
+		
 		MidiPlayer.play(MidiSongs.FF7_PRELUDE); //audio
 		setBackground(ShokuhinMain.REDRUM_RED); //visual
 		timer.cancel();

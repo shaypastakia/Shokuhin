@@ -15,7 +15,7 @@ import main.ShokuhinMain;
  * Encrypts and Decrypts a String, using the Password provided in the Constructor.
  * <br>
  * Uses the jasypt library
- * @author Shaylen
+ * @author Shaylen Pastakia
  *
  */
 public class CryptEngine {

@@ -2,7 +2,6 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
@@ -27,9 +26,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 
 import home.ShokuhinHome;
-import mp3Player.MP3Player;
-import recipe.Recipe;
-import recipe.RecipeMethods;
+import musicPlayer.MusicPlayer;
 import sqlEngine.AuthenticationPanel;
 import sqlEngine.SQLEngine;
 
@@ -239,11 +236,11 @@ public class ShokuhinMain {
 	 * 
 	 * @return The first instance of an MP3Player Module
 	 */
-	public MP3Player getPlayer(){
+	public MusicPlayer getPlayer(){
 		Component[] comps = tabPane.getComponents();
 		for (Component c : comps)
-			if (c instanceof MP3Player)
-				return (MP3Player) c;
+			if (c instanceof MusicPlayer)
+				return (MusicPlayer) c;
 		return null;
 	}
 	
@@ -343,7 +340,7 @@ public class ShokuhinMain {
 //		 Scanner sc = new Scanner(System.in);
 //		 SQLEngine engine = new SQLEngine(DB_URL, USER, PASS);//sc.nextLine());
 
-		 Recipe old = RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/Brioche.rec"));
+//		 Recipe old = RecipeMethods.readRecipe(new File("./Shokuhin/Recipes/Brioche.rec"));
 
 //		 sc.close();
 		 System.exit(0);

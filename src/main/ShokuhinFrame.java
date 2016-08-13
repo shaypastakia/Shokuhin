@@ -22,7 +22,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import cloudManager.CloudManager;
-import mp3Player.MP3Player;
+import musicPlayer.MusicPlayer;
 import recipe.Recipe;
 import recipe.RecipeMethods;
 import recipeEditor.RecipeEditor;
@@ -103,14 +103,14 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		});
 		
 		//Add new modules to the 'Open New Tab' Menu
-		JMenuItem mp3Player = new JMenuItem("MP3 Player");
+		JMenuItem musicPlayer = new JMenuItem("Music Player");
 		JMenuItem cloudManager = new JMenuItem("Cloud Manager");
 		JMenuItem sqlDel = new JMenuItem("Delete from Server");
 		
-		fileMenu.add(mp3Player);
+		fileMenu.add(musicPlayer);
 		fileMenu.add(cloudManager);
 		fileMenu.add(sqlDel);
-		mp3Player.addActionListener(this);
+		musicPlayer.addActionListener(this);
 		cloudManager.addActionListener(this);
 		sqlDel.addActionListener(this);
 		
@@ -169,7 +169,7 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		//All File->Open New Tab buttons are set to trigger this method.
 		//The switch statement determines which Menu Item was pressed, then requests for ShokuhinMain to open a new tab
 			switch(e.getActionCommand()) {
-			case "MP3 Player": main.openTab(new MP3Player(main));
+			case "Music Player": main.openTab(new MusicPlayer(main));
 				break;
 			case "Cloud Manager": main.openTab(new CloudManager(main));
 				break;
