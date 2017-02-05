@@ -17,6 +17,9 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import generalResources.GuiMethods;
+import main.ShokuhinMain;
+
 /**
  * @author Shaylen Pastakia
  *<br>
@@ -27,21 +30,21 @@ import javax.swing.SwingConstants;
 public class IngredientsDialog extends JDialog implements KeyListener{
 
 	private static final long serialVersionUID = -2415235021335302898L;
-	private JPanel panel = new JPanel();
+	private JPanel panel = GuiMethods.getStyledJPanel();//new JPanel();
 	private JPanel buttonPanel = new JPanel();
 	JTextField ingredient = new JTextField();
 	private JPanel okPanel = new JPanel();
 	
-	private JLabel label = new JLabel("Please enter the quantity and name of the new Ingredient");
+	private JLabel label = GuiMethods.getStyledJLabel("Enter the quantity and name of the new Ingredient", 14);
 	
-	private JButton okButton = new JButton("OK");
-	JButton cancelButton = new JButton("Cancel");
+	private JButton okButton = GuiMethods.getStyledJButton("OK", 20);
+	JButton cancelButton = GuiMethods.getStyledJButton("Cancel", 20);
 	
-	private JButton half = new JButton("\u00BD");
-	private JButton third = new JButton("\u2153");
-	private JButton twoThird = new JButton("\u2154");
-	private JButton quart = new JButton("\u00BC");
-	private JButton threeQuart = new JButton("\u00BE");
+	private JButton half = GuiMethods.getStyledJButton("\u00BD", 20);
+	private JButton third = GuiMethods.getStyledJButton("\u2153", 20);
+	private JButton twoThird = GuiMethods.getStyledJButton("\u2154", 20);
+	private JButton quart = GuiMethods.getStyledJButton("\u00BC", 20);
+	private JButton threeQuart = GuiMethods.getStyledJButton("\u00BE", 20);
 	private JCheckBox header = new JCheckBox("Sub-Heading");
 	
 	private String title = "Enter the Quantity and Name of Ingredient";
@@ -76,16 +79,24 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 		buttonPanel.add(twoThird);
 		buttonPanel.add(quart);
 		buttonPanel.add(threeQuart);
+		buttonPanel.setOpaque(false);
+		okPanel.setOpaque(false);
+		header.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 16));
+		header.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
 		
 		int max = buttonPanel.getComponentCount();
 		for (int i = 0; i < max; i++){
-			buttonPanel.getComponent(i).setFont(new Font("Times New Roman", Font.PLAIN, 18));
+			buttonPanel.getComponent(i).setFont(new Font("Times New Roman", Font.PLAIN, 24));
 			((JButton) buttonPanel.getComponent(i)).addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					ingredient.setText(ingredient.getText() + e.getActionCommand() + " ");
+					int i = ingredient.getCaretPosition();
+					String temp = ingredient.getText();
+					temp = temp.substring(0, i) + e.getActionCommand() + " " + temp.substring(i, temp.length());
+					ingredient.setText(temp);
 					ingredient.requestFocusInWindow();
+					ingredient.setCaretPosition(i+2);
 				}
 			});
 		}
@@ -125,7 +136,7 @@ public class IngredientsDialog extends JDialog implements KeyListener{
 		panel.add(okPanel);
 		
 		this.setContentPane((panel));
-		setMinimumSize(new Dimension(400, 190));
+		setMinimumSize(new Dimension(400, 220));
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}

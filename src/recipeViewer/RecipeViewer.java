@@ -1,7 +1,6 @@
 package recipeViewer;
 
 import java.awt.Dimension;
-
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,9 +18,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
+import generalResources.GuiMethods;
 import main.Module;
 import main.ShokuhinMain;
 import recipe.Recipe;
@@ -43,13 +44,19 @@ public class RecipeViewer extends Module
 
 	// Panel structure for Recipe Viewer, indicated by indentation
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-	private JScrollPane ingredientsPane = new JScrollPane();
+	private JPanel leftPane = GuiMethods.getStyledJPanel();
+	private JScrollPane ingredientsPane = GuiMethods.getStyledJScrollPane();
 	private JPanel methodPane = new JPanel();
-	private JScrollPane firstStepPane = new JScrollPane();
-	private JScrollPane secondStepPane = new JScrollPane();
-	private JScrollPane thirdStepPane = new JScrollPane();
-	private JPanel controlPane = new JPanel();
-	private JPanel infoPane = new JPanel();
+	
+	private JPanel firstPane = GuiMethods.getStyledJPanel();
+	private JPanel secondPane = GuiMethods.getStyledJPanel();
+	private JPanel thirdPane = GuiMethods.getStyledJPanel();
+	
+	private JScrollPane firstStepPane = GuiMethods.getStyledJScrollPane();//new JScrollPane();
+	private JScrollPane secondStepPane = GuiMethods.getStyledJScrollPane();// new JScrollPane();
+	private JScrollPane thirdStepPane = GuiMethods.getStyledJScrollPane();//new JScrollPane();
+	private JPanel controlPane = GuiMethods.getStyledJPanel();
+	private JPanel infoPane = GuiMethods.getStyledJPanel();
 
 	// Data structures used in Recipe Viewer
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
@@ -58,13 +65,13 @@ public class RecipeViewer extends Module
 
 	// Swing objects used in Recipe Viewer
 	private JList<String> ingredientsList = new JList<String>(listModel);
-	private JTextArea firstStepText = new JTextArea();
-	private JTextArea secondStepText = new JTextArea();
-	private JTextArea thirdStepText = new JTextArea();
-	private JTextArea infoText = new JTextArea();
-	private JButton previousButton = new JButton("<- Previous Step");
-	private JButton readButton = new JButton("Read out Current Step");
-	private JButton nextButton = new JButton("Next Step ->");
+	private JTextArea firstStepText = GuiMethods.getStyledJTextArea(14);//new JTextArea();
+	private JTextArea secondStepText = GuiMethods.getStyledJTextArea(14);//new JTextArea();
+	private JTextArea thirdStepText = GuiMethods.getStyledJTextArea(14);//new JTextArea();
+	private JTextArea infoText = GuiMethods.getStyledJTextArea(14);//new JTextArea();
+	private JButton previousButton = GuiMethods.getStyledJButton("<- Previous Step", 20);
+	private JButton readButton = GuiMethods.getStyledJButton("Read out Current Step", 20);
+	private JButton nextButton = GuiMethods.getStyledJButton("Next Step ->", 20);
 
 	/**
 	 * Constructor
@@ -81,42 +88,56 @@ public class RecipeViewer extends Module
 		this.main = m;
 
 		// Configure the Panel structures and layouts
-		splitPane.setLeftComponent(ingredientsPane);
+		splitPane.setLeftComponent(leftPane);
 		splitPane.setRightComponent(methodPane);
-		ingredientsPane.setMinimumSize(new Dimension(200, 0));
+		splitPane.setDividerLocation(300);
+		leftPane.setMinimumSize(new Dimension(200, 0));
 		ingredientsPane.setViewportView(ingredientsList);
-
+		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
+		leftPane.add(ingredientsPane);
+		
+		ingredientsList.setBackground(ShokuhinMain.themeColour);
+		ingredientsList.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+		ingredientsList.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 14));
+		
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		methodPane.setLayout(new BoxLayout(methodPane, BoxLayout.PAGE_AXIS));
 		controlPane.setLayout(new BoxLayout(controlPane, BoxLayout.LINE_AXIS));
 		infoPane.setLayout(new BoxLayout(infoPane, BoxLayout.PAGE_AXIS));
 
 		// Set up Panel structure
-		methodPane.add(firstStepPane);
-		methodPane.add(secondStepPane);
-		methodPane.add(thirdStepPane);
+		firstPane.setLayout(new BoxLayout(firstPane, BoxLayout.PAGE_AXIS));
+		secondPane.setLayout(new BoxLayout(secondPane, BoxLayout.PAGE_AXIS));
+		thirdPane.setLayout(new BoxLayout(thirdPane, BoxLayout.PAGE_AXIS));
+		firstPane.add(firstStepPane);
+		secondPane.add(secondStepPane);
+		thirdPane.add(thirdStepPane);
+		
+		methodPane.add(firstPane);
+		methodPane.add(getSeparator());
+		methodPane.add(secondPane);
+		methodPane.add(getSeparator());
+		methodPane.add(thirdPane);
+		methodPane.add(getSeparator());
 		methodPane.add(controlPane);
+		methodPane.add(getSeparator());
 		methodPane.add(infoPane);
 
 		// Set up Borders for Panels
-		firstStepPane.setBorder(BorderFactory.createTitledBorder("Previous Step"));
-		secondStepPane.setBorder(BorderFactory.createTitledBorder("Current Step (Use Arrow Keys to traverse steps, and Space button to Read Step)"));
-		thirdStepPane.setBorder(BorderFactory.createTitledBorder("Next Step"));
-		infoPane.setBorder(BorderFactory.createTitledBorder("Information"));
+//		firstStepPane.setBorder(BorderFactory.createTitledBorder("Previous Step"));
+//		secondStepPane.setBorder(BorderFactory.createTitledBorder("Current Step (Use Arrow Keys to traverse steps, and Space button to Read Step)"));
+//		thirdStepPane.setBorder(BorderFactory.createTitledBorder("Next Step"));
+//		infoPane.setBorder(BorderFactory.createTitledBorder("Information"));
 
 		// Set up Swing items
 		firstStepPane.setViewportView(firstStepText);
 		secondStepPane.setViewportView(secondStepText);
 		thirdStepPane.setViewportView(thirdStepText);
+		infoText.setBorder(BorderFactory.createEmptyBorder());
 		infoPane.add(infoText);
 		controlPane.add(previousButton);
 		controlPane.add(readButton);
 		controlPane.add(nextButton);
-
-		// Set fonts for JButtons
-		previousButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
-		readButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
-		nextButton.setFont(new Font("SansSerif", Font.PLAIN, 20));
 
 		// Set up Listeners for JButtons
 		previousButton.addActionListener(new ActionListener()
@@ -133,7 +154,7 @@ public class RecipeViewer extends Module
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				RecipeMethods.read(secondStepText.getText(), getPar().getPlayer());
+				RecipeMethods.read(getPar(), secondStepText.getText());
 			}
 		});
 		nextButton.addActionListener(new ActionListener()
@@ -199,8 +220,13 @@ public class RecipeViewer extends Module
 	private void displayRecipe()
 	{
 		// Add all Ingredients to the JList
-		for (String s : recipe.getIngredients())
+		for (String s : recipe.getIngredients()){
+			if (s.contains("<html>")){
+				s = s.replaceAll("<html>", "<html><p style=\"color:black;\">");
+				s = s.replaceAll("</html>", "</p></html>");
+			}
 			listModel.addElement(s);
+		}
 
 		// Load the first two steps
 		steps.addAll(recipe.getMethodSteps());
@@ -247,7 +273,7 @@ public class RecipeViewer extends Module
 			previousSteps.push(s);
 			secondStepText.setText(s);
 			if (autoRead)
-				RecipeMethods.read(s, getPar().getPlayer());
+				RecipeMethods.read(getPar(), s);
 			s = steps.peek();
 			thirdStepText.setText(s);
 			firstStepText.setText(temp);
@@ -321,6 +347,12 @@ public class RecipeViewer extends Module
 			previousButton.doClick();
 		else if (e.getKeyCode() == KeyEvent.VK_RIGHT && e.getID() == KeyEvent.KEY_RELEASED)
 			nextButton.doClick();
+	}
+	
+	public JSeparator getSeparator(){
+		JSeparator septimus = new JSeparator();
+		septimus.setMaximumSize(new Dimension(9999, 15));
+		return septimus;
 	}
 
 }

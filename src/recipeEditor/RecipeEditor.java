@@ -38,6 +38,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import generalResources.GuiMethods;
 import generalResources.MyMouseAdapter;
 import main.Module;
 import main.ShokuhinMain;
@@ -56,13 +57,14 @@ public class RecipeEditor extends Module{
 	
 	// Panel structure for Recipe Editor
 	private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-	private JPanel ingredientsPane = new JPanel();
-	private JScrollPane ingredientsScroll = new JScrollPane();
+	private JPanel ingredientsPane = GuiMethods.getStyledJPanel();//new JPanel();
+	private JScrollPane ingredientsScroll = GuiMethods.getStyledJScrollPane();//new JScrollPane();
 	private JPanel ingredientsButtonPane = new JPanel();
-	private JScrollPane firstStepPane = new JScrollPane();
+	private JPanel methodContainer = GuiMethods.getStyledJPanel();
+	private JScrollPane methodStepPane = GuiMethods.getStyledJScrollPane();//new JScrollPane();
 	private JPanel controlPane = new JPanel();
-	private JPanel buttonPane = new JPanel();
-	private JPanel infoPane = new JPanel();
+	private JPanel buttonPane = GuiMethods.getStyledJPanel();//new JPanel();
+	private JPanel infoPane = GuiMethods.getStyledJPanel();//new JPanel();
 	private JPanel generalPane = new JPanel();
 	private JPanel tagsPane = new JPanel();
 
@@ -73,17 +75,17 @@ public class RecipeEditor extends Module{
 	// Swing objects used in Recipe Editor
 	private JList<String> ingredientsList = new JList<String>(listModel);
 	private JTextArea methodText = new JTextArea();
-	private JButton previousButton = new JButton("<- Previous Step");
+	private JButton previousButton = GuiMethods.getStyledJButton("<- Previous Step", 16);
 	private JLabel stepCurrent = new JLabel("0", SwingConstants.RIGHT);
-	JLabel sepLabel = new JLabel("/");
+	JLabel sepLabel = GuiMethods.getStyledJLabel("/", 16);
 	private JLabel stepMax = new JLabel("0", SwingConstants.LEFT);
-	private JButton nextButton = new JButton("Next Step/Add Step To End->");
-	private JButton insButton = new JButton("Insert Step");
-	private JButton delButton = new JButton("Delete Step");
-	private JButton addButton = new JButton("Add");
-	private JButton editButton = new JButton("Edit");
-	private JButton remButton = new JButton("Remove");
-	private JButton saveButton = new JButton("Save Recipe");
+	private JButton nextButton = GuiMethods.getStyledJButton("Next Step/Add Step To End->", 16);
+	private JButton insButton = GuiMethods.getStyledJButton("Insert Step", 16);
+	private JButton delButton = GuiMethods.getStyledJButton("Delete Step", 16);
+	private JButton addButton = GuiMethods.getStyledJButton("Add", 16);//new JButton("Add");
+	private JButton editButton = GuiMethods.getStyledJButton("Edit", 16);
+	private JButton remButton = GuiMethods.getStyledJButton("Remove", 16);
+	private JButton saveButton = GuiMethods.getStyledJButton("Save Recipe", 16);
 	
 	private String[] courseValues = new String[]{"Breakfast", "Lunch", "Dinner", "Dessert", "Snack", "General"};
 	private JComboBox<String> courseCombo = new JComboBox<String>(courseValues);
@@ -139,32 +141,40 @@ public class RecipeEditor extends Module{
 		ingredientsPane.add(ingredientsScroll);
 		ingredientsPane.add(ingredientsButtonPane);
 		ingredientsPane.setMinimumSize(new Dimension(300, 0));
-		ingredientsPane.setBorder(BorderFactory.createTitledBorder("Ingredients (Drag to reorder)"));
-		
+//		ingredientsPane.setBorder(BorderFactory.createTitledBorder("Ingredients (Drag to reorder)"));
+		ingredientsPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+				
 		//Code from http://stackoverflow.com/questions/3804361/how-to-enable-drag-and-drop-inside-jlist, by Grains
 		MyMouseAdapter<String> adaptor = new MyMouseAdapter<String>(ingredientsList, listModel);
 		ingredientsList.addMouseListener(adaptor);
 		ingredientsList.addMouseMotionListener(adaptor);
 		//End code from
-		ingredientsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
+		ingredientsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		ingredientsList.setBackground(ShokuhinMain.themeColour);
+		ingredientsList.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 16));
+		ingredientsList.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
 		ingredientsButtonPane.setLayout(new BoxLayout(ingredientsButtonPane, BoxLayout.LINE_AXIS));
+		ingredientsButtonPane.setOpaque(false);
 		ingredientsButtonPane.add(addButton);
 		ingredientsButtonPane.add(editButton);
 		ingredientsButtonPane.add(remButton);
 		
 		splitPane.setRightComponent(controlPane);
 		controlPane.setLayout(new FlowLayout());
-		controlPane.add(firstStepPane);
-		firstStepPane.setViewportView(methodText);
-		firstStepPane.setBorder(BorderFactory.createTitledBorder("Method Step (Press CTRL + S to Save)"));
+		methodContainer.add(methodStepPane);
+		controlPane.add(methodContainer);
+		methodStepPane.setViewportView(methodText);
+//		firstStepPane.setBorder(BorderFactory.createTitledBorder("Method Step (Press CTRL + S to Save)"));
 		buttonPane.add(previousButton);
 		stepCurrent.setPreferredSize(new Dimension(50, 30));
 		stepMax.setPreferredSize(new Dimension(50, 30));
-		firstStepPane.setPreferredSize(new Dimension(1000, 300));
+		methodStepPane.setPreferredSize(new Dimension(1000, 300));
+		methodText.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 16));
+		methodText.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+		methodText.setBackground(ShokuhinMain.themeColour);
 
 		buttonPane.add(stepCurrent);
-		sepLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
 		buttonPane.add(sepLabel);
 		buttonPane.add(stepMax);
 		buttonPane.add(nextButton);
@@ -175,23 +185,30 @@ public class RecipeEditor extends Module{
 		buttonPane.add(saveButton);
 		controlPane.add(buttonPane);
 		
-		infoPane.setBorder(BorderFactory.createTitledBorder("Recipe Information"));
+		stepCurrent.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 16));
+		stepMax.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 16));
+		stepCurrent.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+		stepMax.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+		
+//		infoPane.setBorder(BorderFactory.createTitledBorder("Recipe Information"));
 		infoPane.setLayout(new BoxLayout(infoPane, BoxLayout.PAGE_AXIS));
-		generalPane.add(new JLabel("Course: "));
+		generalPane.add(GuiMethods.getStyledJLabel("Course: ", 16));
 		generalPane.add(courseCombo);
 		generalPane.add(Box.createHorizontalStrut(15));
-		generalPane.add(new JLabel("Rating: "));
+		generalPane.add(GuiMethods.getStyledJLabel("Rating: ", 16));
 		generalPane.add(ratingCombo);
 		generalPane.add(Box.createHorizontalStrut(15));
-		generalPane.add(new JLabel("Servings: "));
+		generalPane.add(GuiMethods.getStyledJLabel("Servings: ", 16));
 		generalPane.add(servesSpinner);
 		generalPane.add(Box.createHorizontalStrut(15));
-		generalPane.add(new JLabel("Preparation Time: "));
+		generalPane.add(GuiMethods.getStyledJLabel("Preparation Time: ", 16));
 		generalPane.add(prepSpinner);
 		generalPane.add(Box.createHorizontalStrut(15));
-		generalPane.add(new JLabel("Cooking Time: "));
+		generalPane.add(GuiMethods.getStyledJLabel("Cooking Time: ", 16));
 		generalPane.add(cookSpinner);
-		tagsPane.add(new JLabel("Tags: "));
+		generalPane.setOpaque(false);
+		tagsPane.add(GuiMethods.getStyledJLabel("Tags: ", 16));
+		tagsPane.setOpaque(false);
 		tagsPane.add(tagsText);
 		infoPane.add(generalPane);
 		infoPane.add(tagsPane);
@@ -201,8 +218,7 @@ public class RecipeEditor extends Module{
 		add(splitPane);
 		controlPane.add(infoPane);
 		
-		changeFont(this, new Font("SansSerif", Font.PLAIN, 16));
-		changeHeight(infoPane, 50);
+//		changeHeight(infoPane, 50);
 		
 		//Set up listeners for controls
 		nextButton.addActionListener(new ActionListener() {
@@ -334,8 +350,13 @@ public class RecipeEditor extends Module{
 		if (recipe == null)
 			return false;
 		
-		for (String s : recipe.getIngredients())
+		for (String s : recipe.getIngredients()){
+			if (s.contains("<html>")){
+				s = s.replaceAll("<html>", "<html><p style=\"color:black;\">");
+				s = s.replaceAll("</html>", "</p></html>");
+			}
 			listModel.addElement(s);
+		}
 		
 		steps = recipe.getMethodSteps();
 		
@@ -432,30 +453,11 @@ public class RecipeEditor extends Module{
 	}
 	
 	/**
-	 * Method from http://stackoverflow.com/questions/12730230/set-the-same-font-for-all-component-java
-	 * <br>
-	 * Answer by: Mikle Garin
-	 * @param component The Parent window to apply Font to
-	 * @param font The Font to apply
-	 */
-	private void changeFont ( Component component, Font font )
-	{
-	    component.setFont ( font );
-	    if ( component instanceof Container )
-	    {
-	        for ( Component child : ( ( Container ) component ).getComponents () )
-	        {
-	            changeFont ( child, font );
-	        }
-	    }
-	}
-	
-	/**
 	 * Method based on http://stackoverflow.com/questions/12730230/set-the-same-font-for-all-component-java
 	 * <br>
 	 * Answer by: Mikle Garin
 	 * @param component The Parent window to apply Max Height to
-	 * @param font The Font to apply
+	 * @param height The height to apply
 	 */
 	private void changeHeight ( Component component, int height)
 	{

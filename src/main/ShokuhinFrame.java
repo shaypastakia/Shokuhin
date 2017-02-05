@@ -21,7 +21,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import cloudManager.CloudManager;
 import musicPlayer.MusicPlayer;
 import recipe.Recipe;
 import recipe.RecipeMethods;
@@ -56,7 +55,7 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		this.addWindowListener(this);
 		this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 		//Set the window size to the minimally standard resolution of a Laptop
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setMinimumSize(new Dimension(1366,768));
 		this.setJMenuBar(createMenu());
 //		this.setVisible(true);
@@ -104,14 +103,11 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		
 		//Add new modules to the 'Open New Tab' Menu
 		JMenuItem musicPlayer = new JMenuItem("Music Player");
-		JMenuItem cloudManager = new JMenuItem("Cloud Manager");
 		JMenuItem sqlDel = new JMenuItem("Delete from Server");
 		
 		fileMenu.add(musicPlayer);
-		fileMenu.add(cloudManager);
 		fileMenu.add(sqlDel);
 		musicPlayer.addActionListener(this);
-		cloudManager.addActionListener(this);
 		sqlDel.addActionListener(this);
 		
 		//Add parsing menu item
@@ -170,8 +166,6 @@ public class ShokuhinFrame extends JFrame implements ActionListener, WindowListe
 		//The switch statement determines which Menu Item was pressed, then requests for ShokuhinMain to open a new tab
 			switch(e.getActionCommand()) {
 			case "Music Player": main.openTab(new MusicPlayer(main));
-				break;
-			case "Cloud Manager": main.openTab(new CloudManager(main));
 				break;
 			case "Delete from Server": deleteFromServer();
 			}

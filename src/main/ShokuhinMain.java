@@ -2,6 +2,8 @@ package main;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
@@ -333,8 +335,6 @@ public class ShokuhinMain {
 //		 final String DB_URL = "jdbc:postgresql://localhost:5432/shokuhin";
 //		 final String USER = "read";
 //		 final String PASS = "read";
-//		 final String DB_URL = "jdbc:postgresql://ec2-54-75-243-54.eu-west-1.compute.amazonaws.com:5432/dbf52rl6p5vle7?sslmode=require";
-//		 final String USER = "xcdfcxbkrhkdse";
 //		 final String PASS = "";
 //		 System.out.println("Enter Password:");
 //		 Scanner sc = new Scanner(System.in);

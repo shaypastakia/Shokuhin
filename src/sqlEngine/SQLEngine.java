@@ -64,6 +64,10 @@ public class SQLEngine {
 	 * @param silent True, if the user should be prompted with a confirmation dialog. False, if the process should perform without dialogs.<br>Any errors will still result in dialogs.
 	 */
 	public boolean synchronise(boolean silent){
+		
+		if (!connect())
+			return false;
+		
 		final ArrayList<String> originalLocal = RecipeMethods.getRecipeFileNames();
 		final ArrayList<String> originalRemote = getAllRecipeTitles();
 		
@@ -730,7 +734,7 @@ public class SQLEngine {
 			return true;
 			
 		} catch (SQLException e){
-			e.printStackTrace();
+			ShokuhinMain.displayMessage("Unable to connect", "Unable to connect to the SQL Server. Please check your internet connection.", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 	}

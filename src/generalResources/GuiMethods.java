@@ -10,8 +10,11 @@ import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ListModel;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
@@ -19,8 +22,14 @@ import main.ShokuhinMain;
 
 public class GuiMethods {
 	
-	public static JLabel getStyledJLabel(int fontSize){
-		JLabel label = new JLabel();
+	public static JPanel getTransparentJPanel(){
+		JPanel p = new JPanel();
+		p.setOpaque(false);
+		return p;
+	}
+	
+	public static JLabel getStyledJLabel(String text, int fontSize){
+		JLabel label = new JLabel(text);
 		label.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, fontSize));
 		label.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
 		label.setOpaque(false);
@@ -33,10 +42,19 @@ public class GuiMethods {
 		c.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, fontSize));
 		c.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
 		c.setContentAreaFilled(false);
-		c.setBorderPainted(true);
 		c.addMouseListener(new HoverMouseListener());
-		
+		c.setBorderPainted(false);
 		return c;
+	}
+	
+	public static JTextArea getStyledJTextArea(int fontSize){
+		JTextArea text = new JTextArea();
+		text.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, fontSize));
+		
+		text.setBackground(ShokuhinMain.themeColour);
+		text.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+		
+		return text;
 	}
 
 	public static JPanel getStyledJPanel(){
@@ -57,10 +75,17 @@ public class GuiMethods {
 		return panel;
 	}
 	
+	public static <T> JList<T> getStyledJList(ListModel<T> listModel, int fontSize){
+		JList<T> list = new JList<T>(listModel);
+		list.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+		list.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, fontSize));
+		list.setBackground(ShokuhinMain.themeColour);
+		return list;
+	}
+	
 	public static JScrollPane getStyledJScrollPane(){
 		JScrollPane pane = new JScrollPane(){
 			private static final long serialVersionUID = -4823426376560198438L;
-
 			@Override
 			public void setBorder(Border border) {}
 		};

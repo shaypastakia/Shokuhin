@@ -60,7 +60,7 @@ public class MusicPlayer extends Module implements PlayerEventListener {
 
 	JPanel timePanel = GuiMethods.getStyledJPanel();
 	JSlider timeSlider = new JSlider();
-	JLabel timeLabel = GuiMethods.getStyledJLabel(20);
+	JLabel timeLabel = GuiMethods.getStyledJLabel("", 20);
 
 	DefaultListModel<File> listModel = new DefaultListModel<File>();
 	JList<File> list = new JList<File>(listModel);
@@ -234,7 +234,7 @@ public class MusicPlayer extends Module implements PlayerEventListener {
 
 		controlButtonPanel.setLayout(new BoxLayout(controlButtonPanel, BoxLayout.LINE_AXIS));
 		timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.LINE_AXIS));
-		JLabel label = GuiMethods.getStyledJLabel(20);
+		JLabel label = GuiMethods.getStyledJLabel("", 20);
 		label.setText("Time:  ");
 		timePanel.add(label);
 		timePanel.add(timeSlider);
@@ -285,9 +285,15 @@ public class MusicPlayer extends Module implements PlayerEventListener {
 
 	@Override
 	public boolean close() {
+		try {
+			playerInternal.stopSync();
+		} catch (InterruptedException e){
+			playerInternal.stop();
+		}
 		ShokuhinMain.timer.remove(timerPlayButton);
 		ShokuhinMain.timer.remove(timerPrevButton);
 		ShokuhinMain.timer.remove(timerNextButton);
+		ShokuhinMain.timer.repaint();
 		return true;
 	}
 

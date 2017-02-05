@@ -1,5 +1,7 @@
 package recipeSearch;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -35,6 +37,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import generalResources.GuiMethods;
 import main.Module;
 import main.ShokuhinMain;
 import recipe.Recipe;
@@ -51,34 +54,34 @@ public class RecipeSearch extends Module implements ActionListener{
 	private static final long serialVersionUID = -8627032843621798303L;
 
 	//Do not adjust Indents! Represents Nesting of Panels
-	JPanel firstPanel = new JPanel();
-		JPanel titlePanel = new JPanel();
-			JPanel textPanel = new JPanel();
-			JPanel controlPanel = new JPanel();
-				JPanel searchPanel = new JPanel();
-					JPanel searchSelector = new JPanel();
-				JPanel goPanel = new JPanel();
-		JPanel advancedPanel = new JPanel();
-			JPanel advTextPanel = new JPanel();
-				JPanel ingredientsPanel = new JPanel();
-				JPanel tagsPanel = new JPanel();
-			JPanel othersPanel = new JPanel();
-				JPanel firstRowPanel = new JPanel();
-					JPanel coursesPanel = new JPanel();
-					JPanel totalTimePanel = new JPanel();
-				JPanel secondRowPanel = new JPanel();
-					JPanel servingsPanel = new JPanel();
-					JPanel ratingsPanel = new JPanel();
-	JPanel secondPanel = new JPanel();
-		JScrollPane searchResultPanel = new JScrollPane();
-		JPanel searchControlPanel = new JPanel();
-			JPanel searchButtonPanel = new JPanel();
-			JScrollPane searchImageScrollPanel = new JScrollPane();
-				JPanel searchImagePanel = new JPanel();
+	JPanel firstPanel = GuiMethods.getStyledJPanel();//new JPanel();
+		JPanel titlePanel = GuiMethods.getTransparentJPanel();//new JPanel();
+			JPanel textPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+			JPanel controlPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+				JPanel searchPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+					JPanel searchSelector = GuiMethods.getTransparentJPanel();//new JPanel();
+				JPanel goPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+		JPanel advancedPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+			JPanel advTextPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+				JPanel ingredientsPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+				JPanel tagsPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+			JPanel othersPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+				JPanel firstRowPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+					JPanel coursesPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+					JPanel totalTimePanel = GuiMethods.getTransparentJPanel();//new JPanel();
+				JPanel secondRowPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+					JPanel servingsPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+					JPanel ratingsPanel = GuiMethods.getTransparentJPanel();//new JPanel();
+	JPanel secondPanel = GuiMethods.getTransparentJPanel();
+		JScrollPane searchResultPanel = GuiMethods.getStyledJScrollPane();
+		JPanel searchControlPanel = GuiMethods.getStyledJPanel();
+			JPanel searchButtonPanel = GuiMethods.getTransparentJPanel();
+			JScrollPane searchImageScrollPanel = GuiMethods.getStyledJScrollPane();
+				JPanel searchImagePanel = GuiMethods.getTransparentJPanel();
 				
 	//firstPanel fields
 	JTextField titleText = new JTextField(80);
-	JButton searchButton = new JButton("Search");
+	JButton searchButton = GuiMethods.getStyledJButton("Search", 30);
 	JRadioButton simpleRadio = new JRadioButton("Title Search");
 	JRadioButton advancedRadio = new JRadioButton("Advanced Search");
 	
@@ -104,10 +107,10 @@ public class RecipeSearch extends Module implements ActionListener{
 	
 	//Second Panel fields
 	DefaultListModel<String> listModel = new DefaultListModel<String>();
-	JList<String> searchResultList = new JList<String>(listModel);
-	JButton searchBackButton = new JButton("Return to Search");
-	JButton searchOpenButton = new JButton("Open Selected Recipes in Recipe Viewer");
-	JButton searchEditButton = new JButton("Edit Selected Recipes in Recipe Editor");
+	JList<String> searchResultList = GuiMethods.getStyledJList(listModel, 14);
+	JButton searchBackButton = GuiMethods.getStyledJButton("Return to Search", 16);
+	JButton searchOpenButton = GuiMethods.getStyledJButton("Open Selected Recipes in Recipe Viewer", 16);
+	JButton searchEditButton = GuiMethods.getStyledJButton("Edit Selected Recipes in Recipe Editor", 16);
 	
 	
 	public RecipeSearch(ShokuhinMain m) {
@@ -129,15 +132,15 @@ public class RecipeSearch extends Module implements ActionListener{
 		//Format JPanels
 		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.LINE_AXIS));
 		
-		titlePanel.setBorder(BorderFactory.createTitledBorder("Recipe Search"));
+//		titlePanel.setBorder(BorderFactory.createTitledBorder("Recipe Search"));
 		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.LINE_AXIS));
 		titlePanel.setMaximumSize(new Dimension(9999, 200));
 		
-		textPanel.setBorder(BorderFactory.createTitledBorder("Recipe Title"));
+//		textPanel.setBorder(BorderFactory.createTitledBorder("Recipe Title"));
 		
 		controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.PAGE_AXIS));
 		
-		searchSelector.setBorder(BorderFactory.createTitledBorder("Search Type"));
+//		searchSelector.setBorder(BorderFactory.createTitledBorder("Search Type"));
 		searchSelector.setLayout(new BoxLayout(searchSelector, BoxLayout.PAGE_AXIS));
 		
 		//Add listeners to Controls
@@ -157,19 +160,6 @@ public class RecipeSearch extends Module implements ActionListener{
 			}
 		});
 		
-//		titleText.addKeyListener(new KeyListener() {
-//			@Override
-//			public void keyTyped(KeyEvent arg0) {}
-//			@Override
-//			public void keyPressed(KeyEvent arg0) {}
-//			
-//			@Override
-//			public void keyReleased(KeyEvent arg0) {
-//				if (arg0.getKeyCode() == KeyEvent.VK_ENTER)
-//					actionPerformed(null);
-//			}
-//		});
-		
 		//Group Radio Controls together
 		ButtonGroup group = new ButtonGroup();
 		group.add(simpleRadio);
@@ -177,12 +167,11 @@ public class RecipeSearch extends Module implements ActionListener{
 		simpleRadio.setSelected(true);
 		
 		//Format the Search Button
-		searchButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 		searchButton.addActionListener(this);
 		
 		//Add all panels together
 		goPanel.add(searchButton);
-		textPanel.add(new JLabel("Enter Title here: "));
+		textPanel.add(GuiMethods.getStyledJLabel("Enter Title here: ", 14));
 		textPanel.add(titleText);
 		titlePanel.add(textPanel);
 		titlePanel.add(controlPanel);
@@ -195,7 +184,7 @@ public class RecipeSearch extends Module implements ActionListener{
 	
 	public void createBottomGui(){
 		//Set up the Layout and Border of the Advanced Search section
-		advancedPanel.setBorder(BorderFactory.createTitledBorder("Advanced Search"));
+//		advancedPanel.setBorder(BorderFactory.createTitledBorder("Advanced Search"));
 		advancedPanel.setLayout(new BoxLayout(advancedPanel, BoxLayout.PAGE_AXIS));
 		
 		//Prepare the first part of the section
@@ -205,9 +194,9 @@ public class RecipeSearch extends Module implements ActionListener{
 		tagsText.setMaximumSize(new Dimension(9999, 40));
 		ingredientsText.setMaximumSize(new Dimension(9999, 40));
 		
-		ingredientsPanel.add(new JLabel("Enter Ingredients here (Separated with Commas): "));
+		ingredientsPanel.add(GuiMethods.getStyledJLabel("Enter Ingredients here (Separated with Commas): ", 14));
 		ingredientsPanel.add(ingredientsText);
-		tagsPanel.add(new JLabel("Enter Tags here (Separated with Commas):            "));
+		tagsPanel.add(GuiMethods.getStyledJLabel("Enter Tags here (Separated with Commas):            ", 14));
 		tagsPanel.add(tagsText);
 		
 		advTextPanel.add(tagsPanel);
@@ -218,7 +207,7 @@ public class RecipeSearch extends Module implements ActionListener{
 		secondRowPanel.setLayout(new BoxLayout(secondRowPanel, BoxLayout.LINE_AXIS));
 		
 		coursesPanel.setMaximumSize(new Dimension(9999, 80));
-		coursesPanel.add(new JLabel("Select allowed Courses. Leave blank for any course: "));
+		coursesPanel.add(GuiMethods.getStyledJLabel("Select allowed Courses. Leave blank for any course: ", 14));
 		coursesPanel.add(breakfastCheckBox);
 		coursesPanel.add(lunchCheckBox);
 		coursesPanel.add(dinnerCheckBox);
@@ -229,7 +218,7 @@ public class RecipeSearch extends Module implements ActionListener{
 		SpinnerNumberModel timeModel = new SpinnerNumberModel(0, 0, 999, 1);
 		totalTime.setModel(timeModel);
 		totalTimePanel.setMaximumSize(new Dimension(9999, 80));
-		totalTimePanel.add(new JLabel("Enter a maximum total cooking Time. Select 0 for any time: "));
+		totalTimePanel.add(GuiMethods.getStyledJLabel("Enter a maximum total Time. Select 0 for any time: ", 14));
 		totalTimePanel.add(totalTime);
 		
 		coursesPanel.setBorder(BorderFactory.createTitledBorder("Course"));
@@ -240,11 +229,11 @@ public class RecipeSearch extends Module implements ActionListener{
 		SpinnerNumberModel servingsModel = new SpinnerNumberModel(0, 0, 16, 1);
 		servings.setModel(servingsModel);
 		servingsPanel.setMaximumSize(new Dimension(9999, 80));
-		servingsPanel.add(new JLabel("Select a minimum number of Servings. Select 0 for any serving: "));
+		servingsPanel.add(GuiMethods.getStyledJLabel("Select a minimum number of Servings. Select 0 for any serving: ", 14));
 		servingsPanel.add(servings);
 		
 		ratingsPanel.setMaximumSize(new Dimension(9999, 80));
-		ratingsPanel.add(new JLabel("Select allowed Ratings. Leave blank for any rating: "));
+		ratingsPanel.add(GuiMethods.getStyledJLabel("Select allowed Ratings. Leave blank for any rating: ", 14));
 		ratingsPanel.add(oneCheckBox);
 		ratingsPanel.add(twoCheckBox);
 		ratingsPanel.add(threeCheckBox);
@@ -259,6 +248,19 @@ public class RecipeSearch extends Module implements ActionListener{
 		advancedPanel.add(advTextPanel);
 		advancedPanel.add(firstRowPanel);
 		advancedPanel.add(secondRowPanel);
+		
+		for (Component c : coursesPanel.getComponents()){
+			if (c instanceof JCheckBox){
+				c.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 14));
+				c.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+			}
+		}
+		
+		simpleRadio.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 14));
+		simpleRadio.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+		advancedRadio.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 14));
+		advancedRadio.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
+
 	}
 	
 	/**
@@ -304,15 +306,10 @@ public class RecipeSearch extends Module implements ActionListener{
 		searchControlPanel.add(searchButtonPanel);
 		searchImageScrollPanel.setViewportView(searchImagePanel);
 		searchControlPanel.add(searchImageScrollPanel);
-		
 		secondPanel.setLayout(new BoxLayout(secondPanel, BoxLayout.LINE_AXIS));
 		
 		searchResultPanel.setBorder(BorderFactory.createTitledBorder("Results"));
-		searchControlPanel.setBorder(BorderFactory.createTitledBorder("Options"));
-		
-		searchBackButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		searchEditButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		searchOpenButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+//		searchControlPanel.setBorder(BorderFactory.createTitledBorder("Options"));
 		
 		//Add Action Listeners to buttons on second GUI
 		if (searchBackButton.getActionListeners().length == 0)

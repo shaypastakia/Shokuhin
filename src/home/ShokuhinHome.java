@@ -81,7 +81,7 @@ public class ShokuhinHome extends Module implements ActionListener, WindowStateL
 
 	private JLabel termLabel = new JLabel("Search Term: ");
 	private JTextField termText = new JTextField();
-	private JList<String> list = new JList<>(listModel);
+	private JList<String> list = GuiMethods.getStyledJList(listModel, 14);
 	private JButton openButton = GuiMethods.getStyledJButton("View", 20);
 	private JButton editButton = GuiMethods.getStyledJButton("Edit", 20);
 
@@ -113,8 +113,6 @@ public class ShokuhinHome extends Module implements ActionListener, WindowStateL
 
 		termLabel.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
 		termLabel.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 18));
-		list.setForeground(ShokuhinMain.FIFTY_SHADES_OF_WHITE);
-		list.setFont(new Font(ShokuhinMain.themeFontName, Font.BOLD, 14));
 
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
@@ -122,7 +120,9 @@ public class ShokuhinHome extends Module implements ActionListener, WindowStateL
 		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
 		leftPane.setMinimumSize(new Dimension(300, 0));
 		leftPane.setMaximumSize(new Dimension(400, 9999));
+		termText.setMinimumSize(new Dimension(0, 30));
 		termText.setMaximumSize(new Dimension(9999, 30));
+		termText.setColumns(20);
 		// resultPane.setMinimumSize(new Dimension(300, 0));
 		// leftPane.setPreferredSize(new Dimension(300, 0));
 		leftPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -134,8 +134,6 @@ public class ShokuhinHome extends Module implements ActionListener, WindowStateL
 		buttonPane.add(openButton);
 		buttonPane.add(editButton);
 		leftPane.add(buttonPane);
-
-		list.setBackground(ShokuhinMain.themeColour);
 
 		// Decorate the buttons on the left pane
 		decorButton(openButton, 20, 40);
@@ -207,7 +205,7 @@ public class ShokuhinHome extends Module implements ActionListener, WindowStateL
 		topPane.add(search);
 		topPane.add(sync);
 		rightPane.add(topPane, BorderLayout.NORTH);
-		rightPane.add(bottomPane, BorderLayout.PAGE_END);
+		rightPane.add(bottomPane, BorderLayout.SOUTH);
 
 		// Set panels to transparent, to show the background behind
 		topPane.setOpaque(false);
@@ -374,7 +372,7 @@ public class ShokuhinHome extends Module implements ActionListener, WindowStateL
 	 * Draw a background onto the HomeScreen
 	 */
 	@Override
-	protected void paintComponent(java.awt.Graphics g) {
+	protected void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
 
